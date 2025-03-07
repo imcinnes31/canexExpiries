@@ -11,11 +11,15 @@ export default function ModifyRecord() {
   const params = useParams();
   const navigate = useNavigate();
 
+  // CALLED ON FIRST RENDER, WHEN URL CHANGES IN SAME COMPONENT, OR WHEN "ID" PARAMETER IN URL CHANGES
   useEffect(() => {
     async function fetchData() {
+      // IF NO ID IN URL PARAMS, EXIT THIS
       const id = params.id?.toString() || undefined;
       if(!id) return;
+      // USE STATE HOOK SHOWS THAT WE ARE LOOKING AT AN EXISTING RECORD
       setIsNew(false);
+      // GET DATA FOR SINGLE RECORD
       const response = await fetch(
         `http://localhost:5050/record/${params.id.toString()}`
       );
@@ -30,6 +34,7 @@ export default function ModifyRecord() {
         navigate("/");
         return;
       }
+      // SET FORM HOOK WITH EXISTING RECORD
       setForm(record);
     }
     fetchData();
@@ -37,15 +42,19 @@ export default function ModifyRecord() {
   }, [params.id, navigate]);
 
   // These methods will update the state properties.
+  // CALLED WHEN ANY COMPONENT IN FORM CHANGED, EG NEW TEXT ENTERED OR RADIO BUTTON CHANGED
   function updateForm(value) {
+    // CHANGE NEW PROPERTIES IN OBJECT, WHILE KEEPING THE REST OF IT THE WAY IT WAS
     return setForm((prev) => {
       return { ...prev, ...value };
     });
   }
 
   // This function will handle the submission.
+  // CALLED WHEN CREATE OR MODIFY FORM SUBMITTED
   async function onSubmit(e) {
     e.preventDefault();
+    // GET UPDATE / CREATE DATA FROM "FORM" STATE
     const person = { ...form };
     try {
       let response;
@@ -75,6 +84,7 @@ export default function ModifyRecord() {
     } catch (error) {
       console.error('A problem occurred with your fetch operation: ', error);
     } finally {
+      // SET "FORM" STATE TO BLANK AND EXIT TO MAIN SCREEN
       setForm({ name: "", position: "", level: "" });
       navigate("/");
     }

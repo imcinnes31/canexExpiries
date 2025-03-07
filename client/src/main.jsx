@@ -7,6 +7,9 @@ import {
 import App from "./App";
 import ModifyRecord from "./components/ModifyRecord";
 import RecordList from "./components/RecordList";
+import MainMenu from "./components/MainMenu";
+import AlertList from "./components/AlertList";
+import CheckSection from "./components/CheckSection";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -37,6 +40,36 @@ const router = createBrowserRouter([
       {
         path: "/create",
         element: <ModifyRecord />,
+      },
+    ],
+  },
+  {
+    path: "/expiryChecker",
+    element: <App />,
+    children: [
+      {
+        path: "/expiryChecker",
+        element: <MainMenu />,
+      },
+    ],
+  },
+  {
+    path: "/expiryChecker/alert/:type",
+    element: <App />,
+    children: [
+      {
+        path: "/expiryChecker/alert/:type",
+        element: <AlertList />,
+      },
+    ],
+  },
+  {
+    path: "/expiryChecker/check/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/expiryChecker/check/:id",
+        element: <CheckSection />,
       },
     ],
   },

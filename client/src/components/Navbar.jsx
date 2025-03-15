@@ -17,6 +17,7 @@ export default function Navbar() {
       <div className="flex flex-row justify-end">      
         <h5 className="font-serif text-2xl">Expiry Date Checker</h5>
       </div>
+      <NavLink to="/expiryChecker">Main Menu</NavLink>
     </div>
   );
 }

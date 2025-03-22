@@ -10,6 +10,7 @@ import RecordList from "./components/RecordList";
 import MainMenu from "./components/MainMenu";
 import AlertList from "./components/AlertList";
 import CheckSection from "./components/CheckSection";
+import ExpiryReport from "./components/ExpiryReport";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -44,11 +45,11 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/expiryChecker",
+    path: "/expiryChecker/",
     element: <App />,
     children: [
       {
-        path: "/expiryChecker",
+        path: "/expiryChecker/",
         element: <MainMenu />,
       },
     ],
@@ -70,6 +71,16 @@ const router = createBrowserRouter([
       {
         path: "/expiryChecker/check/:id",
         element: <CheckSection />,
+      },
+    ],
+  },
+  {
+    path: "/expiryChecker/report/:reportDate",
+    element: <App />,
+    children: [
+      {
+        path: "/expiryChecker/report/:reportDate",
+        element: <ExpiryReport />,
       },
     ],
   },

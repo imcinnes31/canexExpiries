@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import cross from "../assets/cross.png";
+import tick from "../assets/check.png";
+
 // TODO: put these arrays in separate file
 
 const monthNames = [
@@ -46,13 +49,18 @@ const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map
 const Pull = (props) => (
         <div>
         {props.params.type == "pulls" ?
-            <div id={`${props.product.productUPC}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
-            <div id={`productName${props.product.productUPC}`}>
+            <div id={`${props.product.productUPC}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
+            <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
                 {props.product.productName}
             </div>
-            <div>
-                {props.product.productSection}
-            </div>
+            <div className="grid grid-cols-2">
+                    <div className="bg-white border border-black text-center font-serif font-bold text-l">
+                        {props.product.productSection}
+                    </div>
+                    <div className="bg-white border border-black text-center text-l tracking-wide">
+                        {props.product.productUPC}
+                    </div>
+                </div>
     
             <div>
                 {/* <div>{props.product.productExpiry}</div>
@@ -61,40 +69,49 @@ const Pull = (props) => (
                 <div>{nonCreditVendors.includes(props.product.productVendor) ? "TRUE" : "FALSE"}</div> */}
 
                 {nonCreditVendors.includes(props.product.productVendor) ?
-                    <div>
-                        <label htmlFor="pullNumberMenu">Number to pull:</label>
-                        <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)}>
-                            {Array.from(Array(10), (e, i) => {
+                    <div className="flex w-full pt-2">
+                        <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 m-auto py-1">Pull Amt:</div>
+                        <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
+                            {Array.from(Array(50), (e, i) => {
                                 return <option key={i}>{i}</option>
                             })}
                         </select>
-                        <div id={`pullProduct${props.product.productUPC}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'}`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}>Pull</div>
+                        <div id={`pullProduct${props.product.productUPC}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                        <div className="bg-red-400 basis-24 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="w-7"><img src={cross}/></div></div>
                     </div>
                 :
-                    <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400' onClick={() => props.deleteProduct(props.pullID,false)}>Pull</div>
-                }
-                <div className="bg-red-400" onClick={() => props.deleteProduct(props.pullID,false)}>Sold Out</div>
-            </div>
-            </div>
-        :
-            nonCreditVendors.includes(props.product.productVendor) ?
-            <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
-            <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`}>
-                {props.product.productName}
-            </div>
-            <div>
-                {props.product.productSection}
-            </div>
-                <div>
-                    {"Expires " + monthNames[new Date(props.product.productExpiry).getMonth()] + " " + new Date(props.product.productExpiry).getDate() + " " + props.product.productUPC}
                     <div>
-                        <div className="bg-green-400" onClick={() => props.discountProduct(props.pullID,props.product.productExpiry)}>Stickered</div>
-                        <div className="bg-red-400" onClick={() => props.soldOutProduct(props.pullID,props.product.productExpiry)}>Sold Out</div>
+                        <div className="text-center text-xl font-bold font-serif p-1">Credit Product</div>
+                        <div className="grid grid-cols-2">
+                            <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                            <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            </div>
+        : props.params.type == "discounts" ?
+            <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
+                <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} className="bg-white text-center p-1 font-bold text-xl">
+                    {props.product.productName}
+                </div>
+                <div className="grid grid-cols-2">
+                    <div className="bg-white border border-black text-center font-serif font-bold text-l">
+                        {props.product.productSection}
+                    </div>
+                    <div className="bg-white border border-black text-center text-l tracking-wide">
+                        {props.product.productUPC}
                     </div>
                 </div>
+                    <div className="text-center text-xl font-bold font-serif p-1">
+                        {"Expires " + monthNames[new Date(props.product.productExpiry).getMonth()] + " " + new Date(props.product.productExpiry).getDate()}
+                    </div>
+                    <div className="grid grid-cols-2 p-1">
+                        <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.discountProduct(props.pullID,props.product.productExpiry)}><div className="">Stickered</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                        <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.soldOutProduct(props.pullID,props.product.productExpiry)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>
+                    </div>
                 </div>
-            : null
-        }
+        : "Error "}
     </div>
 );
 
@@ -105,43 +122,57 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
         setPullAmounts(currentPulls => ({...currentPulls, [e.target.id.replace("numberPull","")]: currentPull}));
     }
 
-    // TODO: add new "deleteDiscount" function which calls discount delete route
-
     async function deleteProduct(divID, recording = null) {
         if (recording == true) {
-            await fetch(`http://localhost:5050/record/expiryRecords/${pullAmounts[divID]['name'].replace("%", "%25")}&${pullAmounts[divID]['amount']}`, {
-                method: "POST",
-            });
+            try {
+                await fetch(`http://localhost:5050/record/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
+                    method: "POST",
+                });
+            } catch (error) {
+              console.error('A problem occurred with your fetch operation: ', error);
+            }
         }
         const currentPull = pullAmounts[divID];
         currentPull['clicked'] = true;
-        // TODO: set "sold out" button to call this function
-        // TODO: create then call API to delete product DONE
+
         const prodUPC = divID.substring(0,12);
-        await fetch(`http://localhost:5050/record/products/${prodUPC}`, {
-            method: "DELETE",
-        });
-        setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+        try {
+            await fetch(`http://localhost:5050/record/products/${prodUPC}`, {
+                method: "DELETE",
+            });
+            setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+        } catch (error) {
+          console.error('A problem occurred with your fetch operation: ', error);
+        }
+
     } 
 
     async function soldOutProduct(divID,productExpiry) {
         const currentPull = pullAmounts[divID];
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
-        await fetch(`http://localhost:5050/record/discounts/${prodUPC}&${productExpiry}`, {
-            method: "DELETE",
-        });
-        setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
+        try {
+            await fetch(`http://localhost:5050/record/discounts/${prodUPC}&${productExpiry}`, {
+                method: "DELETE",
+            });
+            setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
+        } catch (error) {
+          console.error('A problem occurred with your fetch operation: ', error);
+        }
     }
 
     async function discountProduct(divID) {
         const currentPull = pullAmounts[divID];
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
-        await fetch(`http://localhost:5050/record/discounts/${prodUPC}`, {
-            method: "PATCH",
-        });
-        setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+        try {
+            await fetch(`http://localhost:5050/record/discounts/${prodUPC}`, {
+                method: "PATCH",
+            });
+            setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+        } catch (error) {
+            console.error('A problem occurred with your fetch operation: ', error);
+        }
     }
 
     function alertAnimationEnd(productID) {
@@ -162,32 +193,31 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
             return;
           }
           const productData = await response.json();
-        //   console.log(productData);
           const initialPullAmounts = {};
           if (params.type == "discounts") {
+            const filteredProductData = productData.filter((product) => nonCreditVendors.includes(product.productVendor))
             for (const x in productData) {
                 initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")] = {};
                 initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['amount'] = 0;
                 initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['clicked'] = false;
                 initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['name'] = productData[x].productName;
               }
-    
+              setProducts(filteredProductData);
+
           } else if (params.type == "pulls") {
-            // console.log(productData);
             for (const x in productData) {
                 initialPullAmounts[productData[x].productUPC] = {};
                 initialPullAmounts[productData[x].productUPC]['amount'] = 0;
                 initialPullAmounts[productData[x].productUPC]['clicked'] = false;
                 initialPullAmounts[productData[x].productUPC]['name'] = productData[x].productName;
               }
-    
+              setProducts(productData);
           }
           setPullAmounts(initialPullAmounts);
-          setProducts(productData);
         }
         getPulls();
         return;
-      }, []);    // TODO: remove this to only happen once DONE
+      }, []);
 
     return products.map((product) => {
         const pullID = params.type == "discounts" ? product.productUPC + (new Date(product.productExpiry).toISOString().split('T')[0].replaceAll("-","")) : product.productUPC;
@@ -216,7 +246,7 @@ export default function AlertList() {
 
     return (
         <div>
-            <div className="font-bold">
+            <div className="font-bold text-center text-xl pt-2">
                 {
                     params.type == "pulls" ? 
                         "Products to Pull" : 

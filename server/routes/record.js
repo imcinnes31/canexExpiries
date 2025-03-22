@@ -8,41 +8,59 @@ import moment from "moment";
 
 const router = express.Router();
 
+const storeClosedSunday = true;
+
 router.get("/test/", async (req,res) => {
   // console.log(new Date(moment().format("MM-DD-YYYY")).toISOString(true));
   // console.log(new Date(moment("2025-02-13").format("MM-DD-YYYY")).toISOString(true));
-  const date1 = new Date(moment().format("MM-DD-YYYY")).toISOString(true);
-  const date2 = new Date(moment("2025-03-08").format("MM-DD-YYYY")).toISOString(true);
-  console.log(new Date("2025-02-13").toISOString(true));
-  console.log(date1 < date2);
-  console.log(date1 >= date2);
+  const date1 = new Date(moment().format("MM-DD-YYYY"));
+  console.log(date1.getDay());
+  // const date2 = new Date(moment("2025-03-08").format("MM-DD-YYYY")).toISOString(true);
+  // console.log(new Date("2025-02-13").toISOString(true));
+  // console.log(date1 < date2);
+  // console.log(date1 >= date2);
+});
+
+router.patch("/expiryRecords", async (req, res) => {
+  try {
+      let collection = await db.collection("expiryRecords");
+      let result = await collection.updateMany({}, {
+        $rename: {
+            "name": "productUPC"
+        }
+    }, false, true);
+      res.send(result).status(200);
+  } catch(err) {
+      console.error(err);
+      res.status(500).send("Error updating record");
+  }
 });
 
 // EXPIRY REPORT
 router.get("/expiryRecords/:expiryMonth&:expiryYear", async (req, res) => {
   let collection = await db.collection("expiryRecords");
   let result = await collection.aggregate([
-  { 
-    "$addFields": 
-    {
-      "writtenOffAt": {
-          "$toDate": "$writeOffDate"
-      }
-    } 
-  },
+  // { 
+  //   "$addFields": 
+  //   {
+  //     "writtenOffAt": {
+  //         "$toDate": "$writeOffDate"
+  //     }
+  //   } 
+  // },
   {
     "$match" : 
     {
       $expr: {
         $and: [
-          {$eq: [{$year: "$writtenOffAt"}, parseInt(req.params.expiryYear)]},
-          {$eq: [{$month: "$writtenOffAt"}, parseInt(req.params.expiryMonth)]}
+          {$eq: [{$year: "$writeOffDate"}, parseInt(req.params.expiryYear)]},
+          {$eq: [{$month: "$writeOffDate"}, parseInt(req.params.expiryMonth)]}
         ]
       }
     }
   },
   {"$sort" : {
-    "writtenOffAt": 1
+    "writeOffDate": 1
   }}
 ]).toArray();
 res.send(result).status(200);
@@ -54,6 +72,7 @@ router.get("/sections/:id", async (req, res) => {
   let results = await collection.aggregate([
     {
       "$match": {
+        // "_id": new ObjectId(req.params.id)
         "_id": new ObjectId(req.params.id)
       }
     },
@@ -293,7 +312,7 @@ router.get("/discounts/", async (req, res) => {
       },
       {
         "$sort":{
-          "productUPC": 1
+          "productSection": 1
         }
       }
     ]).toArray();
@@ -317,8 +336,8 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            new Date(moment().format("MM-DD-YYYY"))
-            // new Date(moment().format("MM-DD-YYYY")).toISOString(true)
+            (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
+            // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
       }
@@ -329,7 +348,7 @@ router.get("/products/", async (req, res) => {
           productUPC: "$products.productUPC",
           productName: "$products.name",
           productVendor: "$products.vendor",
-          productSection: "$section"
+          productSection: "$section",
         },
       }
     },
@@ -344,7 +363,7 @@ router.get("/products/", async (req, res) => {
     },
     {
       "$sort":{
-        "productUPC": 1
+        "productSection": 1
       }
     }
   ]).toArray();
@@ -408,7 +427,7 @@ router.delete("/products/:productUPC", async (req, res) => {
       let result = await collection.updateOne({
         "products":{$elemMatch:{
           "expiryDates.dateGiven": {
-              "$lte": new Date(moment().format("MM-DD-YYYY"))
+              "$lte": (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
               // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
               },
           "productUPC": String(req.params.productUPC)
@@ -418,7 +437,8 @@ router.delete("/products/:productUPC", async (req, res) => {
           $pull: {
             "products.$.expiryDates": {
               "dateGiven": {
-                "$lte": new Date(moment().format("MM-DD-YYYY"))
+                // "$lte": new Date(moment().format("MM-DD-YYYY"))
+                "$lte": (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
                 // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
               }
             }
@@ -441,7 +461,7 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
                 "products.$[x].expiryDates": {
                   "dateGiven": {
                     // "$eq": new Date(moment(req.params.productExpiry).format("MM-DD-YYYY")).toISOString(true)
-                    "$eq": req.params.productExpiry
+                    "$eq": new Date(moment(req.params.productExpiry).format("MM-DD-YYYY"))
                   }
                 }
               }
@@ -461,11 +481,11 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
 });
 
 // ALERT LIST*
-router.post("/expiryRecords/:productName&:productAmount", async (req, res) => {
+router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
   try {
       let collection = await db.collection("expiryRecords");
       let result = await collection.insertOne({
-          name: req.params.productName,
+          productUPC: req.params.productUPC,
           amount: req.params.productAmount,
           writeOffDate: new Date(moment().format("MM-DD-YYYY"))
       });

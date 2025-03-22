@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import moment from "moment";
 
-// TODO: get rid of all console logs
-// TODO: put try / catch blocks and if response not ok around fetches
 // TODO: get rid of annoying error messages
 // TODO: see if animations can be synched
 
@@ -12,6 +10,7 @@ export default function MainMenu() {
     const [pulls, setPulls] = useState([]);
     const [discounts, setDiscounts] = useState([]);
     const [sections, setSections] = useState([]);
+    const [flashes, setFlashes] = useState([]);
 
     const navigate = useNavigate();
 
@@ -88,29 +87,34 @@ const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map
             const sectionsData = await response.json();
             setSections(sectionsData);
         }
+        async function getFlashes() {
+          const flashAlerts = {};
+          flashAlerts['productsPull'] = pulls.length > 0;
+          flashAlerts['productsDiscount'] = discounts.length > 0;
+          for (const x in sections) {
+            flashAlerts[sections[x]['_id']] = sections[x]['needsChecking'];
+          }
+          setFlashes(flashAlerts);
+        }
         async function deleteOldRecords() {
           const response = await fetch(`http://localhost:5050/record/expiryRecords`, {
             method: "DELETE",
           });
-          if (!response.ok) {
-              const message = `An error occurred: ${response.statusText}`;
-              console.error(message);
-              return;
-          }
         }
         deleteOldRecords();
         getPulls();
         getDiscounts();
         getSections();
+        getFlashes();
         return;
       }, []);
 
       const Check = (props) => (
-        <div id={props.section._id} className={`h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold ${!props.section.needsChecking ? 'bg-green-400' : 'animate-flash'}`} onClick={props.section.needsChecking ? ()=>goToCheckPage(props.section._id) : null}>{props.section.section}</div>
+        <div id={props.section._id} className={`h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold ${!flashes[props.section._id] ? 'bg-green-400' : 'animate-flash'}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
       );
 
       const Month = (props) => (
-        <div id={props.month.id} className="h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold">{props.month.name} onClick={()=>getMonthlyReport(props.month.id)}</div>
+        <div id={props.month.id} className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-yellow-300" onClick={()=>getMonthlyReport(props.month.id)}>{props.month.name}</div>
       );
 
       function goToCheckPage(sectionID) {
@@ -144,18 +148,18 @@ const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map
       }
 
     function getMonthlyReport(monthID) {
-      // TODO: go to page with montly report
+      navigate(`/expiryChecker/report/${monthID}`);
     }
     
     return (
         <div className="pt-4 text-center">
-            <a href={pulls.length > 0 ? "expiryChecker/alert/pulls" : null}><div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${pulls.length == 0 ? 'bg-green-400' : 'animate-flash'}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div></a>
-            <a href={discounts.length > 0 ? "expiryChecker/alert/discounts" : null}><div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length == 0 ? 'bg-green-400' : 'animate-flash'}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div></a>
+            <a href={pulls.length > 0 ? "/expiryChecker/alert/pulls" : null}><div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${flashes['productPull'] ? 'animate-flash' : 'bg-green-400'}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div></a>
+            <a href={discounts.length > 0 ? "/expiryChecker/alert/discounts" : null}><div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${flashes['productDiscount'] ? 'animate-flash' : 'bg-green-400'}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div></a>
             <h1 className="text-3xl pb-4">Store Sections</h1>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 pb-4">
                 {sectionList()}
             </div>
-            <h3 className="text-xl pb-4">Monthly Write Off Reports</h3>
+            <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
             <div className="">
                 {reportList()}
             </div>

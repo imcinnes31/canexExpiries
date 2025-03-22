@@ -1,0 +1,115 @@
+export const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+];
+
+export const milkProducts = [
+    {
+        size: "473 ML",
+        products: [
+            {
+                longDesc: "Cream 18%",
+                desc: "Cream",
+                productUPC: "068700100468"
+            },
+            {
+                longDesc: "Cream Half 10%",
+                desc: "Half",
+                productUPC: "068700100444"
+            },                
+            {
+                longDesc: "Milk 2%",
+                desc: "2%",
+                productUPC: "068700100734"
+            },                
+            {
+                longDesc: "Chocolate Milk",
+                desc: "Chocolate",
+                productUPC: "068700100635"
+            },       
+        ]
+    },
+    {
+        size: "1 Litre",
+        products: [
+            {
+                longDesc: "Cream 18%",
+                desc: "Cream",
+                productUPC: "068700103636"
+            },  
+            {
+                longDesc: "Cream Half 10%",
+                desc: "Half",
+                productUPC: "068700103612"
+            },  
+            {
+                longDesc: "Milk 2%",
+                desc: "2%",
+                productUPC: "068700125003"
+            },  
+            {
+                longDesc: "Milk 1%",
+                desc: "1%",
+                productUPC: "068700123405"
+            },  
+            {
+                longDesc: "Chocolate Milk",
+                desc: "Chocolate",
+                productUPC: "068700102981"
+            },      
+        ]
+    },
+    {
+        size: "2 Litre",
+        products: [
+            {
+                longDesc: "Lactose-Free",
+                desc: "Lactose",
+                productUPC: "068700103803"
+            },
+            {
+                longDesc: "Milk 2%",
+                desc: "2%",
+                productUPC: "068700115004"
+            },
+            {
+                longDesc: "Milk 1%",
+                desc: "1%",
+                productUPC: "068700116704"
+            },
+        ]
+    },
+];
+
+export const vendorList = [
+    {
+        name: "Direct Plus",
+        credit: true
+    },
+    {
+        name: "Lumsden Brothers",
+        credit: true
+    },
+    {
+        name: "Coca-Cola",
+        credit: false
+    },
+    {
+        name: "Pepsi",
+        credit: false
+    },
+    {
+        name: "Saputo",
+        credit: false
+    },
+];

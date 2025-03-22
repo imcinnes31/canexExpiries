@@ -14,36 +14,36 @@ import ExpiryReport from "./components/ExpiryReport";
 import "./index.css";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "/",
-        element: <RecordList />,
-      },
-    ],
-  },
-  {
-    path: "/edit/:id",
-    element: <App />,
-    children: [
-      {
-        path: "/edit/:id",
-        element: <ModifyRecord />,
-      },
-    ],
-  },
-  {
-    path: "/create",
-    element: <App />,
-    children: [
-      {
-        path: "/create",
-        element: <ModifyRecord />,
-      },
-    ],
-  },
+  // {
+  //   path: "/",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "/",
+  //       element: <RecordList />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "/edit/:id",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "/edit/:id",
+  //       element: <ModifyRecord />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "/create",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "/create",
+  //       element: <ModifyRecord />,
+  //     },
+  //   ],
+  // },
   {
     path: "/expiryChecker/",
     element: <App />,

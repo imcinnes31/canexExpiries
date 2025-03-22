@@ -3,10 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-    td {
-      @apply border border-black;
-      @apply border border-2;
-    }
-
-
+  td {
+    @apply border border-black;
+    @apply border border-2;
   }
+}

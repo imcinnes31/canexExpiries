@@ -1,114 +1,21 @@
-// TODO: build this page
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
+import {monthNames, milkProducts} from "../constants.jsx"
 
 export default function ExpiryReport() {
     const params = useParams();
     const [milkReport, setMilkReport] = useState({});
     const [nonMilkReport, setNonMilkReport] = useState([]);
 
-    const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-    ];
-
-    const milkProducts = [
-        {
-            size: "473 ML",
-            products: [
-                {
-                    longDesc: "Cream 18%",
-                    desc: "Cream",
-                    productUPC: "068700100468"
-                },
-                {
-                    longDesc: "Cream Half 10%",
-                    desc: "Half",
-                    productUPC: "068700100444"
-                },                
-                {
-                    longDesc: "Milk 2%",
-                    desc: "2%",
-                    productUPC: "068700100734"
-                },                
-                {
-                    longDesc: "Chocolate Milk",
-                    desc: "Chocolate",
-                    productUPC: "068700100635"
-                },       
-            ]
-        },
-        {
-            size: "1 Litre",
-            products: [
-                {
-                    longDesc: "Cream 18%",
-                    desc: "Cream",
-                    productUPC: "068700103636"
-                },  
-                {
-                    longDesc: "Cream Half 10%",
-                    desc: "Half",
-                    productUPC: "068700103612"
-                },  
-                {
-                    longDesc: "Milk 2%",
-                    desc: "2%",
-                    productUPC: "068700125003"
-                },  
-                {
-                    longDesc: "Milk 1%",
-                    desc: "1%",
-                    productUPC: "068700123405"
-                },  
-                {
-                    longDesc: "Chocolate Milk",
-                    desc: "Chocolate",
-                    productUPC: "068700102981"
-                },      
-            ]
-        },
-        {
-            size: "2 Litre",
-            products: [
-                {
-                    longDesc: "Lactose-Free",
-                    desc: "Lactose",
-                    productUPC: "068700103803"
-                },
-                {
-                    longDesc: "Milk 2%",
-                    desc: "2%",
-                    productUPC: "068700115004"
-                },
-                {
-                    longDesc: "Milk 1%",
-                    desc: "1%",
-                    productUPC: "068700116704"
-                },
-            ]
-        },
-    ];
-
     useEffect(() => {
         async function getReport() {
             const monthID = params.reportDate;
             const response = await fetch(`http://localhost:5050/record/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
             if (!response.ok) {
-              const message = `An error occurred: ${response.statusText}`;
-              console.error(message);
-              return;
+                const message = `An error occurred: ${response.statusText}`;
+                console.error(message);
+                return;
             }
             const reportData = await response.json();
             for (const x in reportData) {
@@ -124,9 +31,9 @@ export default function ExpiryReport() {
             const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
             const milkData = Object.fromEntries((Object.values(
                 (reportData.filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
-                  if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
-                  agg[prod.productUPC].sumQuantity += +prod.amount
-                  return agg;
+                    if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
+                    agg[prod.productUPC].sumQuantity += +prod.amount
+                    return agg;
                 }, {})
             )).map(product => [product.prodUPC, product.sumQuantity]));
             setMilkReport(milkData);
@@ -138,12 +45,7 @@ export default function ExpiryReport() {
     }, []);
 
     function NonMilkProduct(props) {
-        const nonMilkProductRow = [];
-        nonMilkProductRow.push(
-            
-        );
         return (
-            // SECTION TO STYLE
             <tr className="h-[25px]">
                 <td className={'border-none leading-none'}></td>
                 <td className={'text-center text-xs leading-none'}>{props.product.productName}</td>
@@ -156,9 +58,10 @@ export default function ExpiryReport() {
 
     function MilkProduct(props){
         return(
-            // SECTION TO STYLE
             <tr className={`${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
-            {props.productIndex == 0 ? <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> : null}
+                {props.productIndex == 0 ? 
+                    <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
+                : null}
                 <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
                 <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
                 <td className={'text-center font-bold text-base leading-none'}>{milkReport[props.currentProduct.productUPC] > 0 ? milkReport[props.currentProduct.productUPC] : null}</td>
@@ -169,7 +72,6 @@ export default function ExpiryReport() {
 
     function MilkGroup(props){
         return(
-            // SECTION TO STYLE
             <div>
                 <table className={`w-full`}>
                     <tbody>
@@ -180,19 +82,19 @@ export default function ExpiryReport() {
                             <th className={`w-[45.50%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
                             <th className={`w-[12.25%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Reason</th>
                         </tr> 
-                    {
-                        props.products.map((product,index) => 
-                            <MilkProduct 
-                                key={product.productUPC}
-                                productUPC={product.productUPC}
-                                productSize={props.sizeDesc}
-                                productIndex={index}
-                                groupIndex={props.groupIndex}
-                                totalProducts={props.products.length}
-                                currentProduct={milkProducts[props.groupIndex].products[index]}
-                            />
-                        )
-                    }
+                        {
+                            props.products.map((product,index) => 
+                                <MilkProduct 
+                                    key={product.productUPC}
+                                    productUPC={product.productUPC}
+                                    productSize={props.sizeDesc}
+                                    productIndex={index}
+                                    groupIndex={props.groupIndex}
+                                    totalProducts={props.products.length}
+                                    currentProduct={milkProducts[props.groupIndex].products[index]}
+                                />
+                            )
+                        }
                     </tbody>
                 </table>
             </div>

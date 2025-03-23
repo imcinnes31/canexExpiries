@@ -113,3 +113,5 @@ export const vendorList = [
         credit: false
     },
 ];
+
+export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {monthNames, vendorList} from "../constants.jsx"
+import {monthNames, vendorList, nonCreditVendors} from "../constants.jsx"
 
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
@@ -22,7 +22,7 @@ const Pull = (props) => (
                     </div>
                 </div>
                 <div>
-                    {props.nonCredits.includes(props.product.productVendor) ?
+                    {nonCreditVendors.includes(props.product.productVendor) ?
                         <div className="flex w-full pt-2">
                             <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 m-auto py-1">Pull Amt:</div>
                             <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
@@ -75,7 +75,7 @@ const Pull = (props) => (
     </div>
 );
 
-function pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits, setNonCredits, params) {    
+function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {    
     function setPullNumber(e) {
         const currentPull = pullAmounts[e.target.id.replace("numberPull","")];
         currentPull['amount'] = parseInt(e.target.value);
@@ -140,10 +140,6 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits
     }
 
     useEffect(() => {
-        function getNonCredits() {
-            const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);
-            setNonCredits(nonCreditVendors);
-        }
         async function getPulls() {
             const response = params.type == "pulls" ? 
                 await fetch(`http://localhost:5050/expiries/products/`) : 
@@ -157,7 +153,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits
             const productData = await response.json();
             const initialPullAmounts = {};
             if (params.type == "discounts") {
-                const filteredProductData = productData.filter((product) => nonCredits.includes(product.productVendor))
+                const filteredProductData = productData.filter((product) => nonCreditVendors.includes(product.productVendor))
                 for (const x in productData) {
                     initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")] = {};
                     initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['amount'] = 0;
@@ -176,7 +172,6 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits
             }
             setPullAmounts(initialPullAmounts);
         }
-        getNonCredits();
         getPulls();
         return;
     }, []);
@@ -191,7 +186,6 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits
                 discountProduct={() => discountProduct(pullID)}
                 soldOutProduct={() => soldOutProduct(pullID,product.productExpiry)}
                 setPullNumber={(e) => setPullNumber(e)}
-                nonCredits = {nonCredits}
                 animationEnds={() => alertAnimationEnd(pullID)}
                 pullMenuValue = {pullAmounts[pullID]}
                 params={params}
@@ -205,7 +199,6 @@ export default function AlertList() {
     const params = useParams();
     const [products, setProducts] = useState([]);
     const [pullAmounts, setPullAmounts] = useState({});
-    const [nonCredits, setNonCredits] = useState([]);
 
     return (
         <div>
@@ -221,7 +214,7 @@ export default function AlertList() {
             <div>
                 {
                     params.type == "pulls" || params.type == "discounts" ? 
-                        pullList(products, setProducts, pullAmounts, setPullAmounts, nonCredits, setNonCredits, params) :
+                        pullList(products, setProducts, pullAmounts, setPullAmounts, params) :
                         "Error"
                 }
             </div>

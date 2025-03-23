@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {monthNames, vendorList} from "../constants.jsx"
+import {monthNames, nonCreditVendors} from "../constants.jsx"
 
 import moment from "moment";
 
@@ -9,17 +9,10 @@ export default function MainMenu() {
   const [pulls, setPulls] = useState([]);
   const [discounts, setDiscounts] = useState([]);
   const [sections, setSections] = useState([]);
-  const [flashes, setFlashes] = useState({});
-  const [nonCredits, setNonCredits] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    function getNonCredits() {
-      const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);
-      setNonCredits(nonCreditVendors);
-    }
-
     async function getPulls() {
       const response = await fetch(`http://localhost:5050/expiries/products/`);
       if (!response.ok) {
@@ -39,7 +32,9 @@ export default function MainMenu() {
         return;
       }
       const discountsData = await response.json();
-      const filteredDiscountData = discountsData.filter((product) => nonCredits.includes(product['productVendor']));
+      console.log(discountsData);
+      const filteredDiscountData = discountsData.filter((product) => nonCreditVendors.includes(product['productVendor']));
+      console.log(filteredDiscountData);
       setDiscounts(filteredDiscountData);
     }
 
@@ -54,15 +49,15 @@ export default function MainMenu() {
       setSections(sectionsData);
     }
       
-    function getFlashes() {
-      const flashAlerts = {};
-      flashAlerts['productsPull'] = pulls.length > 0;
-      flashAlerts['productsDiscount'] = discounts.length > 0;
-      for (const x in sections) {
-        flashAlerts[sections[x]['_id']] = sections[x]['needsChecking'];
-      }
-      setFlashes(flashAlerts);
-    }
+    // function getFlashes() {
+    //   const flashAlerts = {};
+    //   flashAlerts['productsPull'] = pulls.length > 0;
+    //   flashAlerts['productsDiscount'] = discounts.length > 0;
+    //   for (const x in sections) {
+    //     flashAlerts[sections[x]['_id']] = sections[x]['needsChecking'];
+    //   }
+    //   setFlashes(flashAlerts);
+    // }
       
     async function deleteOldRecords() {
       const response = await fetch(`http://localhost:5050/expiries/expiryRecords`, {
@@ -71,11 +66,9 @@ export default function MainMenu() {
     }
 
     deleteOldRecords();
-    getNonCredits();
     getPulls();
     getDiscounts();
     getSections();
-    getFlashes();
     return;
 
   }, []);
@@ -95,7 +88,11 @@ export default function MainMenu() {
   function sectionList() {
     return sections.map((section) => {
       return (
-        <Check key={section._id} section={section} flashes={flashes} />
+        <Check 
+          key={section._id} 
+          section={section} 
+          // flashes={flashes} 
+        />
       );
     });
   }

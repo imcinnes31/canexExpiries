@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
 import expiries from "./routes/routes.js";
+import dotenv from 'dotenv';
 
-const PORT = process.env.PORT || 5050;
+dotenv.config();
+
+const PORT = process.env.PORT || 5000;
 const app = express();
 
 app.use(cors());

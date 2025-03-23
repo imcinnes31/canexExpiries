@@ -11,7 +11,7 @@ export default function ExpiryReport() {
     useEffect(() => {
         async function getReport() {
             const monthID = params.reportDate;
-            const response = await fetch(`http://localhost:5050/expiries/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
+            const response = await fetch(`http://localhost:5000/expiries/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -19,7 +19,7 @@ export default function ExpiryReport() {
             }
             const reportData = await response.json();
             for (const x in reportData) {
-                const responseProduct = await fetch(`http://localhost:5050/expiries/products/${reportData[x].productUPC}`);
+                const responseProduct = await fetch(`http://localhost:5000/expiries/products/${reportData[x].productUPC}`);
                 if (!responseProduct.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);

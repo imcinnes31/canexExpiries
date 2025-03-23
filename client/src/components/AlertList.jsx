@@ -85,7 +85,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
     async function deleteProduct(divID, recording = null) {
         if (recording == true) {
             try {
-                await fetch(`http://localhost:5050/expiries/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
+                await fetch(`http://localhost:5000/expiries/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
                     method: "POST",
                 });
             } catch (error) {
@@ -97,7 +97,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
 
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5050/expiries/products/${prodUPC}`, {
+            await fetch(`http://localhost:5000/expiries/products/${prodUPC}`, {
                 method: "DELETE",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
@@ -111,7 +111,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5050/expiries/discounts/${prodUPC}&${productExpiry}`, {
+            await fetch(`http://localhost:5000/expiries/discounts/${prodUPC}&${productExpiry}`, {
                 method: "DELETE",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
@@ -125,7 +125,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5050/expiries/discounts/${prodUPC}`, {
+            await fetch(`http://localhost:5000/expiries/discounts/${prodUPC}`, {
                 method: "PATCH",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
@@ -142,9 +142,9 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
     useEffect(() => {
         async function getPulls() {
             const response = params.type == "pulls" ? 
-                await fetch(`http://localhost:5050/expiries/products/`) : 
+                await fetch(`http://localhost:5000/expiries/products/`) : 
                 params.type == "discounts" ? 
-                await fetch(`http://localhost:5050/expiries/discounts/`) : null;
+                await fetch(`http://localhost:5000/expiries/discounts/`) : null;
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);

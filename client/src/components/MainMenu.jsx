@@ -14,7 +14,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     async function getPulls() {
-      const response = await fetch(`http://localhost:5050/expiries/products/`);
+      const response = await fetch(`http://localhost:5000/expiries/products/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -25,7 +25,7 @@ export default function MainMenu() {
     }
       
     async function getDiscounts() {
-      const response = await fetch(`http://localhost:5050/expiries/discounts/`);
+      const response = await fetch(`http://localhost:5000/expiries/discounts/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -39,7 +39,7 @@ export default function MainMenu() {
     }
 
     async function getSections() {
-      const response = await fetch(`http://localhost:5050/expiries/sections/`);
+      const response = await fetch(`http://localhost:5000/expiries/sections/`);
       if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
           console.error(message);
@@ -60,7 +60,7 @@ export default function MainMenu() {
     // }
       
     async function deleteOldRecords() {
-      const response = await fetch(`http://localhost:5050/expiries/expiryRecords`, {
+      const response = await fetch(`http://localhost:5000/expiries/expiryRecords`, {
         method: "DELETE",
       });
     }

@@ -9,15 +9,10 @@ export default function MainMenu() {
   const [pulls, setPulls] = useState([]);
   const [discounts, setDiscounts] = useState([]);
   const [sections, setSections] = useState([]);
-  const [flashes, setFlashes] = useState([]);
+  const [flashes, setFlashes] = useState({});
   const [nonCredits, setNonCredits] = useState([]);
 
   const navigate = useNavigate();
-
-  function getFlashAnimate(component) {
-    console.log(flashes[component]);
-    return flashes[component];
-  }
 
   useEffect(() => {
     function getNonCredits() {
@@ -26,7 +21,7 @@ export default function MainMenu() {
     }
 
     async function getPulls() {
-      const response = await fetch(`http://localhost:5050/record/products/`);
+      const response = await fetch(`http://localhost:5050/expiries/products/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -37,7 +32,7 @@ export default function MainMenu() {
     }
       
     async function getDiscounts() {
-      const response = await fetch(`http://localhost:5050/record/discounts/`);
+      const response = await fetch(`http://localhost:5050/expiries/discounts/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -49,7 +44,7 @@ export default function MainMenu() {
     }
 
     async function getSections() {
-      const response = await fetch(`http://localhost:5050/record/sections/`);
+      const response = await fetch(`http://localhost:5050/expiries/sections/`);
       if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
           console.error(message);
@@ -59,7 +54,7 @@ export default function MainMenu() {
       setSections(sectionsData);
     }
       
-    async function getFlashes() {
+    function getFlashes() {
       const flashAlerts = {};
       flashAlerts['productsPull'] = pulls.length > 0;
       flashAlerts['productsDiscount'] = discounts.length > 0;
@@ -70,7 +65,7 @@ export default function MainMenu() {
     }
       
     async function deleteOldRecords() {
-      const response = await fetch(`http://localhost:5050/record/expiryRecords`, {
+      const response = await fetch(`http://localhost:5050/expiries/expiryRecords`, {
         method: "DELETE",
       });
     }
@@ -86,7 +81,7 @@ export default function MainMenu() {
   }, []);
 
   const Check = (props) => (
-    <div id={props.section._id} className={`h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold ${props.flashes[props.section._id] == true ? 'animate-flash' : 'bg-green-400'}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
+    <div id={props.section._id} className={`h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
   );
 
   const Month = (props) => (
@@ -94,7 +89,7 @@ export default function MainMenu() {
   );
 
   function goToCheckPage(sectionID) {
-    navigate(`/expiryChecker/check/${sectionID}`);
+    navigate(`/canexExpiries/check/${sectionID}`);
   }
 
   function sectionList() {
@@ -124,24 +119,28 @@ export default function MainMenu() {
   }
 
   function getMonthlyReport(monthID) {
-    navigate(`/expiryChecker/report/${monthID}`);
+    navigate(`/canexExpiries/report/${monthID}`);
   }
   
   return (
     <div className="pt-4 text-center">
-      <a href={pulls.length > 0 ? "/expiryChecker/alert/pulls" : null}>
-        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${flashes['productsPull'] == true ? 'animate-flash' : 'bg-green-400'}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div>
+      <a href={pulls.length > 0 ? "/canexExpiries/alert/pulls" : null}>
+        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${pulls.length > 0 == true ? 'animate-flash' : ''} ${pulls.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div>
       </a>
-      <a href={discounts.length > 0 ? "/expiryChecker/alert/discounts" : null}>
-        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${flashes['productsDiscount'] == true ? 'animate-flash' : 'bg-green-400'}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
+      <a href={discounts.length > 0 ? "/canexExpiries/alert/discounts" : null}>
+        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length > 0 == true ? 'animate-flash' : ''} ${discounts.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
       </a>
-      <h1 className="text-3xl pb-4">Store Sections</h1>
-      <div className="grid grid-cols-2 gap-4 pb-4">
-          {sectionList()}
+      <div className="px-3 py-2 bg-gray-200 border border-black">
+        <h1 className="text-3xl pb-4">Store Sections</h1>
+        <div className="grid grid-cols-2 gap-4 pb-4">
+            {sectionList()}
+        </div>
       </div>
-      <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
-      <div className="">
-          {reportList()}
+      <div className="pt-4">
+        <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
+        <div className="">
+            {reportList()}
+        </div>
       </div>
     </div>
   );

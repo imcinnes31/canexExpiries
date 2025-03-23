@@ -5,8 +5,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-import ModifyRecord from "./components/ModifyRecord";
-import RecordList from "./components/RecordList";
 import MainMenu from "./components/MainMenu";
 import AlertList from "./components/AlertList";
 import CheckSection from "./components/CheckSection";
@@ -45,41 +43,41 @@ const router = createBrowserRouter([
   //   ],
   // },
   {
-    path: "/expiryChecker/",
+    path: "/canexExpiries/",
     element: <App />,
     children: [
       {
-        path: "/expiryChecker/",
+        path: "/canexExpiries/",
         element: <MainMenu />,
       },
     ],
   },
   {
-    path: "/expiryChecker/alert/:type",
+    path: "/canexExpiries/alert/:type",
     element: <App />,
     children: [
       {
-        path: "/expiryChecker/alert/:type",
+        path: "/canexExpiries/alert/:type",
         element: <AlertList />,
       },
     ],
   },
   {
-    path: "/expiryChecker/check/:id",
+    path: "/canexExpiries/check/:id",
     element: <App />,
     children: [
       {
-        path: "/expiryChecker/check/:id",
+        path: "/canexExpiries/check/:id",
         element: <CheckSection />,
       },
     ],
   },
   {
-    path: "/expiryChecker/report/:reportDate",
+    path: "/canexExpiries/report/:reportDate",
     element: <App />,
     children: [
       {
-        path: "/expiryChecker/report/:reportDate",
+        path: "/canexExpiries/report/:reportDate",
         element: <ExpiryReport />,
       },
     ],

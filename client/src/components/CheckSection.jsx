@@ -27,7 +27,7 @@ export default function CheckSection() {
             setVendors(vendorArray);
         }
         async function getCurrentSection() {
-            const response = await fetch(`http://localhost:5050/record/sections/${params.id}`);
+            const response = await fetch(`http://localhost:5050/expiries/sections/${params.id}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -45,7 +45,7 @@ export default function CheckSection() {
         const numbers = /^[0-9]+$/;
         if (inputtedValue.length == 12 && inputtedValue.match(numbers)) {
             setCurrentUPC(inputtedValue);
-            const response = await fetch(`http://localhost:5050/record/products/${inputtedValue}`);
+            const response = await fetch(`http://localhost:5050/expiries/products/${inputtedValue}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -58,7 +58,7 @@ export default function CheckSection() {
 
     async function setMilk(givenUPC) {
         setCurrentUPC(givenUPC);
-        const response = await fetch(`http://localhost:5050/record/products/${givenUPC}`);
+        const response = await fetch(`http://localhost:5050/expiries/products/${givenUPC}`);
         if (!response.ok) {
             const message = `An error occurred: ${response.statusText}`;
             console.error(message);
@@ -86,7 +86,7 @@ export default function CheckSection() {
     async function enterNewProduct() {
         if (newProduct.productVendor && newProduct.productDesc.length > 0) {
             try {
-                await fetch(`http://localhost:5050/record/sections/${params.id}&${currentUPC}`, {
+                await fetch(`http://localhost:5050/expiries/sections/${params.id}&${currentUPC}`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export default function CheckSection() {
             } catch (error) {
                 console.error('A problem occurred with your fetch operation: ', error);
             } finally {
-                const response = await fetch(`http://localhost:5050/record/products/${currentUPC}`);
+                const response = await fetch(`http://localhost:5050/expiries/products/${currentUPC}`);
                 if (!response.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);
@@ -117,7 +117,7 @@ export default function CheckSection() {
         const productUPC = currentUPC;
         const productExprity = dateID == null ? moment().subtract(1, "days").format("YYYYMMDD") : dateID;
         try {
-            await fetch(`http://localhost:5050/record/products/${productUPC}&${productExprity}`, {
+            await fetch(`http://localhost:5050/expiries/products/${productUPC}&${productExprity}`, {
                 method: "PATCH",
             });
         } catch (error) {
@@ -129,13 +129,13 @@ export default function CheckSection() {
 
     async function setNewCheckedDate() {
         try {
-            await fetch(`http://localhost:5050/record/sections/${params.id}`, {
+            await fetch(`http://localhost:5050/expiries/sections/${params.id}`, {
                 method: "PATCH",
             });
         } catch (error) {
             console.error('A problem occurred with your fetch operation: ', error);
         } finally {
-            navigate("/expiryChecker");
+            navigate("/canexExpiries");
         }
     }
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
 import {monthNames, nonCreditVendors} from "../constants.jsx"
+import {REACT_APP_API_URL} from "../../index.js"
 
 import moment from "moment";
 
@@ -14,7 +15,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     async function getPulls() {
-      const response = await fetch(`http://localhost:5000/expiries/products/`);
+      const response = await fetch(`${REACT_APP_API_URL}/expiries/products/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -25,21 +26,19 @@ export default function MainMenu() {
     }
       
     async function getDiscounts() {
-      const response = await fetch(`http://localhost:5000/expiries/discounts/`);
+      const response = await fetch(`${REACT_APP_API_URL}/expiries/discounts/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
         return;
       }
       const discountsData = await response.json();
-      console.log(discountsData);
       const filteredDiscountData = discountsData.filter((product) => nonCreditVendors.includes(product['productVendor']));
-      console.log(filteredDiscountData);
       setDiscounts(filteredDiscountData);
     }
 
     async function getSections() {
-      const response = await fetch(`http://localhost:5000/expiries/sections/`);
+      const response = await fetch(`${REACT_APP_API_URL}/expiries/sections/`);
       if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
           console.error(message);
@@ -60,7 +59,7 @@ export default function MainMenu() {
     // }
       
     async function deleteOldRecords() {
-      const response = await fetch(`http://localhost:5000/expiries/expiryRecords`, {
+      const response = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`, {
         method: "DELETE",
       });
     }
@@ -82,7 +81,7 @@ export default function MainMenu() {
   );
 
   function goToCheckPage(sectionID) {
-    navigate(`/canexExpiries/check/${sectionID}`);
+    navigate(`/check/${sectionID}`);
   }
 
   function sectionList() {
@@ -100,13 +99,15 @@ export default function MainMenu() {
   function reportList() {
     const monthList = [];
     for (let i = 0; i <= 12; i++) {
-      const d = new Date(moment().subtract(i, "month"));
-      monthList.push(
-        {
-          id: ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + String(d.getFullYear()),
-          name: monthNames[d.getMonth()] + " " + d.getFullYear()
-        }
-      );
+      const d = new Date(moment().subtract(i, "month").format("MM-DD-YYYY"));
+      if (d.getFullYear() > 2025 || (d.getFullYear() == 2025 && (d.getMonth() + 1) >= 3)) {
+        monthList.push(
+          {
+            id: ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + String(d.getFullYear()),
+            name: monthNames[d.getMonth()] + " " + d.getFullYear()
+          }
+        );
+      }
     }
     return monthList.map((month) => {
       return (
@@ -116,22 +117,26 @@ export default function MainMenu() {
   }
 
   function getMonthlyReport(monthID) {
-    navigate(`/canexExpiries/report/${monthID}`);
+    navigate(`/report/${monthID}`);
   }
   
   return (
     <div className="pt-4 text-center">
-      <a href={pulls.length > 0 ? "/canexExpiries/alert/pulls" : null}>
+      <NavLink to={pulls.length > 0 ? "alert/pulls" : null}>
         <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${pulls.length > 0 == true ? 'animate-flash' : ''} ${pulls.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div>
-      </a>
-      <a href={discounts.length > 0 ? "/canexExpiries/alert/discounts" : null}>
+      </NavLink>
+      <NavLink to={discounts.length > 0 ? "alert/discounts" : null}>
         <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length > 0 == true ? 'animate-flash' : ''} ${discounts.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
-      </a>
+      </NavLink>
       <div className="px-3 py-2 bg-gray-200 border border-black">
         <h1 className="text-3xl pb-4">Store Sections</h1>
-        <div className="grid grid-cols-2 gap-4 pb-4">
-            {sectionList()}
-        </div>
+        {sections.length > 0 ?
+          <div className="grid grid-cols-2 gap-4 pb-4">
+              {sectionList()}
+          </div>
+        :
+          <div className="text-2xl text-center font-bold">Loading Sections...</div>
+        }
       </div>
       <div className="pt-4">
         <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>

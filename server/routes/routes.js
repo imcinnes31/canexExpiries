@@ -69,7 +69,8 @@ router.get("/sections/:id", async (req, res) => {
         "_id": 1,
         "section": 1,
         "dateLastChecked": 1,
-        "intervalDays": 1
+        "intervalDays": 1,
+        "expiryRange": 1,
       }
     }
   ]).toArray();
@@ -136,7 +137,7 @@ router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
     },{
       $push: {
         "products.$.expiryDates": {
-          "dateGiven": new Date(moment(dateConverted)),
+          "dateGiven": new Date(moment(dateConverted).format("MM-DD-YYYY")),
           // "dateGiven": new Date(moment(dateConverted)).toISOString(true),
           "discounted": false
         }
@@ -214,7 +215,7 @@ router.get("/sections/", async (req, res) => {
                 "$dateLastChecked",
                 {
                   $dateSubtract: {
-                    startDate: new Date(),
+                    startDate: new Date(moment().format("MM-DD-YYYY")),
                     unit: "day",
                     amount: "$intervalDays"
                   }

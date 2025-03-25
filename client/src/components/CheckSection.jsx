@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import {monthNames, milkProducts, vendorList} from "../constants.jsx"
+import {REACT_APP_API_URL} from "../../index.js"
 
 import moment from "moment";
 import cross from "../assets/cross.png";
@@ -17,6 +18,7 @@ export default function CheckSection() {
         productVendor: null,
     });
     const [vendors, setVendors] = useState([]);
+    const [currentDate, setCurrentDate] = useState(null);
 
     const params = useParams();
     const navigate = useNavigate();
@@ -27,7 +29,7 @@ export default function CheckSection() {
             setVendors(vendorArray);
         }
         async function getCurrentSection() {
-            const response = await fetch(`http://localhost:5000/expiries/sections/${params.id}`);
+            const response = await fetch(`${REACT_APP_API_URL}/expiries/sections/${params.id}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -45,7 +47,7 @@ export default function CheckSection() {
         const numbers = /^[0-9]+$/;
         if (inputtedValue.length == 12 && inputtedValue.match(numbers)) {
             setCurrentUPC(inputtedValue);
-            const response = await fetch(`http://localhost:5000/expiries/products/${inputtedValue}`);
+            const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${inputtedValue}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -58,7 +60,7 @@ export default function CheckSection() {
 
     async function setMilk(givenUPC) {
         setCurrentUPC(givenUPC);
-        const response = await fetch(`http://localhost:5000/expiries/products/${givenUPC}`);
+        const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${givenUPC}`);
         if (!response.ok) {
             const message = `An error occurred: ${response.statusText}`;
             console.error(message);
@@ -86,7 +88,7 @@ export default function CheckSection() {
     async function enterNewProduct() {
         if (newProduct.productVendor && newProduct.productDesc.length > 0) {
             try {
-                await fetch(`http://localhost:5000/expiries/sections/${params.id}&${currentUPC}`, {
+                await fetch(`${REACT_APP_API_URL}/expiries/sections/${params.id}&${currentUPC}`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -101,7 +103,7 @@ export default function CheckSection() {
             } catch (error) {
                 console.error('A problem occurred with your fetch operation: ', error);
             } finally {
-                const response = await fetch(`http://localhost:5000/expiries/products/${currentUPC}`);
+                const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${currentUPC}`);
                 if (!response.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);
@@ -115,9 +117,9 @@ export default function CheckSection() {
 
     async function enterExpiryDate(dateID) {
         const productUPC = currentUPC;
-        const productExprity = dateID == null ? moment().subtract(1, "days").format("YYYYMMDD") : dateID;
+        const productExprity = dateID == null ? moment().subtract(1, "days").format("YYYYMMDD") : dateID.replace("confirm","");
         try {
-            await fetch(`http://localhost:5000/expiries/products/${productUPC}&${productExprity}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/products/${productUPC}&${productExprity}`, {
                 method: "PATCH",
             });
         } catch (error) {
@@ -129,14 +131,18 @@ export default function CheckSection() {
 
     async function setNewCheckedDate() {
         try {
-            await fetch(`http://localhost:5000/expiries/sections/${params.id}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/sections/${params.id}`, {
                 method: "PATCH",
             });
         } catch (error) {
             console.error('A problem occurred with your fetch operation: ', error);
         } finally {
-            navigate("/canexExpiries");
+            navigate("/");
         }
+    }
+
+    function confirmCurrentDate(dateID) {
+        setCurrentDate(dateID);
     }
 
     function daysIntoYear(date){
@@ -145,7 +151,16 @@ export default function CheckSection() {
     }
 
     const DateSelect = (props) => (
-        <div id={props.date.id} className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(e.target.id)}>{props.date.name}</div>
+        <div id={`${props.date.id}`} className="flex">
+            {/* <div id={props.date.id} className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(e.target.id)}>{props.date.name}</div> */}
+            <div className={`w-full ${currentDate == props.date.id ? 'animate-horizontalHide' : 'bg-green-400'} h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold`} onClick={(e) => confirmCurrentDate(props.date.id)}>{props.date.name}</div>
+            <div className={`${currentDate == props.date.id ? 'animate-horizontalShow' : 'hidden'} bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold`} onClick={(e) => enterExpiryDate(props.date.id)}>
+                <div className='flex'>
+                    <div>Confirm</div>
+                    <div className="w-7 ml-1"><img src={tick}/></div>
+                </div>
+            </div>
+        </div>
     );
 
     const Milk = (props) => (
@@ -154,7 +169,7 @@ export default function CheckSection() {
 
     function dateList() {
         const expiryDateList = [];
-        for (let i = 0; i <= currentSection.intervalDays; i++) {
+        for (let i = 0; i <= currentSection.expiryRange; i++) {
             const d = new Date(moment().add(i, "days"));
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
@@ -188,11 +203,11 @@ export default function CheckSection() {
                 <div>
                     <div className="text-3xl font-serif pt-4">Current Section:</div>
                     <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
-                    <div className="text-2xl font-serif">Check for any products until:</div>
-                    <div className="text-2xl font-bold">{monthNames[new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getMonth()] + " " + new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getDate() + " " + new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getFullYear()}</div>
+                    <div className="text-2xl font-serif">Check for any products expiring until:</div>
+                    <div className="text-2xl font-bold">{monthNames[new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getMonth()] + " " + new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getDate() + " " + new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getFullYear()}</div>
                     { currentSection.section == "Frozen" ?
                         <div className="text-lg">
-                            {(new Date(moment().format("MM-DD-YYYY")).getFullYear()) == (new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getFullYear()) ?
+                            {(new Date(moment().format("MM-DD-YYYY")).getFullYear()) == (new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getFullYear()) ?
                                 `(On M&M products, the four digit number ending in ${new Date(moment().format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")))}.)` 
                             : 
                                 `(On M&M products, the four digit number ending in ${new Date(moment().format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${new Date(moment().format("MM-DD-YYYY")).getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")))})`
@@ -202,7 +217,7 @@ export default function CheckSection() {
                         null
                     }
                     <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
-                    <input type="number" autoFocus onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                    <input type="number" autoFocus={currentSection.section != "Dairy"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
                     {currentSection.section == "Dairy" ? 
                         <div>
                             <div className="text-center font-serif text-xl font-bold">Or choose milk product:</div>
@@ -224,7 +239,7 @@ export default function CheckSection() {
                             <div className="w-7 ml-1"><img src={cross}/></div>
                         </div>
                     </div>
-                    <div className="bg-yellow-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div>
+                    <div className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div>
                     <div>{dateList()}</div>
                 </div>
             :

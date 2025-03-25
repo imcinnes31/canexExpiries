@@ -43,41 +43,41 @@ const router = createBrowserRouter([
   //   ],
   // },
   {
-    path: "/canexExpiries/",
+    path: "/",
     element: <App />,
     children: [
       {
-        path: "/canexExpiries/",
+        path: "/",
         element: <MainMenu />,
       },
     ],
   },
   {
-    path: "/canexExpiries/alert/:type",
+    path: "/alert/:type",
     element: <App />,
     children: [
       {
-        path: "/canexExpiries/alert/:type",
+        path: "/alert/:type",
         element: <AlertList />,
       },
     ],
   },
   {
-    path: "/canexExpiries/check/:id",
+    path: "/check/:id",
     element: <App />,
     children: [
       {
-        path: "/canexExpiries/check/:id",
+        path: "/check/:id",
         element: <CheckSection />,
       },
     ],
   },
   {
-    path: "/canexExpiries/report/:reportDate",
+    path: "/report/:reportDate",
     element: <App />,
     children: [
       {
-        path: "/canexExpiries/report/:reportDate",
+        path: "/report/:reportDate",
         element: <ExpiryReport />,
       },
     ],

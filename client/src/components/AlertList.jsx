@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
 
 import {monthNames, vendorList, nonCreditVendors} from "../constants.jsx"
+import {REACT_APP_API_URL} from "../../index.js"
+
+import moment from "moment";
 
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
@@ -9,7 +12,7 @@ import tick from "../assets/check.png";
 const Pull = (props) => (
     <div>
         {props.params.type == "pulls" ?
-            <div id={`${props.product.productUPC}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
+            <div id={`${props.product.productUPC}`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
                 <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
                     {props.product.productName}
                 </div>
@@ -45,7 +48,7 @@ const Pull = (props) => (
                 </div>
             </div>
         : props.params.type == "discounts" ?
-            <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} onAnimationEnd={()=>props.animationEnds(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
+            <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
                 <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} className="bg-white text-center p-1 font-bold text-xl">
                     {props.product.productName}
                 </div>
@@ -58,7 +61,7 @@ const Pull = (props) => (
                     </div>
                 </div>
                 <div className="text-center text-xl font-bold font-serif p-1">
-                    {"Expires " + monthNames[new Date(props.product.productExpiry).getMonth()] + " " + new Date(props.product.productExpiry).getDate()}
+                    {"Expires " + monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1] + " " + parseInt(props.product.productExpiry.substring(8,10))}
                 </div>
                 <div className="grid grid-cols-2 p-1">
                     <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.discountProduct(props.pullID,props.product.productExpiry)}>
@@ -75,7 +78,8 @@ const Pull = (props) => (
     </div>
 );
 
-function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {    
+function pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, params) {   
+     
     function setPullNumber(e) {
         const currentPull = pullAmounts[e.target.id.replace("numberPull","")];
         currentPull['amount'] = parseInt(e.target.value);
@@ -85,7 +89,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
     async function deleteProduct(divID, recording = null) {
         if (recording == true) {
             try {
-                await fetch(`http://localhost:5000/expiries/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
+                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
                     method: "POST",
                 });
             } catch (error) {
@@ -97,7 +101,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
 
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5000/expiries/products/${prodUPC}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}`, {
                 method: "DELETE",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
@@ -111,7 +115,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5000/expiries/discounts/${prodUPC}&${productExpiry}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${productExpiry}`, {
                 method: "DELETE",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
@@ -125,7 +129,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         try {
-            await fetch(`http://localhost:5000/expiries/discounts/${prodUPC}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}`, {
                 method: "PATCH",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
@@ -136,24 +140,26 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
 
     function alertAnimationEnd(productID) {
         const newProducts = products.filter((pl) => pl.productUPC !== productID.substring(0,12));
+        setProductsLength(newProducts.length);
         setProducts(newProducts);
     }
 
     useEffect(() => {
         async function getPulls() {
             const response = params.type == "pulls" ? 
-                await fetch(`http://localhost:5000/expiries/products/`) : 
+                await fetch(`${REACT_APP_API_URL}/expiries/products/`) : 
                 params.type == "discounts" ? 
-                await fetch(`http://localhost:5000/expiries/discounts/`) : null;
+                await fetch(`${REACT_APP_API_URL}/expiries/discounts/`) : null;
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
                 return;
             }
             const productData = await response.json();
-            const initialPullAmounts = {};
+            const initialPullAmounts = [];
             if (params.type == "discounts") {
                 const filteredProductData = productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+                setProductsLength(filteredProductData.length);
                 for (const x in productData) {
                     initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")] = {};
                     initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['amount'] = 0;
@@ -162,6 +168,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
                 }
                 setProducts(filteredProductData);
             } else if (params.type == "pulls") {
+                setProductsLength(productData.length);
                 for (const x in productData) {
                     initialPullAmounts[productData[x].productUPC] = {};
                     initialPullAmounts[productData[x].productUPC]['amount'] = 0;
@@ -186,7 +193,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
                 discountProduct={() => discountProduct(pullID)}
                 soldOutProduct={() => soldOutProduct(pullID,product.productExpiry)}
                 setPullNumber={(e) => setPullNumber(e)}
-                animationEnds={() => alertAnimationEnd(pullID)}
+                alertAnimationEnd={() => alertAnimationEnd(pullID)}
                 pullMenuValue = {pullAmounts[pullID]}
                 params={params}
                 key={pullID}
@@ -198,26 +205,36 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, params) {
 export default function AlertList() {
     const params = useParams();
     const [products, setProducts] = useState([]);
-    const [pullAmounts, setPullAmounts] = useState({});
+    const [pullAmounts, setPullAmounts] = useState([]);
+    const [productsLength, setProductsLength] = useState(null);
 
     return (
         <div>
-            <div className="font-bold text-center text-xl pt-2">
-                {
-                    params.type == "pulls" ? 
-                        "Products to Pull" : 
-                    params.type == "discounts" ? 
-                        "Products to Mark as 50% off":
-                        "Error"
+            <div>           
+                {productsLength > 0 ?
+                    <div className="font-bold text-center text-xl pt-2">
+                    {
+                        params.type == "pulls" ? 
+                            "Products to Pull" : 
+                        params.type == "discounts" ? 
+                            "Products to Mark as 50% off":
+                            "Error"
+                    }
+                    </div>
+                : null
                 }
+                <div>
+                    {
+                        params.type == "pulls" || params.type == "discounts" ? 
+                            pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, params) :
+                            "Error"
+                    }
+                </div>
             </div>
-            <div>
-                {
-                    params.type == "pulls" || params.type == "discounts" ? 
-                        pullList(products, setProducts, pullAmounts, setPullAmounts, params) :
-                        "Error"
-                }
-            </div>
+            {productsLength == 0 ?
+                <div className="text-2xl text-center font-bold font-serif my-4">No product left to {params.type == "pulls" ? 'pull' : params.type == "discounts" ? 'discount' : ''}. <NavLink className="text-2xl font-serif font-bold underline decoration-blue-400 text-blue-400" to="/">Click here</NavLink> to return to Main Menu.</div>
+            : null
+            }
         </div>
     );
 }

@@ -12,6 +12,10 @@ app.use(cors());
 app.use(express.json());
 app.use("/expiries", expiries);
 
+app.get("/", (req, res) => {
+    res.send("Hello from Expiries API");
+});
+
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });

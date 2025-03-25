@@ -5,7 +5,7 @@ export default function Navbar() {
   return (
     <div>
     <div className="flex flex-row justify-end print:hidden">      
-      {useLocation().pathname == "/canexExpiries/" ? null : <NavLink className="text-xl underline decoration-blue-400 text-blue-400" to="/canexExpiries/">Main Menu</NavLink>}
+      {useLocation().pathname == "/" ? null : <NavLink className="text-xl underline decoration-blue-400 text-blue-400" to="/">Main Menu</NavLink>}
     </div>
       <img className="w-60 print:hidden" src={canexLogo}/>
       <div className="flex flex-row justify-end print:hidden">      

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {monthNames, milkProducts} from "../constants.jsx"
+import {REACT_APP_API_URL} from "../../index.js"
 
 export default function ExpiryReport() {
     const params = useParams();
@@ -11,7 +12,7 @@ export default function ExpiryReport() {
     useEffect(() => {
         async function getReport() {
             const monthID = params.reportDate;
-            const response = await fetch(`http://localhost:5000/expiries/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
+            const response = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
@@ -19,7 +20,7 @@ export default function ExpiryReport() {
             }
             const reportData = await response.json();
             for (const x in reportData) {
-                const responseProduct = await fetch(`http://localhost:5000/expiries/products/${reportData[x].productUPC}`);
+                const responseProduct = await fetch(`${REACT_APP_API_URL}/expiries/products/${reportData[x].productUPC}`);
                 if (!responseProduct.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);

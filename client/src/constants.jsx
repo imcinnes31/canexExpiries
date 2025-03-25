@@ -85,7 +85,7 @@ export const milkProducts = [
             {
                 longDesc: "Milk 1%",
                 desc: "1%",
-                productUPC: "068700116704"
+                productUPC: "068700011825"
             },
         ]
     },
@@ -105,7 +105,7 @@ export const vendorList = [
         credit: false
     },
     {
-        name: "Pepsi",
+        name: "Pepsi-Cola",
         credit: false
     },
     {

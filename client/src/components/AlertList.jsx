@@ -1,85 +1,123 @@
 import { useEffect, useState } from "react";
 import { useParams, NavLink } from "react-router-dom";
 
-import {monthNames, vendorList, nonCreditVendors} from "../constants.jsx"
+import {monthNames, nonCreditVendors} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
-
-import moment from "moment";
 
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
 
 const Pull = (props) => (
     <div>
-        {props.params.type == "pulls" ?
-            <div id={`${props.product.productUPC}`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
-                <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
-                    {props.product.productName}
-                </div>
-                <div className="grid grid-cols-2">
-                    <div className="bg-white border border-black text-center font-serif font-bold text-l">
-                        {props.product.productSection}
-                    </div>
-                    <div className="bg-white border border-black text-center text-l tracking-wide">
-                        {props.product.productUPC}
-                    </div>
-                </div>
-                <div>
-                    {nonCreditVendors.includes(props.product.productVendor) ?
-                        <div className="flex w-full pt-2">
-                            <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 m-auto py-1">Pull Amt:</div>
-                            <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
-                                {Array.from(Array(50), (e, i) => {
-                                    return <option key={i}>{i}</option>
-                                })}
-                            </select>
-                            <div id={`pullProduct${props.product.productUPC}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
-                            <div className="bg-red-400 basis-24 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="w-7"><img src={cross}/></div></div>
+        <div>
+            {props.params.type == "pulls" ?
+                <div id={`${props.product.productUPC}`}>
+                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                        <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
+                            {props.product.productName}
                         </div>
-                    :
-                        <div>
-                            <div className="text-center text-xl font-bold font-serif p-1">Credit Product</div>
-                            <div className="grid grid-cols-2">
-                                <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
-                                <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>
+                        <div className="grid grid-cols-2">
+                            <div className="bg-white border border-black text-center font-serif font-bold text-l">
+                                {props.product.productSection}
+                            </div>
+                            <div className="bg-white border border-black text-center text-l tracking-wide">
+                                {props.product.productUPC}
                             </div>
                         </div>
-                    }
-                </div>
-            </div>
-        : props.params.type == "discounts" ?
-            <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true ? 'animate-hide' : ''}`}>
-                <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} className="bg-white text-center p-1 font-bold text-xl">
-                    {props.product.productName}
-                </div>
-                <div className="grid grid-cols-2">
-                    <div className="bg-white border border-black text-center font-serif font-bold text-l">
-                        {props.product.productSection}
+                        <div>
+                            {nonCreditVendors.includes(props.product.productVendor) ?
+                                <div className="flex w-full pt-2">
+                                    <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 m-auto py-1">Pull Amt:</div>
+                                    <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
+                                        {Array.from(Array(50), (e, i) => {
+                                            return <option key={i}>{i}</option>
+                                        })}
+                                    </select>
+                                    <div id={`pullProduct${props.product.productUPC}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                                    <div className="bg-red-400 basis-24 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.setCurrentConfirm(props.pullID)}><div className="w-7"><img src={cross}/></div></div>
+                                </div>
+                            :
+                                <div>
+                                    <div className="text-center text-xl font-bold font-serif p-1">Credit Product</div>
+                                    <div className="grid grid-cols-2">
+                                        <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                                        <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
-                    <div className="bg-white border border-black text-center text-l tracking-wide">
-                        {props.product.productUPC}
+                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                        <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-lg">
+                            Mark All Items of {props.product.productName} ({props.product.productUPC}) as Sold Out?
+                        </div>
+                        <div className="grid grid-cols-2 p-1">
+                            <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID)}>
+                                <div className="">Confirm</div>
+                                <div className="w-7 ml-1"><img src={tick}/></div>
+                            </div>
+                            <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.cancelCurrentConfirm()}>
+                                <div className="">Cancel</div>
+                                <div className="w-7 ml-1"><img src={cross}/></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="text-center text-xl font-bold font-serif p-1">
-                    {"Expires " + monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1] + " " + parseInt(props.product.productExpiry.substring(8,10))}
-                </div>
-                <div className="grid grid-cols-2 p-1">
-                    <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.discountProduct(props.pullID,props.product.productExpiry)}>
-                        <div className="">Stickered</div>
-                        <div className="w-7 ml-1"><img src={tick}/></div>
+            : props.params.type == "discounts" ?
+                <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`}>
+                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-gray-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                        <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} className="bg-white text-center p-1 font-bold text-xl">
+                            {props.product.productName}
+                        </div>
+                        <div className="grid grid-cols-2">
+                            <div className="bg-white border border-black text-center font-serif font-bold text-l">
+                                {props.product.productSection}
+                            </div>
+                            <div className="bg-white border border-black text-center text-l tracking-wide">
+                                {props.product.productUPC}
+                            </div>
+                        </div>
+                        <div className="text-center text-xl font-bold font-serif p-1">
+                            {"Expires " + monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1] + " " + parseInt(props.product.productExpiry.substring(8,10))}
+                        </div>
+                        <div className="grid grid-cols-2 p-1">
+                            <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.discountProduct(props.pullID,props.product.productExpiry)}>
+                                <div className="">Stickered</div>
+                                <div className="w-7 ml-1"><img src={tick}/></div>
+                            </div>
+                            <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.setCurrentConfirm(props.pullID)}>
+                                <div className="">Sold Out</div>
+                                <div className="w-7 ml-1"><img src={cross}/></div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.soldOutProduct(props.pullID,props.product.productExpiry)}>
-                        <div className="">Sold Out</div>
-                        <div className="w-7 ml-1"><img src={cross}/></div>
+                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                        <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-xl">
+                            Mark All Items of {props.product.productName} ({props.product.productUPC}), Expiring {monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1]} {parseInt(props.product.productExpiry.substring(8,10))}, as Sold Out?
+                        </div>
+                        <div className="grid grid-cols-2 p-1">
+                            <div className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center" onClick={() => props.soldOutProduct(props.pullID)}>
+                                <div className="">Confirm</div>
+                                <div className="w-7 ml-1"><img src={tick}/></div>
+                            </div>
+                            <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.cancelCurrentConfirm()}>
+                                <div className="">Cancel</div>
+                                <div className="w-7 ml-1"><img src={cross}/></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        : "Error "}
+            : "Error "}
+        </div>
     </div>
 );
 
-function pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, params) {   
+function pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, setCurrentConfirm, currentConfirm, params) {   
      
+    function cancelCurrentConfirm() {
+        setCurrentConfirm(null);
+    }
+
     function setPullNumber(e) {
         const currentPull = pullAmounts[e.target.id.replace("numberPull","")];
         currentPull['amount'] = parseInt(e.target.value);
@@ -110,10 +148,12 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
         }
     } 
 
-    async function soldOutProduct(divID,productExpiry) {
+    async function soldOutProduct(divID) {
         const currentPull = pullAmounts[divID];
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
+        const productExpiry = divID.substring(12,20);
+        // console.log(productExpiry);
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${productExpiry}`, {
                 method: "DELETE",
@@ -180,6 +220,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             setPullAmounts(initialPullAmounts);
         }
         getPulls();
+        // console.log(products);
         return;
     }, []);
 
@@ -191,8 +232,11 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 product={product}
                 deleteProduct={deleteProduct}
                 discountProduct={() => discountProduct(pullID)}
-                soldOutProduct={() => soldOutProduct(pullID,product.productExpiry)}
+                soldOutProduct={() => soldOutProduct(pullID)}
+                currentConfirm={currentConfirm}
+                setCurrentConfirm={() => setCurrentConfirm(pullID)}
                 setPullNumber={(e) => setPullNumber(e)}
+                cancelCurrentConfirm={cancelCurrentConfirm}
                 alertAnimationEnd={() => alertAnimationEnd(pullID)}
                 pullMenuValue = {pullAmounts[pullID]}
                 params={params}
@@ -207,6 +251,7 @@ export default function AlertList() {
     const [products, setProducts] = useState([]);
     const [pullAmounts, setPullAmounts] = useState([]);
     const [productsLength, setProductsLength] = useState(null);
+    const [currentConfirm, setCurrentConfirm] = useState(null);
 
     return (
         <div>
@@ -226,7 +271,7 @@ export default function AlertList() {
                 <div>
                     {
                         params.type == "pulls" || params.type == "discounts" ? 
-                            pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, params) :
+                            pullList(products, setProducts, pullAmounts, setPullAmounts, setProductsLength, productsLength, setCurrentConfirm, currentConfirm, params) :
                             "Error"
                     }
                 </div>

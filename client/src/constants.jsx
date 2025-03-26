@@ -115,3 +115,17 @@ export const vendorList = [
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);
+
+export function getLocalDate() {
+    const date1 = new Date();
+    const date2 = new Date(date1);
+    const durationInMinutes = date1.getTimezoneOffset();
+    date2.setMinutes(date1.getMinutes() - durationInMinutes)
+    const date3 = date2.toISOString().split("T")[0] + "T00:00:00.000+00:00";
+    return new Date(date3);
+}
+  
+export function addDays(numDays) {
+    // console.log(new Date(getLocalDate().getTime() + (numDays * 86400000)));
+    return new Date(new Date().getTime() + (numDays * 86400000));
+}

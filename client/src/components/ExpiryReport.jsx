@@ -127,7 +127,9 @@ export default function ExpiryReport() {
         <div>
             <div className={"screen:hidden text-xl pl-1"}>4375 - Winnipeg</div>
             <div className={"screen:hidden text-xl pl-1"}>Store Spoilage log - {monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,6)}</div>
-            <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
+            {Object.keys(milkReport).length > 0 || nonMilkReport.length > 0 ?
+                <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
+            : null}
             <div className="print:hidden h-3 font-serif font-bold text-center text-lg">{monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,6)}</div>
             <div className="pt-[24px]">
                 {milkGroups()}

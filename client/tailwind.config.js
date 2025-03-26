@@ -33,6 +33,32 @@ export default {
             'line-height': '0'
           }
         },
+        confirmHide: {
+          '0%': {
+            'opacity': '1',
+            'height': '100%',
+          },
+          '50%': {
+            'opacity': '0',
+            'max-height': '0%',
+            'display': 'none',
+            'line-height': '0'
+          },
+          '100%': {
+            'opacity': '0',
+            'max-height': '0%',
+            'display': 'none',
+            'line-height': '0'
+          },
+        },
+        confirmShow: {
+          '0%': {
+            'height': '0%',
+          },
+          '100%': {
+            'height': '100%',
+          },
+        },
         horizontalShow: {
           '0%': {
             'opacity': '0',
@@ -59,6 +85,8 @@ export default {
       animation: {
         flash: 'flash 1s step-end infinite',
         hide: 'hide ease-in-out 1s forwards',
+        confirmHide: 'confirmHide ease-in-out 1s forwards',
+        confirmShow: 'confirmShow ease-in-out 1s forwards',
         horizontalShow: 'horizontalShow ease-in-out 0.5s forwards',
         horizontalHide: 'horizontalHide ease-in-out 0.5s forwards',
       }

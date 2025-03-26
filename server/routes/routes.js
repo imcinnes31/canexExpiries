@@ -10,8 +10,21 @@ import moment from "moment";
 
 const router = express.Router();
 
+function getLocalDate() {
+  const date1 = new Date();
+  const date2 = new Date(date1);
+  const durationInMinutes = date1.getTimezoneOffset();
+  date2.setMinutes(date1.getMinutes() - durationInMinutes)
+  const date3 = date2.toISOString().split("T")[0] + "T00:00:00.000+00:00";
+  return new Date(date3);
+}
+
+function addDays(numDays) {
+  return new Date(getLocalDate().getTime() + (numDays * 86400000));
+}
+
 router.get("/test/", async (req,res) => {
-  console.log(storeClosedSunday);
+  // console.log(storeClosedSunday);
   // console.log(new Date(moment().format("MM-DD-YYYY")).toISOString(true));
   // console.log(new Date(moment("2025-02-13").format("MM-DD-YYYY")).toISOString(true));
   // const date1 = new Date(moment().format("MM-DD-YYYY"));
@@ -20,6 +33,24 @@ router.get("/test/", async (req,res) => {
   // console.log(new Date("2025-02-13").toISOString(true));
   // console.log(date1 < date2);
   // console.log(date1 >= date2);
+  // const date1 = new Date("2025-03-27T00:00:00.000+00:00");
+  // console.log(date1);
+  // const date2 = new Date();
+  // console.log(date2.getTimezoneOffset());
+
+  // console.log("start date");
+  // console.log(date1);
+  // console.log("end date");
+  // console.log(date2);
+  // console.log("fixed date");
+  // console.log(date3);
+  // console.log("data date");
+  // console.log(date4);
+  // console.log(date3 <= date4);
+
+  // console.log(getLocalDate());
+  // console.log(addDays(3));
+
 });
 
 // EXPIRY REPORT
@@ -83,7 +114,7 @@ router.patch("/sections/:id", async (req, res) => {
     const query = { _id: new ObjectId(req.params.id) };
     const updates = {
         $set: {
-            dateLastChecked: new Date(moment().format("MM-DD-YYYY"))
+            dateLastChecked: getLocalDate()
         },
     };
 
@@ -99,7 +130,7 @@ router.patch("/sections/:id", async (req, res) => {
 // CHECK SECTION*
 router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
   const dateGiven = req.params.expiryDate;
-  const dateConverted = dateGiven.substring(0,4) + "-" + dateGiven.substring(4,6) + "-" + dateGiven.substring(6,8);
+  const dateConverted = dateGiven.substring(0,4) + "-" + dateGiven.substring(4,6) + "-" + dateGiven.substring(6,8) + "T00:00:00.000+00:00";
   try {
     let collection = await db.collection("storeSections");
       // let result = await collection.updateOne({
@@ -129,7 +160,7 @@ router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
     let result = await collection.updateOne({
       "products":{$elemMatch:{
         "expiryDates.dateGiven": {
-          $ne: new Date(moment(dateConverted))
+          $ne: new Date(dateConverted)
           // $ne: new Date(moment(dateConverted)).toISOString(true)
         },
         "productUPC": String(req.params.productUPC)
@@ -137,7 +168,7 @@ router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
     },{
       $push: {
         "products.$.expiryDates": {
-          "dateGiven": new Date(moment(dateConverted).format("MM-DD-YYYY")),
+          "dateGiven": new Date(dateConverted),
           // "dateGiven": new Date(moment(dateConverted)).toISOString(true),
           "discounted": false
         }
@@ -215,7 +246,7 @@ router.get("/sections/", async (req, res) => {
                 "$dateLastChecked",
                 {
                   $dateSubtract: {
-                    startDate: new Date(moment().format("MM-DD-YYYY")),
+                    startDate: getLocalDate(),
                     unit: "day",
                     amount: "$intervalDays"
                   }
@@ -243,7 +274,7 @@ router.get("/sections/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/discounts/", async (req, res) => {
-  let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY"));
+  let threeDaysAfter = addDays(3);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -273,7 +304,7 @@ router.get("/discounts/", async (req, res) => {
           $gte: [
             "$products.expiryDates.dateGiven",
             // new Date(moment().format("MM-DD-YYYY")).toISOString(true)
-            new Date(moment().format("MM-DD-YYYY"))
+            getLocalDate()
             
             // new Date(moment("$products.expiryDates.dateGiven").format("MM-DD-YYYY")),
             // new Date(moment().format("MM-DD-YYYY"))
@@ -324,7 +355,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
+            (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
@@ -362,7 +393,7 @@ router.get("/products/", async (req, res) => {
 router.patch("/discounts/:productUPC", async (req, res) => {
   try {
     // let threeDaysFromNow = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
-    let threeDaysFromNow = new Date(moment().add(3, "days").format("MM-DD-YYYY"));
+    let threeDaysFromNow = addDays(3);
     let collection = await db.collection("storeSections");
     let result = await collection.updateOne({},
     {
@@ -415,7 +446,7 @@ router.delete("/products/:productUPC", async (req, res) => {
     let result = await collection.updateOne({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
+          "$lte": (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -426,7 +457,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": (parseInt(new Date(moment().format("MM-DD-YYYY")).getDay()) == 6 && storeClosedSunday == true) ? new Date(moment().add(1,"days").format("MM-DD-YYYY")) : new Date(moment().format("MM-DD-YYYY"))
+            "$lte": (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }
@@ -449,7 +480,7 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
         "products.$[x].expiryDates": {
           "dateGiven": {
             // "$eq": new Date(moment(req.params.productExpiry).format("MM-DD-YYYY")).toISOString(true)
-            "$eq": new Date(moment(req.params.productExpiry).format("MM-DD-YYYY"))
+            "$eq": new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
           }
         }
       }
@@ -475,7 +506,7 @@ router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
     let result = await collection.insertOne({
         productUPC: req.params.productUPC,
         amount: req.params.productAmount,
-        writeOffDate: new Date(moment().format("MM-DD-YYYY"))
+        writeOffDate: getLocalDate()
     });
     res.send(result).status(200);
   } catch(err) {
@@ -486,8 +517,8 @@ router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
 
 // MAIN MENU*
 router.delete("/expiryRecords", async (req, res) => {
-  const twelveMonthsAgoYear = new Date(moment().subtract(12, "month").format("MM-DD-YYYY")).getFullYear();
-  const twelveMonthsAgoMonth = new Date(moment().subtract(12, "month").format("MM-DD-YYYY")).getMonth();
+  const twelveMonthsAgoYear = getLocalDate().getFullYear() - 1;
+  const twelveMonthsAgoMonth = getLocalDate().getMonth();
   try {
     let collection = await db.collection("expiryRecords");
     let result = await collection.deleteMany( { writeOffDate : {"$lt" : new Date(twelveMonthsAgoYear, twelveMonthsAgoMonth, 1) } })

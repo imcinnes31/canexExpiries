@@ -4,8 +4,6 @@ import { useNavigate, NavLink } from "react-router-dom";
 import {monthNames, nonCreditVendors} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
-import moment from "moment";
-
 export default function MainMenu() {
   const [pulls, setPulls] = useState([]);
   const [discounts, setDiscounts] = useState([]);
@@ -99,7 +97,13 @@ export default function MainMenu() {
   function reportList() {
     const monthList = [];
     for (let i = 0; i <= 12; i++) {
-      const d = new Date(moment().subtract(i, "month").format("MM-DD-YYYY"));
+      const d = new Date();
+      if (d.getMonth() - i < 0) {
+        d.setMonth(d.getMonth() + 12 - i);
+        d.setFullYear(d.getFullYear() - 1);
+      } else {
+        d.setMonth(d.getMonth() - i);
+      }
       if (d.getFullYear() > 2025 || (d.getFullYear() == 2025 && (d.getMonth() + 1) >= 3)) {
         monthList.push(
           {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import {monthNames, milkProducts, vendorList} from "../constants.jsx"
+import {monthNames, milkProducts, vendorList, addDays} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
 import moment from "moment";
@@ -68,6 +68,7 @@ export default function CheckSection() {
         }
         const productData = await response.json();
         setCurrentProduct(productData);
+        window.scrollTo(0,0);
     }
 
     function cancelInput() {
@@ -169,11 +170,11 @@ export default function CheckSection() {
 
     function dateList() {
         const expiryDateList = [];
-        for (let i = 0; i <= currentSection.expiryRange; i++) {
-            const d = new Date(moment().add(i, "days"));
+        for (let i = -1; i <= currentSection.expiryRange; i++) {
+            const d = addDays(i);
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                name: monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()
+                name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
             });
         }
         return expiryDateList.map((date) => {
@@ -204,13 +205,13 @@ export default function CheckSection() {
                     <div className="text-3xl font-serif pt-4">Current Section:</div>
                     <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
-                    <div className="text-2xl font-bold">{monthNames[new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getMonth()] + " " + new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getDate() + " " + new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getFullYear()}</div>
+                    <div className="text-2xl font-bold">{monthNames[addDays(currentSection.expiryRange).getMonth()] + " " + addDays(currentSection.expiryRange).getDate() + " " + addDays(currentSection.expiryRange).getFullYear()}</div>
                     { currentSection.section == "Frozen" ?
                         <div className="text-lg">
-                            {(new Date(moment().format("MM-DD-YYYY")).getFullYear()) == (new Date(moment().add(currentSection.expiryRange, "days").format("MM-DD-YYYY")).getFullYear()) ?
-                                `(On M&M products, the four digit number ending in ${new Date(moment().format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")))}.)` 
+                            {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
                             : 
-                                `(On M&M products, the four digit number ending in ${new Date(moment().format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${new Date(moment().format("MM-DD-YYYY")).getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(new Date(moment().add(currentSection.intervalDays, "days").format("MM-DD-YYYY")))})`
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.intervalDays).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
                             }
                         </div>
                     :
@@ -239,7 +240,7 @@ export default function CheckSection() {
                             <div className="w-7 ml-1"><img src={cross}/></div>
                         </div>
                     </div>
-                    <div className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div>
+                    {/* <div className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div> */}
                     <div>{dateList()}</div>
                 </div>
             :

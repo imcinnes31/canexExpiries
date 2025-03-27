@@ -13,8 +13,9 @@ const router = express.Router();
 function getLocalDate() {
   const date1 = new Date();
   const date2 = new Date(date1);
-  const durationInMinutes = date1.getTimezoneOffset();
-  date2.setMinutes(date1.getMinutes() - durationInMinutes)
+  // const durationInMinutes = date1.getTimezoneOffset();
+  // date2.setMinutes(date1.getMinutes() - durationInMinutes)
+  date2.setMinutes(date1.getMinutes() - 300);
   const date3 = date2.toISOString().split("T")[0] + "T00:00:00.000+00:00";
   return new Date(date3);
 }
@@ -48,9 +49,13 @@ router.get("/test/", async (req,res) => {
   // console.log(date4);
   // console.log(date3 <= date4);
 
-  // console.log(getLocalDate());
+  const date1 = getLocalDate();
+  const date2 = new Date("2025-03-27T00:00:00.000+00:00");
+  // console.log(date1);
+  // console.log(date2);
+  // console.log(date1.getTimezoneOffset());
   // console.log(addDays(3));
-
+  res.send().status(200);
 });
 
 // EXPIRY REPORT
@@ -274,7 +279,7 @@ router.get("/sections/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/discounts/", async (req, res) => {
-  let threeDaysAfter = addDays(3);
+  let threeDaysAfter = (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(4) : addDays(3);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -377,9 +382,19 @@ router.get("/products/", async (req, res) => {
         productUPC: "$_id.productUPC",
         productName: "$_id.productName",
         productVendor: "$_id.productVendor",
-        productSection: "$_id.productSection"
+        productSection: "$_id.productSection",
+        currentDate: getLocalDate()
       }
     },
+    // {
+    //   "$project": {
+    //     productUPC: "$products.productUPC",
+    //     productName: "$products.name",
+    //     productVendor: "$products.vendor",
+    //     productSection: "$section",
+    //     productExpiry: "$products.expiryDates.dateGiven",
+    //   }
+    // },    
     {
       "$sort":{
         "productSection": 1

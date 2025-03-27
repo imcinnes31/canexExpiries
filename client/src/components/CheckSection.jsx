@@ -127,6 +127,8 @@ export default function CheckSection() {
             console.error('A problem occurred with your fetch operation: ', error);
         } finally {
             setCurrentProduct(null);
+            setCurrentDate(null);
+            window.scrollTo(0,0);
         }
     }
 

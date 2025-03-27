@@ -101,6 +101,14 @@ export const vendorList = [
         credit: true
     },
     {
+        name: "Scholtens Candy",
+        credit: true
+    },
+    {
+        name: "United Distribution",
+        credit: true
+    },
+    {
         name: "Coca-Cola",
         credit: false
     },

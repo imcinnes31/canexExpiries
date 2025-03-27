@@ -156,7 +156,7 @@ export default function CheckSection() {
     const DateSelect = (props) => (
         <div id={`${props.date.id}`} className="flex">
             {/* <div id={props.date.id} className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(e.target.id)}>{props.date.name}</div> */}
-            <div className={`w-full ${currentDate == props.date.id ? 'animate-horizontalHide' : 'bg-green-400'} h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold`} onClick={(e) => confirmCurrentDate(props.date.id)}>{props.date.name}</div>
+            <div className={`w-full ${currentDate == props.date.id ? 'animate-horizontalHide' : 'bg-green-400'} h-10 my-4 pb-1 pt-1 border-2 border-black text-center ${props.date.section == "Frozen" || props.date.section == "Cottage Candy" ? 'text-md' : 'text-xl'} font-bold`} onClick={(e) => confirmCurrentDate(props.date.id)}>{props.date.name}</div>
             <div className={`${currentDate == props.date.id ? 'animate-horizontalShow' : 'hidden'} bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold`} onClick={(e) => enterExpiryDate(props.date.id)}>
                 <div className='flex'>
                     <div>Confirm</div>
@@ -176,7 +176,8 @@ export default function CheckSection() {
             const d = addDays(i);
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
+                name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Frozen" ? ` OR ${daysIntoYear(d)}${d.getFullYear() - 2020 - 1}` : "") + (currentSection.section == "Cottage Candy" ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoYear(d)}` : ""),
+                section: currentSection.section
             });
         }
         return expiryDateList.map((date) => {
@@ -209,15 +210,22 @@ export default function CheckSection() {
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
                     <div className="text-2xl font-bold">{monthNames[addDays(currentSection.expiryRange).getMonth()] + " " + addDays(currentSection.expiryRange).getDate() + " " + addDays(currentSection.expiryRange).getFullYear()}</div>
                     { currentSection.section == "Frozen" ?
-                        <div className="text-lg">
+                        <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
                             : 
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.intervalDays).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.intervalDays).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
                             }
                         </div>
-                    :
-                        null
+                    : currentSection.section == "Cottage Candy" ?
+                        <div className="text-xl font-bold">
+                            {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
+                            : 
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.intervalDays).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
+                            }
+                        </div>
+                    : null
                     }
                     <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
                     <input type="number" autoFocus={currentSection.section != "Dairy"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>

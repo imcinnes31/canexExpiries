@@ -120,6 +120,18 @@ export const vendorList = [
         name: "Saputo",
         credit: false
     },
+    {
+        name: "M&M Food Market",
+        credit: false
+    },
+    {
+        name: "Great Canadian Meat",
+        credit: true
+    },
+    {
+        name: "Coldhaus Direct",
+        credit: true
+    }
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

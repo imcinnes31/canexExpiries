@@ -94,16 +94,26 @@ export default function MainMenu() {
     });
   }
 
+  function subtractMonth(date, months) {
+    let d = date.getDate();
+    date.setMonth(date.getMonth() - months);
+    if (date.getDate() != d) {
+      date.setDate(0);
+    }
+    return date;
+  }
+
   function reportList() {
     const monthList = [];
     for (let i = 0; i <= 12; i++) {
-      const d = new Date();
-      if (d.getMonth() - i < 0) {
-        d.setMonth(d.getMonth() + 12 - i);
-        d.setFullYear(d.getFullYear() - 1);
-      } else {
-        d.setMonth(d.getMonth() - i);
-      }
+      let d = new Date();
+      // if (d.getMonth() - i < 0) {
+      //   d.setMonth(d.getMonth() + 12 - i);
+      //   d.setFullYear(d.getFullYear() - 1);
+      // } else {
+      //   d.setMonth(d.getMonth() - i);
+      // }
+      d = subtractMonth(d,i);
       if (d.getFullYear() > 2025 || (d.getFullYear() == 2025 && (d.getMonth() + 1) >= 3)) {
         monthList.push(
           {

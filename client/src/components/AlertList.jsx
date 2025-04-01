@@ -168,8 +168,9 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
         const currentPull = pullAmounts[divID];
         currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
+        const prodExpiry = divID.substring(12,20);
         try {
-            await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${prodExpiry}`, {
                 method: "PATCH",
             });
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));

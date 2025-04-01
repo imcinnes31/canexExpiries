@@ -135,29 +135,31 @@ export default function MainMenu() {
   }
   
   return (
-    <div className="pt-4 text-center">
-      <NavLink to={pulls.length > 0 ? "alert/pulls" : null}>
-        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${pulls.length > 0 == true ? 'animate-flash' : ''} ${pulls.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div>
-      </NavLink>
-      <NavLink to={discounts.length > 0 ? "alert/discounts" : null}>
-        <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length > 0 == true ? 'animate-flash' : ''} ${discounts.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
-      </NavLink>
-      <div className="px-3 py-2 bg-gray-200 border border-black">
-        <h1 className="text-3xl pb-4">Store Sections</h1>
-        {sections.length > 0 ?
-          <div className="grid grid-cols-2 gap-4 pb-4">
-              {sectionList()}
+    <div>
+      {sections.length > 0 ?
+        <div className="pt-4 text-center">
+          <NavLink to={pulls.length > 0 ? "alert/pulls" : null}>
+            <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${pulls.length > 0 == true ? 'animate-flash' : ''} ${pulls.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{pulls.length == 0 ? "No Products to Pull" : "Products to Pull"}</div>
+          </NavLink>
+          <NavLink to={discounts.length > 0 ? "alert/discounts" : null}>
+            <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length > 0 == true ? 'animate-flash' : ''} ${discounts.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
+          </NavLink>
+          <div className="px-3 py-2 bg-gray-200 border border-black">
+            <h1 className="text-3xl pb-4">Store Sections</h1>
+              <div className="grid grid-cols-2 gap-4 pb-4">
+                  {sectionList()}
+              </div>
           </div>
-        :
-          <div className="text-2xl text-center font-bold">Loading Sections...</div>
-        }
-      </div>
-      <div className="pt-4">
-        <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
-        <div className="">
-            {reportList()}
+          <div className="pt-4">
+            <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
+            <div className="">
+                {reportList()}
+            </div>
+          </div>
         </div>
-      </div>
+      : 
+        <div className="h-50 text-2xl text-center font-bold">Loading...</div>
+      }
     </div>
   );
 }

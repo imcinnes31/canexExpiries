@@ -144,7 +144,10 @@ export default function CheckSection() {
         }
     }
 
-    function confirmCurrentDate(dateID) {
+    function confirmCurrentDate(dateID, last) {
+        if (last == true) {
+            document.getElementById("pageBottom").scrollIntoView({behavior: 'smooth'});
+        }
         setCurrentDate(dateID);
     }
 
@@ -156,7 +159,7 @@ export default function CheckSection() {
     const DateSelect = (props) => (
         <div id={`${props.date.id}`} className="flex">
             {/* <div id={props.date.id} className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(e.target.id)}>{props.date.name}</div> */}
-            <div className={`w-full ${currentDate == props.date.id ? 'animate-horizontalHide' : 'bg-green-400'} h-10 my-4 pb-1 pt-1 border-2 border-black text-center ${props.date.section == "Frozen" || props.date.section == "Cottage Candy" ? 'text-md' : 'text-xl'} font-bold`} onClick={(e) => confirmCurrentDate(props.date.id)}>{props.date.name}</div>
+            <div className={`w-full ${currentDate == props.date.id ? 'animate-horizontalHide' : 'bg-green-400'} h-10 my-4 pb-1 pt-1 border-2 border-black text-center ${props.date.section == "Frozen" || props.date.section == "Cottage Candy" ? 'text-md' : 'text-xl'} font-bold`} onClick={(e) => confirmCurrentDate(props.date.id, props.date.last)}>{props.date.name}</div>
             <div className={`${currentDate == props.date.id ? 'animate-horizontalShow' : 'hidden'} bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold`} onClick={(e) => enterExpiryDate(props.date.id)}>
                 <div className='flex'>
                     <div>Confirm</div>
@@ -177,6 +180,7 @@ export default function CheckSection() {
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
                 name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Frozen" ? ` OR ${daysIntoYear(d)}${d.getFullYear() - 2020 - 1}` : "") + (currentSection.section == "Cottage Candy" ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoYear(d)}` : ""),
+                last: i == currentSection.expriryRange ? true : false,
                 section: currentSection.section
             });
         }
@@ -252,6 +256,7 @@ export default function CheckSection() {
                     </div>
                     {/* <div className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div> */}
                     <div>{dateList()}</div>
+                    <div className="h-10" id="pageBottom"></div>
                 </div>
             :
                 <div className="pt-6">
@@ -274,7 +279,7 @@ export default function CheckSection() {
                         })}
                     </select>
                     <div className="flex">
-                        <div onClick={() => enterNewProduct()} className="m-auto basis-70 bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center">
+                        <div onClick={() => enterNewProduct()} className={`m-auto basis-70 ${(newProduct.productVendor && newProduct.productDesc.length > 0) ? "bg-green-400" : "bg-green-100"} text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center`}>
                             <div>Enter New Product</div>
                             <div className="w-7 ml-1"><img src={tick}/></div>
                         </div>

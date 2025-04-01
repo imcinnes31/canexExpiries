@@ -98,7 +98,7 @@ export const vendorList = [
     },
     {
         name: "Lumsden Brothers",
-        credit: true
+        credit: false
     },
     {
         name: "Scholtens Candy",

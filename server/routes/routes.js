@@ -49,7 +49,6 @@ router.get("/test/", async (req,res) => {
   // console.log(date4);
   // console.log(date3 <= date4);
 
-  // const date1 = getLocalDate();
   // const date2 = new Date("2025-03-27T00:00:00.000+00:00");
   // // console.log(date1);
   // // console.log(date2);
@@ -57,30 +56,30 @@ router.get("/test/", async (req,res) => {
   // // console.log(addDays(3));
   // res.send().status(200);
 
-  try {
-    // let threeDaysFromNow = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
-    let threeDaysFromNow = addDays(3);
-    let collection = await db.collection("storeSections");
-    let result = await collection.aggregate([
-    {
-      "arrayFilters": [
-        {
-          "x.productUPC": "068700100468"
-        },
-        {
-          "y.dateGiven": {
-            "$lte": threeDaysFromNow
-          },
-          "y.discounted": false
-        }
-      ]
-    }
-    ]).toArray();
-    res.send(result).status(200);
-  } catch(err) {
-    console.error(err);
-    res.status(500).send("Error updating record.");
-  }
+  // try {
+  //   // let threeDaysFromNow = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
+  //   let threeDaysFromNow = addDays(3);
+  //   let collection = await db.collection("storeSections");
+  //   let result = await collection.aggregate([
+  //   {
+  //     "arrayFilters": [
+  //       {
+  //         "x.productUPC": "068700100468"
+  //       },
+  //       {
+  //         "y.dateGiven": {
+  //           "$lte": threeDaysFromNow
+  //         },
+  //         "y.discounted": false
+  //       }
+  //     ]
+  //   }
+  //   ]).toArray();
+  //   res.send(result).status(200);
+  // } catch(err) {
+  //   console.error(err);
+  //   res.status(500).send("Error updating record.");
+  // }
 });
 
 // EXPIRY REPORT
@@ -304,7 +303,7 @@ router.get("/sections/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/discounts/", async (req, res) => {
-  let threeDaysAfter = (parseInt(getLocalDate().getDay()) >= 4 && storeClosedSunday == true) ? addDays(4) : addDays(3);
+  let threeDaysAfter = (parseInt(getLocalDate().getDay()) >= 3 && storeClosedSunday == true) ? addDays(4) : addDays(3);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -385,7 +384,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
@@ -431,8 +430,6 @@ router.get("/products/", async (req, res) => {
 
 // ALERT LIST*
 router.patch("/discounts/:productUPC&:productExpiry", async (req, res) => {
-  console.log("patch entered");
-  console.log(req.params);
   try {
     let collection = await db.collection("storeSections");
     let result = await collection.updateMany({},
@@ -486,7 +483,7 @@ router.delete("/products/:productUPC", async (req, res) => {
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+          "$lte": (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -497,7 +494,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": (parseInt(getLocalDate().getDay()) == 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            "$lte": (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }

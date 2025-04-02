@@ -5,7 +5,9 @@ export const REACT_APP_API_URL="https://expiries-project-0e679ac0eb2f.herokuapp.
 // use canexExpiries
 
 // MONGO SHELL COMMAND TO ADD NEW SECTION:
-// db.storeSections.insertOne({_id: ObjectId(),section: "", dateLastChecked: new Date(), intervalDays: 0, expiryRange: 0, products: []});
+// db.storeSections.insertOne({_id: ObjectId(),section: "", dateLastChecked: new Date("2020-01-01"), intervalDays: 0, expiryRange: 0, products: []});
 
 // MONGO SHELL COMMAND TO ADD NEW PRODUCTS:
-// db.storeSections.updateOne({_id: new ObjectId("")},{$push: {products: {productUPC: "",name: "",vendor: "",expiryDates: []}}});
+// db.storeSections.findOneAndUpdate({_id: new ObjectId("")}, { $push: { products: {$each: [
+// {productUPC: "",name: "",vendor: "",expiryDates: []}
+// ]}}});

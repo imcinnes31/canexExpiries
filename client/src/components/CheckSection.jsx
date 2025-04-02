@@ -72,6 +72,7 @@ export default function CheckSection() {
     }
 
     function cancelInput() {
+        setCurrentDate(null);
         setCurrentProduct(null);
         setNewProduct({
             productDesc: "",
@@ -216,17 +217,17 @@ export default function CheckSection() {
                     { currentSection.section == "Frozen" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.intervalDays).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.expriryRange).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : currentSection.section == "Cottage Candy" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))}.)` 
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.intervalDays).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.intervalDays))})`
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : null

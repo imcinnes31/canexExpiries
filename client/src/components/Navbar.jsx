@@ -9,7 +9,7 @@ export default function Navbar() {
     </div>
       <img className="w-60 print:hidden" src={canexLogo}/>
       <div className="flex flex-row justify-end print:hidden">      
-        <h5 className="font-serif text-2xl">Expiry Date Checker</h5>
+        <h5 className="font-serif text-2xl">Expiry Date Tracker</h5>
       </div>
     </div>
   );

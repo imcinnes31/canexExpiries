@@ -131,7 +131,27 @@ export const vendorList = [
     {
         name: "Coldhaus Direct",
         credit: true
-    }
+    },
+    {
+        name: "Peak Performance Products",
+        credit: false
+    },
+    {
+        name: "True North Nutrition",
+        credit: false
+    },
+    {
+        name: "Nutrition Excellence",
+        credit: false
+    },
+    {
+        name: "Healthy Body",
+        credit: false
+    },
+    {
+        name: "Red Pine Outdoor Equipment",
+        credit: false
+    },
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

@@ -71,7 +71,7 @@ export default function MainMenu() {
   }, []);
 
   const Check = (props) => (
-    <div id={props.section._id} className={`h-20 pt-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
+    <div id={props.section._id} className={`h-20 items-center pt-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
   );
 
   const Month = (props) => (
@@ -84,13 +84,15 @@ export default function MainMenu() {
 
   function sectionList() {
     return sections.map((section) => {
-      return (
-        <Check 
-          key={section._id} 
-          section={section} 
-          // flashes={flashes} 
-        />
-      );
+      if (section.section != "Protein Powders") {
+        return (
+          <Check 
+            key={section._id} 
+            section={section} 
+            // flashes={flashes} 
+          />
+        );
+      }
     });
   }
 

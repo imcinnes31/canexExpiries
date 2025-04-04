@@ -158,7 +158,7 @@ export default function MainMenu() {
           </div>
         </div>
       : 
-        <div className="h-50 text-md text-center font-bold">Loading...</div>
+        <div className="h-50 text-3xl text-center font-bold">Loading...</div>
       }
     </div>
   );

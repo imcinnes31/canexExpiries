@@ -71,7 +71,7 @@ export default function MainMenu() {
   }, []);
 
   const Check = (props) => (
-    <div id={props.section._id} className={`h-20 items-center pt-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
+    <div id={props.section._id} className={`h-20 items-center ${props.section.section.length > 12 ? "pt-3" : "pt-6"} border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
   );
 
   const Month = (props) => (
@@ -84,15 +84,13 @@ export default function MainMenu() {
 
   function sectionList() {
     return sections.map((section) => {
-      if (section.section != "Protein Powders") {
-        return (
-          <Check 
-            key={section._id} 
-            section={section} 
-            // flashes={flashes} 
-          />
-        );
-      }
+      return (
+        <Check 
+          key={section._id} 
+          section={section} 
+          // flashes={flashes} 
+        />
+      );
     });
   }
 
@@ -160,7 +158,7 @@ export default function MainMenu() {
           </div>
         </div>
       : 
-        <div className="h-50 text-2xl text-center font-bold">Loading...</div>
+        <div className="h-50 text-3xl text-center font-bold">Loading...</div>
       }
     </div>
   );

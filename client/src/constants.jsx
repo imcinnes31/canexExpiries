@@ -152,6 +152,10 @@ export const vendorList = [
         name: "Red Pine Outdoor Equipment",
         credit: false
     },
+    {
+        name: "Frito Lay Canada",
+        credit: true
+    },
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

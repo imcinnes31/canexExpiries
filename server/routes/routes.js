@@ -303,7 +303,7 @@ router.get("/sections/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/discounts/", async (req, res) => {
-  let threeDaysAfter = (parseInt(getLocalDate().getDay()) >= 3 && storeClosedSunday == true) ? addDays(4) : addDays(3);
+  let threeDaysAfter = (parseInt(getLocalDate().getDay()) >= 4 && storeClosedSunday == true) ? addDays(4) : addDays(3);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -384,7 +384,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
@@ -483,7 +483,7 @@ router.delete("/products/:productUPC", async (req, res) => {
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+          "$lte": (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -494,7 +494,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": (parseInt(getLocalDate().getDay()) >= 5 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            "$lte": (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }

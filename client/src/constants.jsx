@@ -156,6 +156,10 @@ export const vendorList = [
         name: "Frito Lay Canada",
         credit: true
     },
+    {
+        name: "Aliments Krispy Kernels",
+        credit: false
+    },
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

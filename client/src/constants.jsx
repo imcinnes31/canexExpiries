@@ -101,6 +101,14 @@ export const vendorList = [
         credit: false
     },
     {
+        name: "Core Mark",
+        credit: false
+    },
+    {
+        name: "Sobeys Inc",
+        credit: false
+    },
+    {
         name: "Scholtens Candy",
         credit: true
     },
@@ -158,6 +166,14 @@ export const vendorList = [
     },
     {
         name: "Aliments Krispy Kernels",
+        credit: false
+    },
+    {
+        name: "Pratts Wholesale",
+        credit: false
+    },
+    {
+        name: "Arrowhead Coffee Company",
         credit: false
     },
 ];

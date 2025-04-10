@@ -19,6 +19,7 @@ export default function CheckSection() {
     });
     const [vendors, setVendors] = useState([]);
     const [currentDate, setCurrentDate] = useState(null);
+    const [smallUPCProducts, setSmallUPCProducts] = useState({});
 
     const params = useParams();
     const navigate = useNavigate();
@@ -36,6 +37,8 @@ export default function CheckSection() {
                 return;
             }
             const sectionData = await response.json();
+            const smallUPCDict = Object.fromEntries(sectionData.products.map(x => [x.smallUPC, x.productUPC]));
+            setSmallUPCProducts(smallUPCDict);
             setCurrentSection(sectionData);
         }
         getVendors();
@@ -45,6 +48,11 @@ export default function CheckSection() {
 
     async function checkInput(inputtedValue) {
         const numbers = /^[0-9]+$/;
+        if (inputtedValue.length == 8 && inputtedValue.match(numbers)) {
+            if (inputtedValue in smallUPCProducts) {
+                inputtedValue = smallUPCProducts[inputtedValue];
+            }
+        }
         if (inputtedValue.length == 12 && inputtedValue.match(numbers)) {
             setCurrentUPC(inputtedValue);
             const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${inputtedValue}`);
@@ -55,7 +63,7 @@ export default function CheckSection() {
             }
             const productData = await response.json();
             setCurrentProduct(productData);
-        }
+        } 
     }
 
     async function setMilk(givenUPC) {

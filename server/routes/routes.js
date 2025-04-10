@@ -131,8 +131,20 @@ router.get("/sections/:id", async (req, res) => {
         "dateLastChecked": 1,
         "intervalDays": 1,
         "expiryRange": 1,
-      }
-    }
+        "products":              
+        {
+          "$filter": 
+          {
+            "input": "$products",
+            "cond": {
+              "$gte": [
+                  "$$this.smallUPC", null
+              ]
+            }
+          }
+        }
+      },
+    },
   ]).toArray();
   res.send(results[0]).status(200);
 });

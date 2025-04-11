@@ -35,6 +35,7 @@ export default function CheckSection() {
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
+                alert("Failed to retrieve data. Please try again.")
                 return;
             }
             const sectionData = await response.json();
@@ -60,6 +61,8 @@ export default function CheckSection() {
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
+                alert("Failed to retrieve product data. Please try again.");
+                setCurrentUPC("");
                 return;
             }
             const productData = await response.json();
@@ -73,6 +76,7 @@ export default function CheckSection() {
         if (!response.ok) {
             const message = `An error occurred: ${response.statusText}`;
             console.error(message);
+            alert("Failed to retrieve product data. Please try again.")
             return;
         }
         const productData = await response.json();
@@ -126,11 +130,13 @@ export default function CheckSection() {
                 });
             } catch (error) {
                 console.error('A problem occurred with your fetch operation: ', error);
+                alert("Failed to add new product. Please try again.")
             } finally {
                 const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${currentUPC}`);
                 if (!response.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);
+                    alert("Failed to retrieve product data. Please try again.")
                     return;
                 }
                 const productData = await response.json();

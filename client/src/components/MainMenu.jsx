@@ -17,6 +17,7 @@ export default function MainMenu() {
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
+        alert("Failed to retrieve pulls data. Please reload.");
         return;
       }
       const pullsData = await response.json();
@@ -28,6 +29,7 @@ export default function MainMenu() {
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
+        alert("Failed to retrieve discounts data. Please reload.");
         return;
       }
       const discountsData = await response.json();
@@ -40,6 +42,7 @@ export default function MainMenu() {
       if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
           console.error(message);
+          alert("Failed to retrieve sections data. Please reload.");
           return;
       }
       const sectionsData = await response.json();
@@ -66,7 +69,6 @@ export default function MainMenu() {
     getPulls();
     getDiscounts();
     getSections();
-    alert("Welcome!");
     return;
 
   }, []);

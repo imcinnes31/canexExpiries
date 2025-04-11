@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import {monthNames, milkProducts, vendorList, addDays} from "../constants.jsx"
+import {monthNames, milkProducts, vendorList, addDays, titleCase} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
 import moment from "moment";
@@ -15,11 +15,12 @@ export default function CheckSection() {
     const [newProduct, setNewProduct] = useState({
         productDesc: "",
         productSize: "",
+        productSmallUPC: "",
         productVendor: null,
     });
     const [vendors, setVendors] = useState([]);
     const [currentDate, setCurrentDate] = useState(null);
-    const [smallUPCProducts, setSmallUPCProducts] = useState({});
+    const [smallUPCProducts, setSmallUPCProducts] = useState([]);
 
     const params = useParams();
     const navigate = useNavigate();
@@ -85,6 +86,7 @@ export default function CheckSection() {
         setNewProduct({
             productDesc: "",
             productSize: "",
+            productSmallUPC: "",
             productVendor: null,
         });
     }
@@ -97,17 +99,29 @@ export default function CheckSection() {
 
     async function enterNewProduct() {
         if (newProduct.productVendor && newProduct.productDesc.length > 0) {
+            const numbers = /^[0-9]+$/;
+            const newProductEntered = newProduct;
+            newProductEntered.productDesc = titleCase(newProduct.productDesc);
+            if (!(newProductEntered.productSmallUPC.length == 8 && newProductEntered.productSmallUPC.match(numbers))) {
+                delete newProductEntered.productSmallUPC;
+            } else {
+                setSmallUPCProducts({
+                    ...smallUPCProducts,
+                    [newProductEntered.productSmallUPC]: currentUPC
+                })
+            }
             try {
                 await fetch(`${REACT_APP_API_URL}/expiries/sections/${params.id}&${currentUPC}`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(newProduct)
+                    body: JSON.stringify(newProductEntered)
                 });
                 setNewProduct({
                     productDesc: "",
                     productSize: "",
+                    productSmallUPC: "",
                     productVendor: null,
                 });
             } catch (error) {
@@ -121,7 +135,7 @@ export default function CheckSection() {
                 }
                 const productData = await response.json();
                 setCurrentProduct(productData); 
-            }           
+            }
         }
     }
 
@@ -281,6 +295,10 @@ export default function CheckSection() {
                         <div className="text-l m-auto font-bold">Size (Optional):</div>
                         <input type="text" onChange={(e) => updateNew({ productSize: (e.target.value).trim() })} className="border border-black text-l"/>
                     </div>
+                    <div className="flex">
+                        <div className="text-sm m-auto font-bold">Small UPC (If Applicable):</div>
+                        <input type="text" onChange={(e) => updateNew({ productSmallUPC: (e.target.value).trim() })} className="border border-black text-l"/>
+                    </div>                    
                     <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
                         <option disabled value="DEFAULT">--Select Product Vendor</option>
                         {vendors.map(function(i) {

@@ -252,6 +252,7 @@ router.get("/products/:productUPC", async (req, res) => {
 // CHECK SECTION*
 router.post("/sections/:id&:productUPC", async (req, res) => {
   const productDescription = req.body.productDesc + (String(req.body.productSize).length > 0 ? " " + req.body.productSize : "");
+  const results = [];
   try {
     let collection = await db.collection("storeSections");
     let result = await collection.updateOne({
@@ -267,7 +268,23 @@ router.post("/sections/:id&:productUPC", async (req, res) => {
         }
       }
     });
-    res.send(result).status(200);
+    results.push(result); 
+    if (req.body.productSmallUPC) {
+      let result2 = await collection.updateMany({
+        "products":
+          {
+            $elemMatch:
+            {
+              "productUPC": String(req.params.productUPC)
+            }
+          }
+      },
+      {
+        $set: {"products.$.smallUPC": req.body.productSmallUPC},
+      });
+      results.push(result2);
+    }
+    res.send(results).status(200);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding record");

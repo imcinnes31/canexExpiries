@@ -69,6 +69,7 @@ export default function MainMenu() {
     getPulls();
     getDiscounts();
     getSections();
+    alert("Welcome!");
     return;
 
   }, []);

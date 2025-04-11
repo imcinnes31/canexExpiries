@@ -132,19 +132,21 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 });
             } catch (error) {
               console.error('A problem occurred with your fetch operation: ', error);
+              alert("Failed to add written off product to record. Please write it manually.")
             }
         }
-        const currentPull = pullAmounts[divID];
-        currentPull['clicked'] = true;
 
         const prodUPC = divID.substring(0,12);
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}`, {
                 method: "DELETE",
             });
+            const currentPull = pullAmounts[divID];
+            currentPull['clicked'] = true;
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);
+          alert("Failed to remove expiry date from product. Please try again.")
         }
     } 
 
@@ -161,21 +163,23 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);
+          alert("Failed to remove expiry date from product. Please try again.")
         }
     }
 
     async function discountProduct(divID) {
-        const currentPull = pullAmounts[divID];
-        currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         const prodExpiry = divID.substring(12,20);
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${prodExpiry}`, {
                 method: "PATCH",
             });
+            const currentPull = pullAmounts[divID];
+            currentPull['clicked'] = true;
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
         } catch (error) {
             console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to mark product as discounted. Please try again.")
         }
     }
 
@@ -194,6 +198,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
+                alert("Failed to retrieve data. Please try again.")
                 return;
             }
             const productData = await response.json();

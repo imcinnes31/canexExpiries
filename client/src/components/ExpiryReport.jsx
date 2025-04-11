@@ -16,6 +16,7 @@ export default function ExpiryReport() {
             if (!response.ok) {
                 const message = `An error occurred: ${response.statusText}`;
                 console.error(message);
+                alert("Failed to get report data. Please go back and try again.");
                 return;
             }
             const reportData = await response.json();
@@ -24,6 +25,7 @@ export default function ExpiryReport() {
                 if (!responseProduct.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);
+                    alert("Failed to get report data. Please go back and try again.");
                     return;
                 }
                 const productData = await responseProduct.json();

@@ -77,6 +77,7 @@ export default function CheckSection() {
             const message = `An error occurred: ${response.statusText}`;
             console.error(message);
             alert("Failed to retrieve product data. Please try again.")
+            setCurrentUPC("");
             return;
         }
         const productData = await response.json();
@@ -154,6 +155,7 @@ export default function CheckSection() {
             });
         } catch (error) {
             console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to add expiry date to product. Please try again.");
         } finally {
             setCurrentProduct(null);
             setCurrentDate(null);
@@ -168,6 +170,7 @@ export default function CheckSection() {
             });
         } catch (error) {
             console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to mark section as checked. Please go back and hit Finished Checking Section button again.");
         } finally {
             navigate("/");
         }

@@ -616,4 +616,59 @@ router.delete("/expiryRecords", async (req, res) => {
   }
 });
 
+// PROJECT REPORT
+router.get("/projections", async (req, res) => {
+  let twoWeeksAfter = addDays(14);
+  let collection = await db.collection("storeSections");
+  let results = await collection.aggregate([
+    {
+      $unwind: "$products"
+    },
+    {
+      $unwind: "$products.expiryDates"
+    },
+    {
+      "$match": {
+        $expr: {
+          $lte: [
+            "$products.expiryDates.dateGiven",
+            twoWeeksAfter
+          ]
+        }
+      }
+    },
+    {
+      "$match": {
+        $expr: {
+          $gte: [
+            "$products.expiryDates.dateGiven",
+            getLocalDate()
+          ]
+        }
+      }
+    },
+    {
+      "$project": {
+        _id: 0,
+        productName: "$products.name",
+        productVendor: "$products.vendor",
+        productExpiry: "$products.expiryDates.dateGiven",
+        productSection: "$section"
+      }
+    },
+    {
+      "$sort":{
+        "productExpiry": 1,
+        "productSection": 1
+      }
+    }
+  ]).toArray();
+  // const newResults = Object.groupBy(results, product => {
+  //   const convertDate = product.productExpiry;
+  //   convertDate.setMinutes(convertDate.getMinutes() + 300)
+  //   return convertDate;
+  // });
+  res.send(results).status(200);
+});
+
 export default router;

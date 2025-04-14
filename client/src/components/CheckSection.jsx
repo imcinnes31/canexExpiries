@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import {monthNames, milkProducts, vendorList, addDays, titleCase} from "../constants.jsx"
+import {monthNames, milkProducts, vendorList, addDays, titleCase, fiveDigitJulianProducts} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
 import moment from "moment";
@@ -183,7 +183,7 @@ export default function CheckSection() {
         setCurrentDate(dateID);
     }
 
-    function daysIntoYear(date){
+    function daysIntoJulian(date){
         const dayNumber = (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
         return (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber);
     }
@@ -211,7 +211,7 @@ export default function CheckSection() {
             const d = addDays(i);
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Frozen" ? ` OR ${daysIntoYear(d)}${d.getFullYear() - 2020 - 1}` : "") + (currentSection.section == "Cottage Candy" ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoYear(d)}` : ""),
+                name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                 last: i == currentSection.expriryRange ? true : false,
                 section: currentSection.section
             });
@@ -257,17 +257,31 @@ export default function CheckSection() {
                     { currentSection.section == "Frozen" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))}.)` 
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.expriryRange).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))})`
+                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.expriryRange).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
-                        </div>
+                            <br/>
+                            {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
+                                `(Or on rare items, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
+                            : 
+                                `(Or on rare items, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                            }
+                        </div>   
                     : currentSection.section == "Cottage Candy" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))}.)` 
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoYear(addDays(currentSection.expiryRange))})`
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                            }
+                        </div>
+                    : currentSection.section == "Pastry" ?
+                        <div className="text-xl font-bold">
+                            {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
+                                `(On some products, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
+                            : 
+                                `(On some products, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : null
@@ -307,28 +321,28 @@ export default function CheckSection() {
                     <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
                     <div className="flex">
                         <div className="text-l m-auto font-bold">Product Name:</div>
-                        <input type="text" onChange={(e) => updateNew({ productDesc: (e.target.value).trim() })} className="border border-black text-l"/>
+                        <input type="text" onChange={(e) => updateNew({ productDesc: (e.target.value).trim() })} className="border border-black text-xl"/>
                     </div>
                     <div className="flex">
                         <div className="text-l m-auto font-bold">Size (Optional):</div>
-                        <input type="text" onChange={(e) => updateNew({ productSize: (e.target.value).trim() })} className="border border-black text-l"/>
+                        <input type="text" onChange={(e) => updateNew({ productSize: (e.target.value).trim() })} className="border border-black text-xl"/>
                     </div>
                     <div className="flex">
                         <div className="text-sm m-auto font-bold">Small UPC (If Applicable):</div>
-                        <input type="text" onChange={(e) => updateNew({ productSmallUPC: (e.target.value).trim() })} className="border border-black text-l"/>
+                        <input type="text" onChange={(e) => updateNew({ productSmallUPC: (e.target.value).trim() })} className="border border-black text-xl"/>
                     </div>                    
                     <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
                         <option disabled value="DEFAULT">--Select Product Vendor</option>
-                        {vendors.map(function(i) {
+                        {vendors.filter((vendor) => vendor != "Tim Hortons").map(function(i) {
                             return <option key={i.replace(" ","")}>{i}</option>;
                         })}
                     </select>
                     <div className="flex">
-                        <div onClick={() => enterNewProduct()} className={`m-auto basis-70 ${(newProduct.productVendor && newProduct.productDesc.length > 0) ? "bg-green-400" : "bg-green-100"} text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center`}>
+                        <div onClick={() => enterNewProduct()} className={`m-auto mr-0 basis-70 ${(newProduct.productVendor && newProduct.productDesc.length > 0) ? "bg-green-400" : "bg-green-100"} text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center`}>
                             <div>Enter New Product</div>
                             <div className="w-7 ml-1"><img src={tick}/></div>
                         </div>
-                        <div onClick={()=>cancelInput()} className="m-auto basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center">
+                        <div onClick={()=>cancelInput()} className="m-auto ml-0 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center">
                             <div>Cancel</div>
                             <div className="w-7 ml-1"><img src={cross}/></div>
                         </div>

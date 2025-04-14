@@ -91,6 +91,19 @@ export const milkProducts = [
     },
 ];
 
+export const fiveDigitJulianProductsList = [
+    {
+        name: "Jimmy Dean Sausage Egg Cheese Muffin 5oz",
+        productUPC: "077900513671"
+    },
+    {
+        name: "Homestyle 2Bite Cinnamon Bun 85g",
+        productUPC: "770981090412"
+    }
+]
+
+export const fiveDigitJulianProducts = fiveDigitJulianProductsList.map(product => product.productUPC);
+
 export const vendorList = [
     {
         name: "Direct Plus",

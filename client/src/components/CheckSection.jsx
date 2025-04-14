@@ -224,7 +224,16 @@ export default function CheckSection() {
     }
 
     function milkButtons() {
-        const milkProductsArray = [];
+        const milkProductsArray = [
+            {
+                milkDesc: "Tim's Dispenser Cream",
+                milkUPC: "057957101946"
+            },
+            {
+                milkDesc: "Tim's Dispenser Milk",
+                milkUPC: "057957101953"
+            },
+        ];
         for (const x in milkProducts) {
             for (const y in milkProducts[x].products) {
                 milkProductsArray.push({milkDesc: milkProducts[x].products[y].longDesc + " " + milkProducts[x].size, milkUPC: milkProducts[x].products[y].productUPC})

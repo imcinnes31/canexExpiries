@@ -176,6 +176,10 @@ export const vendorList = [
         name: "Arrowhead Coffee Company",
         credit: false
     },
+    {
+        name: "Tim Hortons",
+        credit: true
+    },
 ];
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);

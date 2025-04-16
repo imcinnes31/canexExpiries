@@ -195,6 +195,8 @@ export const vendorList = [
     },
 ];
 
+export const vendorArray = vendorList.map(vendor => vendor.name);
+
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);
 
 export function getLocalDate() {

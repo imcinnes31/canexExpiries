@@ -159,6 +159,14 @@ export default function MainMenu() {
                 {reportList()}
             </div>
           </div>
+          <div className="pt-4">
+            <h3 className="text-2xl pb-4">Projection Reports</h3>
+            <div className="">
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/upcoming`)}>Pulls & Discounts For Next 7 Days</div>
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/discounts`)}>Non-Credit Pulls - Next Two Weeks</div>
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/vendors`)}>Upcoming Expiries By Vendor</div>
+            </div>
+          </div>
         </div>
       : 
         <div className="h-50 text-3xl text-center font-bold">Loading...</div>

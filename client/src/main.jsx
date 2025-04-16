@@ -9,6 +9,7 @@ import MainMenu from "./components/MainMenu";
 import AlertList from "./components/AlertList";
 import CheckSection from "./components/CheckSection";
 import ExpiryReport from "./components/ExpiryReport";
+import ProjectionReport from "./components/ProjectionReport";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -79,6 +80,16 @@ const router = createBrowserRouter([
       {
         path: "/report/:reportDate",
         element: <ExpiryReport />,
+      },
+    ],
+  },
+  {
+    path: "/projections/:type",
+    element: <App />,
+    children: [
+      {
+        path: "/projections/:type",
+        element: <ProjectionReport />,
       },
     ],
   },

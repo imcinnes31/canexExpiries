@@ -618,7 +618,7 @@ router.delete("/expiryRecords", async (req, res) => {
 
 // PROJECT REPORT
 router.get("/projections", async (req, res) => {
-  let twoWeeksAfter = addDays(14);
+  let fourWeeksLater = addDays(28);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
     {
@@ -632,7 +632,7 @@ router.get("/projections", async (req, res) => {
         $expr: {
           $lte: [
             "$products.expiryDates.dateGiven",
-            twoWeeksAfter
+            fourWeeksLater
           ]
         }
       }
@@ -651,8 +651,10 @@ router.get("/projections", async (req, res) => {
       "$project": {
         _id: 0,
         productName: "$products.name",
+        productUPC: "$products.productUPC",
         productVendor: "$products.vendor",
         productExpiry: "$products.expiryDates.dateGiven",
+        productDiscounted: "$products.expiryDates.discounted",
         productSection: "$section"
       }
     },

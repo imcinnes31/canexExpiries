@@ -39,6 +39,15 @@ export default function CheckSection() {
                 return;
             }
             const sectionData = await response.json();
+            // const upcomingMonths = [];
+            // for (let i = 0; i <= sectionData.expiryRange; i++) {
+            //     const currentMonth = addDays(i).getMonth();
+            //     const currentYear = addDays(i).getFullYear();
+            //     if (!(upcomingMonths.includes(monthNames[currentMonth] + " " + currentYear))) {
+            //         upcomingMonths.push(monthNames[currentMonth] + " " + currentYear);
+            //     }
+            // }
+            // sectionData['upcomingMonths'] = upcomingMonths;
             const smallUPCDict = Object.fromEntries(sectionData.products.map(x => [x.smallUPC, x.productUPC]));
             setSmallUPCProducts(smallUPCDict);
             setCurrentSection(sectionData);
@@ -211,9 +220,11 @@ export default function CheckSection() {
             const d = addDays(i);
             expiryDateList.push({
                 id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
+                // name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + (d.getDate() == 1 ? " (or just month of " + monthNames[d.getMonth()] + ")" : "") + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                 name: i == - 1 ? "Already Expired" : (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                 last: i == currentSection.expriryRange ? true : false,
-                section: currentSection.section
+                section: currentSection.section,
+                expiryMonth: d.getMonth()
             });
         }
         return expiryDateList.map((date) => {
@@ -254,6 +265,8 @@ export default function CheckSection() {
                     <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
                     <div className="text-2xl font-bold">{monthNames[addDays(currentSection.expiryRange).getMonth()] + " " + addDays(currentSection.expiryRange).getDate() + " " + addDays(currentSection.expiryRange).getFullYear()}</div>
+                    {/* <div className="text-2xl font-serif">Or any products where the expiry date just states the months of:</div>
+                    <div className="text-2xl font-bold">{String(currentSection.upcomingMonths).split(",").join(", ")}</div> */}
                     { currentSection.section == "Frozen" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?

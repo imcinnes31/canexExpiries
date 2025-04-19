@@ -186,13 +186,19 @@ export default function ProjectionReport() {
         });
         const vendorDictDates = Object.groupBy(vendorDataDict, product => product.productExpiryGroup);
         const vendorDict = Object.entries(vendorDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        return vendorDict.map((a) => 
-            <VendorDate 
-                key={a.date}
-                name={a.date}
-                products={a.products}
-            />
-        );
+        if (vendorDict.length > 0) {
+            return vendorDict.map((a) => 
+                <VendorDate 
+                    key={a.date}
+                    name={a.date}
+                    products={a.products}
+                />
+            );    
+        } else {
+            return (
+                <div className="text-2xl font-bold font-serif mb-2">There are no products for this vendor in this date range.</div>
+            );
+        }
     }
 
     const params = useParams();
@@ -300,18 +306,23 @@ export default function ProjectionReport() {
         <div>
             <div className={"screen:hidden font-bold text-xl pl-1"}>4375 - Winnipeg</div>
             <div className={"font-bold text-xl pl-1"}>Upcoming Pulls and Discounts for</div>
-            <div className={"font-bold text-xl pl-1 pb-3"}>{addDays(0).toDateString()} to {addDays(7).toDateString()}</div>
+            <div className={"font-bold text-xl pl-1"}>{addDays(0).toDateString()} to {addDays(7).toDateString()}</div>
+            <div className={"font-bold text-xl pl-1 pb-3"}>For Products Entered by CANEX Expiry Date Tracker</div>
+
             <div className={"screen:hidden font-bold text-xl text-black pl-1"}>Legend:</div>
             <div className={"screen:hidden font-bold text-xl text-red-600 pl-1"}>Credit - Do Not Throw Out</div>
             <div className={"screen:hidden font-bold text-xl text-green-700 pl-1"}>Write Off And Dispose Of</div>
             <div className={"screen:hidden font-bold text-xl text-blue-700 pl-1 pb-7"}>Place 50% Off Discount Stickers</div>
             {upcomingDateList()}
+            <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
         </div>
         : params.type == "discounts" ?
         <div>
             <div className={"screen:hidden font-bold text-xl pl-1"}>4375 - Winnipeg</div>
-            <div className={"font-bold text-xl pl-1 pb-7"}>Upcoming Non-Credit Write-Offs For Two Weeks</div>
+            <div className={"font-bold text-xl pl-1"}>Upcoming Non-Credit Write-Offs For Two Weeks</div>
+            <div className={"font-bold text-xl pl-1 pb-7"}>For Products Entered by CANEX Expiry Date Tracker</div>
             {discountsDateList()}
+            <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
         </div>
         : params.type == "vendors" ?
         <div>
@@ -338,6 +349,7 @@ export default function ProjectionReport() {
             <div>
                 {vendorDateList()}
             </div>
+            <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
         </div>
         : null
     );

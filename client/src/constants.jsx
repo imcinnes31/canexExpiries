@@ -1,3 +1,5 @@
+import {easter} from 'date-easter';
+
 export const monthNames = [
     "Jan",
     "Feb",
@@ -199,6 +201,63 @@ export const vendorArray = vendorList.map(vendor => vendor.name);
 
 export const nonCreditVendors = vendorList.filter(vendor => vendor.credit == false).map(vendor => vendor.name);
 
+export const storeClosedSunday = true;
+
+function convertToTodaysDate(dateGiven) {
+    const convertDate = new Date(dateGiven);
+    convertDate.setMinutes(convertDate.getMinutes() + convertDate.getTimezoneOffset());
+    return convertDate;
+}
+
+const easterSundayCalc = convertToTodaysDate(easter(getLocalDate().getFullYear()).year + "-" + easter(getLocalDate().getFullYear()).month + "-" + easter(getLocalDate().getFullYear()).day);
+const easterSunday = convertToTodaysDate(easterSundayCalc).toDateString();
+const goodFriday = convertToTodaysDate(easterSundayCalc.getTime() - (2 * 86400000)).toDateString();
+const easterMonday = convertToTodaysDate(easterSundayCalc.getTime() + (1 * 86400000)).toDateString();
+const christmasDay = convertToTodaysDate(getLocalDate().getFullYear() + "-12-25").toDateString();
+const newYearsDay = convertToTodaysDate((getLocalDate().getFullYear() + 1) + "-01-01").toDateString();
+const truthDay = convertToTodaysDate(getLocalDate().getFullYear() + "-09-30").toDateString();
+const remembranceDay = convertToTodaysDate(getLocalDate().getFullYear() + "-11-11").toDateString();
+const canadaDay = convertToTodaysDate(getLocalDate().getFullYear() + "-07-01").toDateString();
+
+const octoberFirst = convertToTodaysDate(getLocalDate().getFullYear() + "-10-01");
+const tgDayOfWeekCalc = 15 - (octoberFirst.getDay() < 2 ? octoberFirst.getDay() + 7 : octoberFirst.getDay());
+const tgDayCanada = convertToTodaysDate(octoberFirst.getTime() + (tgDayOfWeekCalc * 86400000)).toDateString();
+
+const may24 = convertToTodaysDate(getLocalDate().getFullYear() + "-05-24");
+const vdDayOfWeekCalc = 1 - (may24.getDay() == 0 ? may24.getDay() + 7 : may24.getDay());
+const victoriaDay = convertToTodaysDate(may24.getTime() + (vdDayOfWeekCalc * 86400000)).toDateString();
+
+const septemberFirst = convertToTodaysDate(getLocalDate().getFullYear() + "-09-01");
+const ldDayOfWeekCalc = 8 - (septemberFirst.getDay() < 2 ? septemberFirst.getDay() + 7 : septemberFirst.getDay());
+const laborDayCanada = convertToTodaysDate(septemberFirst.getTime() + (ldDayOfWeekCalc * 86400000)).toDateString();
+
+const augustFirst = convertToTodaysDate(getLocalDate().getFullYear() + "-08-01");
+const tfDayOfWeekCalc = 8 - (augustFirst.getDay() < 2 ? augustFirst.getDay() + 7 : augustFirst.getDay());
+const terryFoxDay = convertToTodaysDate(augustFirst.getTime() + (tfDayOfWeekCalc * 86400000)).toDateString();
+
+const februaryFirst = convertToTodaysDate(getLocalDate().getFullYear() + "-02-01");
+const lrDayOfWeekCalc = 22 - (februaryFirst.getDay() < 2 ? februaryFirst.getDay() + 7 : februaryFirst.getDay());
+const louisRielDay = convertToTodaysDate(februaryFirst.getTime() + (lrDayOfWeekCalc * 86400000)).toDateString();
+
+export const storeHolidays = {
+    [easterSunday]: "Easter Sunday",
+    [goodFriday]: "Good Friday",
+    [easterMonday]: "Easter Monday",
+    [christmasDay]: "Christmas Day",
+    [newYearsDay]: "New Years Day",
+    [truthDay]: "Truth and Reconciliation Day",
+    [tgDayCanada]: "Thanksgiving Monday",
+    [remembranceDay]: "Remembrance Day",
+    [victoriaDay]: "Victoria Day",
+    [canadaDay]: "Canada Day",
+    [laborDayCanada]: "Labor Day",
+    [terryFoxDay]: "Terry Fox Day",
+    [louisRielDay]: "Louis Riel Day",
+    // "Tue Apr 22 2025" : "Test Holiday",
+}
+
+export const storeHolidayArray = Object.keys(storeHolidays);
+
 export function getLocalDate() {
     const date1 = new Date();
     const date2 = new Date(date1);
@@ -211,6 +270,13 @@ export function getLocalDate() {
 export function addDays(numDays) {
     // console.log(new Date(getLocalDate().getTime() + (numDays * 86400000)));
     return new Date(new Date().getTime() + (numDays * 86400000));
+}
+
+export function addDaysToDate(dateGiven, numDays) {
+    const convertDate = new Date(dateGiven);
+    convertDate.setMinutes(convertDate.getMinutes() + convertDate.getTimezoneOffset());
+    // console.log(new Date(getLocalDate().getTime() + (numDays * 86400000)));
+    return convertDate.getTime() + (numDays * 86400000);
 }
 
 export function titleCase(str) {

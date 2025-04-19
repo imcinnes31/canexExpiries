@@ -4,9 +4,7 @@ import db from "../db/connection.js";
 
 import { ObjectId } from "mongodb";
 
-import {storeClosedSunday} from "../constants.js"
-
-import moment from "moment";
+import {storeClosedSunday, storeHolidayArray} from "../constants.js"
 
 const router = express.Router();
 
@@ -332,7 +330,19 @@ router.get("/sections/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/discounts/", async (req, res) => {
-  let threeDaysAfter = (parseInt(getLocalDate().getDay()) >= 4 && storeClosedSunday == true) ? addDays(4) : addDays(3);
+  let businessDaysPassed = 0;
+  let totalDaysPassed = 0;
+  while(true) {
+      if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+          businessDaysPassed++;
+      }
+      totalDaysPassed++;
+      if (businessDaysPassed == 3) {
+          break;
+      }
+  }
+
+  let threeDaysAfter = addDays(totalDaysPassed);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -399,6 +409,18 @@ router.get("/discounts/", async (req, res) => {
 // ALERT LIST*
 // MAIN MENU*
 router.get("/products/", async (req, res) => {
+  let businessDaysPassed = 0;
+  let totalDaysPassed = 0;
+  while(true) {
+      if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+          businessDaysPassed++;
+      }
+      totalDaysPassed++;
+      if (businessDaysPassed == 1) {
+          break;
+      }
+  }
+
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
     {
@@ -413,7 +435,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            addDays(totalDaysPassed + 1)
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }

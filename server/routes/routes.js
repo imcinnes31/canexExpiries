@@ -35,7 +35,7 @@ router.get("/test/", async (req,res) => {
       }
   }
 
-  let threeDaysAfter = addDays(totalDaysPassed + 1);
+  let threeDaysAfter = addDays(totalDaysPassed);
 
   res.send(threeDaysAfter).status(200);
 
@@ -358,7 +358,7 @@ router.get("/discounts/", async (req, res) => {
       }
   }
 
-  let threeDaysAfter = addDays(totalDaysPassed + 1);
+  let threeDaysAfter = addDays(totalDaysPassed - 1);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -451,7 +451,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            addDays(totalDaysPassed + 1)
+            addDays(totalDaysPassed - 1)
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
@@ -562,7 +562,7 @@ router.delete("/products/:productUPC", async (req, res) => {
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": addDays(totalDaysPassed + 1)
+          "$lte": addDays(totalDaysPassed - 1)
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -573,7 +573,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": addDays(totalDaysPassed + 1)
+            "$lte": addDays(totalDaysPassed - 1)
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }

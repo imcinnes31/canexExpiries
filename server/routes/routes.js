@@ -451,7 +451,7 @@ router.get("/products/", async (req, res) => {
           $lte: 
           [
             "$products.expiryDates.dateGiven",
-            addDays(totalDaysPassed - 1)
+            addDays(totalDaysPassed - 2)
             // new Date(moment().format("MM-DD-YYYY"))
           ]
         }
@@ -562,7 +562,7 @@ router.delete("/products/:productUPC", async (req, res) => {
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": addDays(totalDaysPassed - 1)
+          "$lte": addDays(totalDaysPassed - 2)
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -573,7 +573,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": addDays(totalDaysPassed - 1)
+            "$lte": addDays(totalDaysPassed - 2)
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }

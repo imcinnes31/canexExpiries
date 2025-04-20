@@ -30,12 +30,12 @@ router.get("/test/", async (req,res) => {
           businessDaysPassed++;
       }
       totalDaysPassed++;
-      if (businessDaysPassed == 3) {
+      if (businessDaysPassed == 1) {
           break;
       }
   }
 
-  let threeDaysAfter = addDays(totalDaysPassed);
+  let threeDaysAfter = addDays(totalDaysPassed + 1);
 
   res.send(threeDaysAfter).status(200);
 
@@ -358,8 +358,7 @@ router.get("/discounts/", async (req, res) => {
       }
   }
 
-  let threeDaysAfter = addDays(totalDaysPassed);
-  console.log(threeDaysAfter);
+  let threeDaysAfter = addDays(totalDaysPassed + 1);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -437,8 +436,6 @@ router.get("/products/", async (req, res) => {
           break;
       }
   }
-
-  console.log(addDays(totalDaysPassed + 1));
 
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([

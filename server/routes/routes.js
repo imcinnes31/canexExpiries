@@ -23,6 +23,22 @@ function addDays(numDays) {
 }
 
 router.get("/test/", async (req,res) => {
+  let businessDaysPassed = 0;
+  let totalDaysPassed = 0;
+  while(true) {
+      if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+          businessDaysPassed++;
+      }
+      totalDaysPassed++;
+      if (businessDaysPassed == 3) {
+          break;
+      }
+  }
+
+  let threeDaysAfter = addDays(totalDaysPassed);
+
+  res.send(threeDaysAfter).status(200);
+
   // console.log(storeClosedSunday);
   // console.log(new Date(moment().format("MM-DD-YYYY")).toISOString(true));
   // console.log(new Date(moment("2025-02-13").format("MM-DD-YYYY")).toISOString(true));
@@ -343,6 +359,7 @@ router.get("/discounts/", async (req, res) => {
   }
 
   let threeDaysAfter = addDays(totalDaysPassed);
+  console.log(threeDaysAfter);
   // let threeDaysAfter = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -420,6 +437,8 @@ router.get("/products/", async (req, res) => {
           break;
       }
   }
+
+  console.log(addDays(totalDaysPassed + 1));
 
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
@@ -531,10 +550,22 @@ router.delete("/products/:productUPC", async (req, res) => {
       //   ]
       // });
 
+    let businessDaysPassed = 0;
+    let totalDaysPassed = 0;
+    while(true) {
+        if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+            businessDaysPassed++;
+        }
+        totalDaysPassed++;
+        if (businessDaysPassed == 1) {
+            break;
+        }
+    }
+
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-          "$lte": (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+          "$lte": addDays(totalDaysPassed + 1)
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -545,7 +576,7 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": (parseInt(getLocalDate().getDay()) >= 6 && storeClosedSunday == true) ? addDays(1) : getLocalDate()
+            "$lte": addDays(totalDaysPassed + 1)
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }

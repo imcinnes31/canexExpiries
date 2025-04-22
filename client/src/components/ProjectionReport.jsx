@@ -219,9 +219,7 @@ export default function ProjectionReport() {
             const reportData = await response.json();
             switch (params.type) {
                 case "upcoming":
-                    console.log(reportData);
                     const storeHolidayArray = Object.keys(storeHolidays);
-                    // console.log(storeHolidayArray);
                     const upcomingDiscounts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);

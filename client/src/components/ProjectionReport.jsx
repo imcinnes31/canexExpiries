@@ -186,7 +186,7 @@ export default function ProjectionReport() {
         });
         const vendorDictDates = Object.groupBy(vendorDataDict, product => product.productExpiryGroup);
         const vendorDict = Object.entries(vendorDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        if (vendorDict.length > 0 && currentVendor != null) {
+        // if (vendorDict.length > 0 && currentVendor != null) {
             return vendorDict.map((a) => 
                 <VendorDate 
                     key={a.date}
@@ -194,11 +194,11 @@ export default function ProjectionReport() {
                     products={a.products}
                 />
             );    
-        } else {
-            return (
-                <div className="text-2xl font-bold font-serif mb-2">There are no products for this vendor in this date range.</div>
-            );
-        }
+        // } else {
+        //     return (
+        //         <div className="text-2xl font-bold font-serif mb-2">There are no products for this vendor in this date range.</div>
+        //     );
+        // }
     }
 
     const params = useParams();
@@ -219,12 +219,13 @@ export default function ProjectionReport() {
             const reportData = await response.json();
             switch (params.type) {
                 case "upcoming":
+                    console.log(reportData);
                     const storeHolidayArray = Object.keys(storeHolidays);
                     // console.log(storeHolidayArray);
                     const upcomingDiscounts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);
-                        return convertDate >= addDays(3) && convertDate < addDays(10);
+                        return convertDate >= addDays(2) && convertDate < addDays(9);
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .map((product) => {
                         const convertExpiryDate = convertToTodaysDate(product.productExpiry);
@@ -258,7 +259,7 @@ export default function ProjectionReport() {
                             if (!((storeClosedSunday == true && convertToTodaysDate(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
                                 businessDaysPassed++;
                             }
-                            passedDate = addDaysToDate(passedDate, -1);
+                            passedDate = addDaysToDate(passedDate, 0);
                             totalDaysPassed++;
                             if (businessDaysPassed == 1) {
                                 break;
@@ -346,12 +347,18 @@ export default function ProjectionReport() {
                 <input className="w-7 h-7" type="radio" id="4Weeks" name="dateRange" value="4" onChange={(e) => setCurrentRange(e.target.value)}/>
                 <label className="text-2xl" htmlFor="4Weeks">4 Weeks</label>
             </div>
-            {currentVendor != null ?
+            {currentVendor != null && vendorDateList().length > 0 ?
+                <div>
                 <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
-            : null}
-            <div>
                 {vendorDateList()}
-            </div>
+                </div>
+                : currentVendor != null ?
+                <div className="text-2xl font-bold font-serif mb-2">There are no products for this vendor in this date range.</div>
+                : null
+            }
+            {/* <div>
+                {vendorDateList()}
+            </div> */}
         </div>
         : null
     );

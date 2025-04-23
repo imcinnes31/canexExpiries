@@ -107,7 +107,7 @@ const Pull = (props) => (
                             </div>
                         </div>
                     </div>
-                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
                         <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-xl">
                             Mark All Items of {props.product.productName} ({props.product.productUPC}), Expiring {monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1]} {parseInt(props.product.productExpiry.substring(8,10)) + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(convertIntoTodaysDate(props.product.productExpiry))) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(convertIntoTodaysDate(props.product.productExpiry))) + ")" : "")}, as Sold Out?
                         </div>
@@ -167,15 +167,14 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     } 
 
     async function soldOutProduct(divID) {
-        const currentPull = pullAmounts[divID];
-        currentPull['clicked'] = true;
         const prodUPC = divID.substring(0,12);
         const productExpiry = divID.substring(12,20);
-        // console.log(productExpiry);
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${productExpiry}`, {
                 method: "DELETE",
             });
+            const currentPull = pullAmounts[divID];
+            currentPull['clicked'] = true;
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull})); 
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);
@@ -202,7 +201,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     function alertAnimationEnd(productID) {
         let productExpiry = null;
         productExpiry = params.type == "discounts" ? 
-            productID.substring(12,16) + "-" + productID.substring(16,18) + "-" + productID.substring(18,20) + "T00:00:00.000+00:00"
+            productID.substring(12,16) + "-" + productID.substring(16,18) + "-" + productID.substring(18,20) + "T00:00:00.000Z"
             : null;
         const newProducts = params.type == "pulls" ? products.filter((pl) => pl.productUPC !== productID.substring(0,12))
             : params.type == "discounts" ? products.filter((pl) => !(pl.productUPC == productID.substring(0,12) && pl.productExpiry == productExpiry))

@@ -577,12 +577,13 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": addDays(totalDaysPassed - 2)
+            "$lte": addDays(totalDaysPassed - 1)
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }
       }
     });
+    result['expiryRangeLTE'] = addDays(totalDaysPassed - 1);
     res.send(result).status(200);
   } catch(err) {
     console.error(err);
@@ -726,5 +727,47 @@ router.get("/projections", async (req, res) => {
   // });
   res.send(results).status(200);
 });
+
+// NEW ROUTE FOR PRODUCTS
+router.get("/upcoming", async (req, res) => {
+  let collection = await db.collection("storeSections");
+  let results = await collection.aggregate([
+    {
+      $unwind: "$products"
+    },
+    {
+      $unwind: "$products.expiryDates"
+    },
+    {
+      "$match": {
+        $expr: {
+          $lte: [
+            "$products.expiryDates.dateGiven",
+            addDays(7)
+          ]
+        }
+      }
+    },
+    {
+      "$project": {
+        _id: 0,
+        productUPC: "$products.productUPC",
+        productName: "$products.name",
+        productVendor: "$products.vendor",
+        productExpiry: "$products.expiryDates.dateGiven",
+        productDiscounted: "$products.expiryDates.discounted",
+        productSection: "$section"
+      }
+    },
+    {
+      "$sort":{
+        "productExpiry": 1,
+        "productSection": 1
+      }
+    }
+  ]).toArray();
+  res.send(results).status(200);
+});
+
 
 export default router;

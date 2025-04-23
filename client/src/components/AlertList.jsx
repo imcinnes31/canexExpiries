@@ -200,7 +200,13 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     }
 
     function alertAnimationEnd(productID) {
-        const newProducts = products.filter((pl) => pl.productUPC !== productID.substring(0,12));
+        let productExpiry = null;
+        productExpiry = params.type == "discounts" ? 
+            productID.substring(12,16) + "-" + productID.substring(16,18) + "-" + productID.substring(18,20) + "T00:00:00.000+00:00"
+            : null;
+        const newProducts = params.type == "pulls" ? products.filter((pl) => pl.productUPC !== productID.substring(0,12))
+            : params.type == "discounts" ? products.filter((pl) => !(pl.productUPC == productID.substring(0,12) && pl.productExpiry == productExpiry))
+            : null;
         setProductsLength(newProducts.length);
         setProducts(newProducts);
     }
@@ -242,7 +248,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             setPullAmounts(initialPullAmounts);
         }
         getPulls();
-        // console.log(products);
+        console.log(products);
         return;
     }, []);
 

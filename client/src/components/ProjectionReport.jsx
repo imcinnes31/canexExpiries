@@ -65,7 +65,7 @@ export default function ProjectionReport() {
         return(
             props.id != currentDelete ?
             <tr id={props.id} className="h-10 border-none">
-                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.discount == true ? "text-blue-700" : nonCreditVendors.includes(props.product.productVendor) ? "text-green-700" : "text-red-600"}`}>{props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.discount == true ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
+                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.discount == true ? "text-blue-700" : nonCreditVendors.includes(props.product.productVendor) ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.discount == true ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
                 <td className="border-none w-15 print:hidden"><div className="border border-black bg-red-600 h-10 w-10 p-1" onClick={() => setCurrentDelete(props.id)}><img src={cross}/></div></td>
             </tr>
             :
@@ -86,7 +86,7 @@ export default function ProjectionReport() {
     function Discount(props){
         const convertExpiryDate = convertToTodaysDate(props.product.productExpiry);
         return(
-            <div>{props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""}</div>
+            <div>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""}</div>
         );
     }
 

@@ -274,7 +274,6 @@ export function addDays(numDays) {
 
 export function addDaysToDate(dateGiven, numDays) {
     const convertDate = new Date(dateGiven);
-    convertDate.setMinutes(convertDate.getMinutes() + convertDate.getTimezoneOffset());
     // console.log(new Date(getLocalDate().getTime() + (numDays * 86400000)));
     return convertDate.getTime() + (numDays * 86400000);
 }

@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 
-import {monthNames, nonCreditVendors} from "../constants.jsx"
+import {monthNames, nonCreditVendors, storeHolidays, storeClosedSunday, addDaysToDate} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
+
+function convertIntoTodaysDate(date) {
+  const convertDate = new Date(date);
+  convertDate.setMinutes(convertDate.getMinutes() + convertDate.getTimezoneOffset());
+  return convertDate;
+}
 
 export default function MainMenu() {
   const [pulls, setPulls] = useState([]);
@@ -48,6 +54,81 @@ export default function MainMenu() {
       const sectionsData = await response.json();
       setSections(sectionsData);
     }
+
+    async function getUpcomingPulls() {
+        const response = await fetch(`${REACT_APP_API_URL}/expiries/upcoming/`); 
+        if (!response.ok) {
+            const message = `An error occurred: ${response.statusText}`;
+            console.error(message);
+            alert("Failed to retrieve data. Please try again.")
+            return;
+        }
+        const productData = await response.json();
+        const storeHolidayArray = Object.keys(storeHolidays);
+        let businessDaysPassed = 0;
+        let totalDaysPassed = 0;
+        let passedDate = new Date();
+        while(true) {
+            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+                businessDaysPassed++;
+            }
+            passedDate = addDaysToDate(passedDate, 1);
+            totalDaysPassed++;
+            if (businessDaysPassed == 1) {
+                break;
+            }
+        }
+        const filteredProductData = 
+        Object.entries(Object.groupBy(productData
+        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+        .map((product) => {
+            return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
+            }
+        ), product => product.productUPC)).map(([k, v]) => ({ "products": v.sort((a,b) => convertIntoTodaysDate(b.productExpiry).getTime() - convertIntoTodaysDate(a.productExpiry).getTime())[0] }))
+        .map(c => c.products).map((d) => {
+            return { ...d, productDiscountStatus: convertIntoTodaysDate(d.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
+            }
+        )
+        setPulls(filteredProductData);           
+      }
+      
+      async function getUpcomingDiscounts() {
+        const response = await fetch(`${REACT_APP_API_URL}/expiries/upcoming/`); 
+        if (!response.ok) {
+            const message = `An error occurred: ${response.statusText}`;
+            console.error(message);
+            alert("Failed to retrieve data. Please try again.")
+            return;
+        }
+        const productData = await response.json();
+        const storeHolidayArray = Object.keys(storeHolidays);
+        let businessDaysPassed = 0;
+        let totalDaysPassed = 0;
+        let passedDate = new Date();
+            while(true) {
+                if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+                    businessDaysPassed++;
+                }
+                passedDate = addDaysToDate(passedDate, 1);
+                totalDaysPassed++;
+                if (businessDaysPassed == 3) {
+                    break;
+                }
+            }
+        const filteredProductData = 
+        productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+        .filter((product) => product.productDiscounted == false)
+        .map((product) => {
+            return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
+            }
+        )
+        .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+        .map((product) => {
+            return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productDiscountDate).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
+            }
+        )
+        setDiscounts(filteredProductData);
+    }
       
     // function getFlashes() {
     //   const flashAlerts = {};
@@ -66,8 +147,10 @@ export default function MainMenu() {
     }
 
     deleteOldRecords();
-    getPulls();
-    getDiscounts();
+    // getPulls();
+    // getDiscounts();
+    getUpcomingPulls();
+    getUpcomingDiscounts();
     getSections();
     return;
 

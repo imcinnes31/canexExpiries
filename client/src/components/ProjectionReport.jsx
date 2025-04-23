@@ -185,7 +185,7 @@ export default function ProjectionReport() {
             return { ...product, productExpiryGroup: convertDate.toDateString() }
         });
         const vendorDictDates = Object.groupBy(vendorDataDict, product => product.productExpiryGroup);
-        const vendorDict = Object.entries(vendorDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        const vendorDict = Object.entries(vendorDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => convertToTodaysDate(a.date).getTime() - convertToTodaysDate(b.date).getTime());
         // if (vendorDict.length > 0 && currentVendor != null) {
             return vendorDict.map((a) => 
                 <VendorDate 
@@ -220,6 +220,7 @@ export default function ProjectionReport() {
             switch (params.type) {
                 case "upcoming":
                     const storeHolidayArray = Object.keys(storeHolidays);
+                    // console.log(storeHolidayArray);
                     const upcomingDiscounts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);

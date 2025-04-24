@@ -337,6 +337,7 @@ router.get("/sections/", async (req, res) => {
         "dateLastChecked": 1,
         "intervalDays": 1,
         "needsChecking": 1,
+        "demoSection": 1,
       }
     }
   ]).toArray();
@@ -528,6 +529,36 @@ router.patch("/discounts/:productUPC&:productExpiry", async (req, res) => {
   }
 });
 
+// ALERT LIST*DEMO
+router.patch("/discountsDemo/:productUPC&:productExpiry", async (req, res) => {
+  try {
+    let collection = await db.collection("storeSections");
+    let result = await collection.updateMany({},
+    {
+      "$set": {
+        "products.$[x].expiryDates.$[y].demoDiscounted": true
+      }
+    },
+    {
+      "arrayFilters": [
+        {
+          "x.productUPC": req.params.productUPC
+        },
+        {
+          "y.dateGiven": {
+            "$eq": new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
+          },
+          "y.discounted": false
+        }
+      ]
+    });
+    res.send(result).status(200);
+  } catch(err) {
+    console.error(err);
+    res.status(500).send("Error updating record.");
+  }
+});
+
 // ALERT LIST*
 router.delete("/products/:productUPC", async (req, res) => {
   try {
@@ -591,6 +622,49 @@ router.delete("/products/:productUPC", async (req, res) => {
   }
 });
 
+// ALERT LIST*DEMO
+router.delete("/productsDemo/:productUPC", async (req, res) => {
+  try {
+      let collection = await db.collection("storeSections");
+
+    let businessDaysPassed = 0;
+    let totalDaysPassed = 0;
+    while(true) {
+        if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+            businessDaysPassed++;
+        }
+        totalDaysPassed++;
+        if (businessDaysPassed == 1) {
+            break;
+        }
+    }
+
+    let result = await collection.updateMany({},
+        {
+          "$set": {
+            "products.$[x].expiryDates.$[y].demoPulled": true
+          }
+        },
+        {
+          "arrayFilters": [
+            {
+              "x.productUPC": req.params.productUPC
+            },
+            {
+              "y.dateGiven": {
+                "$lte": addDays(totalDaysPassed - 1)
+              },
+            }
+          ]
+        })
+    res.send(result).status(200);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send("Error updating record.");
+  }
+});
+
 // ALERT LIST*
 router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
   try {
@@ -606,7 +680,7 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
         },
         {
           $pull: {
-            "products.$.expiryDates": {
+            "products.$.expiryDates.$.dateGiven.": {
               "dateGiven": {
                 "$eq": new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
               }
@@ -638,6 +712,37 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
   }
 });
 
+// ALERT LIST*DEMO
+router.delete("/discountsDemo/:productUPC&:productExpiry", async (req, res) => {
+  try {
+    let collection = await db.collection("storeSections");
+
+    let result = await collection.updateMany({},
+      {
+        "$set": {
+          "products.$[x].expiryDates.$[y].demoPulled": true
+        }
+      },
+      {
+        "arrayFilters": [
+          {
+            "x.productUPC": req.params.productUPC
+          },
+          {
+            "y.dateGiven": {
+              "$eq": new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
+            },
+          }
+        ]
+      });
+      res.send(result).status(200);
+
+  } catch(err) {
+      console.error(err);
+      res.status(500).send("Error updating record.");
+  }
+});
+
 // ALERT LIST*
 router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
   try {
@@ -645,6 +750,23 @@ router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
     let result = await collection.insertOne({
         productUPC: req.params.productUPC,
         amount: req.params.productAmount,
+        writeOffDate: getLocalDate()
+    });
+    res.send(result).status(200);
+  } catch(err) {
+    console.error(err);
+    res.status(500).send("Error making record");
+  }
+});
+
+// ALERT LIST*DEMO
+router.post("/expiryRecordsDemo/:productUPC&:productAmount", async (req, res) => {
+  try {
+    let collection = await db.collection("expiryRecords");
+    let result = await collection.insertOne({
+        productUPC: req.params.productUPC,
+        amount: req.params.productAmount,
+        demoRecord: true,
         writeOffDate: getLocalDate()
     });
     res.send(result).status(200);
@@ -710,7 +832,9 @@ router.get("/projections", async (req, res) => {
         productVendor: "$products.vendor",
         productExpiry: "$products.expiryDates.dateGiven",
         productDiscounted: "$products.expiryDates.discounted",
-        productSection: "$section"
+        productSection: "$section",
+        demoPulled: "$products.expiryDates.demoPulled",
+        demoDiscounted: "$products.expiryDates.demoDiscounted",
       }
     },
     {
@@ -756,7 +880,9 @@ router.get("/upcoming", async (req, res) => {
         productVendor: "$products.vendor",
         productExpiry: "$products.expiryDates.dateGiven",
         productDiscounted: "$products.expiryDates.discounted",
-        productSection: "$section"
+        productSection: "$section",
+        demoPulled: "$products.expiryDates.demoPulled",
+        demoDiscounted: "$products.expiryDates.demoDiscounted",
       }
     },
     {

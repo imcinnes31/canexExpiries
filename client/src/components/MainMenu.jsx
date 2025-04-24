@@ -121,7 +121,7 @@ export default function MainMenu() {
         productData.filter((product) => nonCreditVendors.includes(product.productVendor))
         .filter((product) => product.productDiscounted == false)
         .map((product) => {
-            return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
+            return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed - 1))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
             }
         )
         .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0] + "T00:00:00.000Z").getTime() )

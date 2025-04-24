@@ -288,6 +288,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 }
             )
             .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0] + "T00:00:00.000Z").getTime() )
+            .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= convertIntoTodaysDate(new Date().toISOString().split("T")[0] + "T00:00:00.000Z").getTime() )
             .map((product) => {
                 return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productDiscountDate).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
                 }

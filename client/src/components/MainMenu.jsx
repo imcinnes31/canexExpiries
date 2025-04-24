@@ -53,7 +53,8 @@ export default function MainMenu() {
           return;
       }
       const sectionsData = await response.json();
-      setSections(sectionsData);
+      const filteredSectionsData = sectionsData.filter((section) => !(section.demoSection == true));
+      setSections(filteredSectionsData);
     }
 
     async function getUpcomingPulls() {

@@ -20,8 +20,9 @@ export default function ExpiryReport() {
                 return;
             }
             const reportData = await response.json();
-            for (const x in reportData) {
-                const responseProduct = await fetch(`${REACT_APP_API_URL}/expiries/products/${reportData[x].productUPC}`);
+            const filteredReportData = reportData.filter((report) => !(report.demoRecord == true))
+            for (const x in filteredReportData) {
+                const responseProduct = await fetch(`${REACT_APP_API_URL}/expiries/products/${filteredReportData[x].productUPC}`);
                 if (!responseProduct.ok) {
                     const message = `An error occurred: ${response.statusText}`;
                     console.error(message);
@@ -29,18 +30,18 @@ export default function ExpiryReport() {
                     return;
                 }
                 const productData = await responseProduct.json();
-                reportData[x].productName = productData[0].name;
+                filteredReportData[x].productName = productData[0].name;
             }
             const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
             const milkData = Object.fromEntries((Object.values(
-                (reportData.filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
+                (filteredReportData.filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
                     if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
                     agg[prod.productUPC].sumQuantity += +prod.amount
                     return agg;
                 }, {})
             )).map(product => [product.prodUPC, product.sumQuantity]));
             setMilkReport(milkData);
-            const nonMilkData = reportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
+            const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
             setNonMilkReport(nonMilkData);
         }
         getReport();

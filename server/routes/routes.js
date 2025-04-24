@@ -680,7 +680,7 @@ router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
         },
         {
           $pull: {
-            "products.$.expiryDates.$.dateGiven.": {
+            "products.$.expiryDates.$.dateGiven": {
               "dateGiven": {
                 "$eq": new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
               }

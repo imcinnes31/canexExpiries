@@ -251,8 +251,6 @@ export const storeHolidays = {
     [victoriaDay]: "Victoria Day",
     [canadaDay]: "Canada Day",
     [laborDayCanada]: "Labor Day",
-    [terryFoxDay]: "Terry Fox Day",
-    [louisRielDay]: "Louis Riel Day",
     // "Tue Apr 22 2025" : "Test Holiday",
 }
 

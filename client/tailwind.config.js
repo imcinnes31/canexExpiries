@@ -17,6 +17,14 @@ export default {
           '0%, 100%': { "background-color" : "#feb2b2", "color":"black" },
           '50%': { "background-color" : "#e53e3e;", "color":"white" },
         },
+        load: {
+          '0%': { "clip-path": "inset(0% 83% 0% 0%)" },
+          '20%': { "clip-path": "inset(0% 65% 0% 0%)" },
+          '40%': { "clip-path": "inset(0% 43% 0% 0%)" },
+          '60%': { "clip-path": "inset(0% 26% 0% 0%)" },
+          '80%': { "clip-path": "inset(0% 0% 0% 0%)" },
+          '100%': { "clip-path": "inset(0% 0% 0% 0%)" },
+        },
         hide: {
           '0%': {
             'opacity': '1',
@@ -85,6 +93,7 @@ export default {
       animation: {
         flash: 'flash 1s step-end infinite',
         hide: 'hide ease-in-out 1s forwards',
+        load: 'load step-end 3s infinite',
         confirmHide: 'confirmHide ease-in-out 1s forwards',
         confirmShow: 'confirmShow ease-in-out 1s forwards',
         horizontalShow: 'horizontalShow ease-in-out 0.5s forwards',

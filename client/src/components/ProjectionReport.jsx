@@ -226,6 +226,7 @@ export default function ProjectionReport() {
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);
                         return convertDate >= addDays(2) && convertDate < addDays(9);
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
+                    .filter((product) => product.productDiscounted == false)
                     .map((product) => {
                         const convertExpiryDate = convertToTodaysDate(product.productExpiry);
                         let businessDaysPassed = 0;

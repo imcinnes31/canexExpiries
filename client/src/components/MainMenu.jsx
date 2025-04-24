@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 
 import {monthNames, nonCreditVendors, storeHolidays, storeClosedSunday, addDaysToDate} from "../constants.jsx"
+import canexLogo from "../assets/canex.png";
 import {REACT_APP_API_URL} from "../../index.js"
 
 function convertIntoTodaysDate(date) {
@@ -80,7 +81,7 @@ export default function MainMenu() {
         }
         const filteredProductData = 
         Object.entries(Object.groupBy(productData
-        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= new Date().getTime() )
         .map((product) => {
             return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
             }
@@ -122,7 +123,7 @@ export default function MainMenu() {
             return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
             }
         )
-        .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+        .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= new Date().getTime() )
         .map((product) => {
             return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productDiscountDate).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
             }
@@ -252,7 +253,11 @@ export default function MainMenu() {
           </div>
         </div>
       : 
-        <div className="h-50 text-3xl text-center font-bold">Loading...</div>
+        <div className="mt-10 justify-items-center">        
+          <div className="h-50 w-80 overflow-hidden relative"><img className="print:hidden animate-load" src={canexLogo}/></div>
+          <div className="h-50 text-3xl text-center font-bold">Loading...</div>
+        </div>
+
       }
     </div>
   );

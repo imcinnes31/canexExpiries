@@ -34,7 +34,7 @@ const Pull = (props) => (
         <div>
             {props.params.type == "pulls" ?
                 <div id={`${props.product.productUPC}`}>
-                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productDiscountStatus == "overdue" ? 'bg-red-100' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productDiscountStatus == "overdue" ? 'bg-red-300' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
                         <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
                             {props.product.productName + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date())) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date())) + ")" : "")}
                         </div>
@@ -287,14 +287,15 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
                 }
             )
-            .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+            .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= new Date().getTime() )
             .map((product) => {
                 return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productDiscountDate).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
                 }
-            ) :
-            params.type == "pulls" ? 
+            )
+            .sort((a,b) => b.productDiscountStatus - a.productDiscountStatus)
+            : params.type == "pulls" ? 
             Object.entries(Object.groupBy(productData
-            .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0]).getTime() )
+            .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= new Date().getTime() )
             .map((product) => {
                 return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
                 }
@@ -302,7 +303,8 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             .map(c => c.products).map((d) => {
                 return { ...d, productDiscountStatus: convertIntoTodaysDate(d.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
                 }
-            )           
+            )
+            .sort((a,b) => b.productDiscountStatus - a.productDiscountStatus)  
             : null; 
 
             const initialPullAmounts = [];

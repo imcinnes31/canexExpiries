@@ -94,11 +94,6 @@ export default function MainMenu() {
         )
         .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
         .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
-        .map((product) => {
-            return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
-            }
-        )
-        .sort((a,b) => a.productDiscountStatus.localeCompare(b.productDiscountStatus))
 
         const pullData =
         Object.entries(
@@ -108,16 +103,12 @@ export default function MainMenu() {
                     return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedPulls))).toDateString() }
                     }
                 )
-                .map((product) => {
-                    return { ...product, productPullStatus: new Date(product.productPullDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
-                })
                 .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
                 , product => product.productUPC
             )
         )
         .map(([k, v]) => ({ "products": v.sort((a,b) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
         .map((date) => date.products)
-        .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
 
         setPulls(pullData);
         setDiscounts(discountData);

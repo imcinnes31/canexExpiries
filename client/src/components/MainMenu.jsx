@@ -57,7 +57,7 @@ export default function MainMenu() {
       setSections(filteredSectionsData);
     }
 
-    async function getUpcomingPulls() {
+    async function getUpcoming() {
         const response = await fetch(`${REACT_APP_API_URL}/expiries/upcoming/`); 
         if (!response.ok) {
             const message = `An error occurred: ${response.statusText}`;
@@ -68,69 +68,59 @@ export default function MainMenu() {
         const productData = await response.json();
         const storeHolidayArray = Object.keys(storeHolidays);
         let businessDaysPassed = 0;
-        let totalDaysPassed = 0;
-        let passedDate = new Date();
+        let totalDaysPassedPulls = 0;
+        let totalDaysPassedDiscounts = 0;
+        let passedDate = new Date(new Date().toDateString());
         while(true) {
             if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
                 businessDaysPassed++;
             }
             passedDate = addDaysToDate(passedDate, 1);
-            totalDaysPassed++;
-            if (businessDaysPassed == 1) {
+            totalDaysPassedDiscounts++;
+            if (businessDaysPassed < 1) {
+              totalDaysPassedPulls++;
+            }
+            if (businessDaysPassed ==  3) {
                 break;
             }
         }
-        const filteredProductData = 
-        Object.entries(Object.groupBy(productData
-        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() <= new Date().getTime() )
-        .map((product) => {
-            return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
-            }
-        ), product => product.productUPC)).map(([k, v]) => ({ "products": v.sort((a,b) => convertIntoTodaysDate(b.productExpiry).getTime() - convertIntoTodaysDate(a.productExpiry).getTime())[0] }))
-        .map(c => c.products).map((d) => {
-            return { ...d, productDiscountStatus: convertIntoTodaysDate(d.productExpiry).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
-            }
-        )
-        setPulls(filteredProductData);           
-      }
-      
-      async function getUpcomingDiscounts() {
-        const response = await fetch(`${REACT_APP_API_URL}/expiries/upcoming/`); 
-        if (!response.ok) {
-            const message = `An error occurred: ${response.statusText}`;
-            console.error(message);
-            alert("Failed to retrieve data. Please try again.")
-            return;
-        }
-        const productData = await response.json();
-        const storeHolidayArray = Object.keys(storeHolidays);
-        let businessDaysPassed = 0;
-        let totalDaysPassed = 0;
-        let passedDate = new Date();
-            while(true) {
-                if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
-                    businessDaysPassed++;
-                }
-                passedDate = addDaysToDate(passedDate, 1);
-                totalDaysPassed++;
-                if (businessDaysPassed == 3) {
-                    break;
-                }
-            }
-        const filteredProductData = 
+
+        const discountData = 
         productData.filter((product) => nonCreditVendors.includes(product.productVendor))
         .filter((product) => product.productDiscounted == false)
         .map((product) => {
-            return { ...product, productDiscountDate: (convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed - 1))).toISOString().split("T")[0]) + "T00:00:00.000Z" }
+            return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
             }
         )
-        .filter((product) => convertIntoTodaysDate(product.productDiscountDate).getTime() <= convertIntoTodaysDate(new Date().toISOString().split("T")[0] + "T00:00:00.000Z").getTime() )
-        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= convertIntoTodaysDate(new Date().toISOString().split("T")[0] + "T00:00:00.000Z").getTime() )
+        .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
         .map((product) => {
-            return { ...product, productDiscountStatus: convertIntoTodaysDate(product.productDiscountDate).getTime() == (convertIntoTodaysDate(new Date().toISOString().split("T")[0])).getTime() ? "match" : "overdue" }
+            return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
             }
         )
-        setDiscounts(filteredProductData);
+        .sort((a,b) => a.productDiscountStatus.localeCompare(b.productDiscountStatus))
+
+        const pullData =
+        Object.entries(
+            Object.groupBy(
+                productData
+                .map((product) => {
+                    return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedPulls))).toDateString() }
+                    }
+                )
+                .map((product) => {
+                    return { ...product, productPullStatus: new Date(product.productPullDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+                })
+                .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+                , product => product.productUPC
+            )
+        )
+        .map(([k, v]) => ({ "products": v.sort((a,b) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+        .map((date) => date.products)
+        .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
+
+        setPulls(pullData);
+        setDiscounts(discountData);
     }
       
     // function getFlashes() {
@@ -152,8 +142,7 @@ export default function MainMenu() {
     deleteOldRecords();
     // getPulls();
     // getDiscounts();
-    getUpcomingPulls();
-    getUpcomingDiscounts();
+    getUpcoming();
     getSections();
     return;
 

@@ -346,7 +346,11 @@ export default function CheckSection() {
                     </div>                    
                     <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
                         <option disabled value="DEFAULT">--Select Product Vendor</option>
-                        {vendors.filter((vendor) => vendor != "Tim Hortons").map(function(i) {
+                        {vendors
+                        .filter((vendor) => vendor != "Tim Hortons")
+                        .filter((vendor) => vendor != "Farmers Favorite")
+                        .filter((vendor) => vendor != "Quality Deli")
+                        .map(function(i) {
                             return <option key={i.replace(" ","")}>{i}</option>;
                         })}
                     </select>

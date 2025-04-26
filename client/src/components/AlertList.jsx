@@ -282,6 +282,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             const filteredProductData = 
             params.type == "discounts" ? 
             productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+            .filter((product) => !(product.demoProduct == true))
             .filter((product) => product.productDiscounted == false)
             .map((product) => {
                 return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toDateString() }
@@ -308,6 +309,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             Object.entries(
                 Object.groupBy(
                     productData
+                    .filter((product) => !(product.demoProduct == true))
                     .map((product) => {
                         return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))).toDateString() }
                         }
@@ -387,7 +389,7 @@ export default function AlertList() {
         <div>
             <div>           
                 {productsLength > 0 ?
-                    <div className="font-bold text-center text-xl pt-2">
+                    <div className="font-bold text-center font-serif text-3xl pt-2">
                     {
                         params.type == "pulls" ? 
                             "Products to Pull" : 

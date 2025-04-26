@@ -88,6 +88,7 @@ export default function MainMenu() {
         const discountData = 
         productData.filter((product) => nonCreditVendors.includes(product.productVendor))
         .filter((product) => product.productDiscounted == false)
+        .filter((product) => !(product.demoProduct == true))
         .map((product) => {
             return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
             }
@@ -99,6 +100,7 @@ export default function MainMenu() {
         Object.entries(
             Object.groupBy(
                 productData
+                .filter((product) => !(product.demoProduct == true))
                 .map((product) => {
                     return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedPulls))).toDateString() }
                     }

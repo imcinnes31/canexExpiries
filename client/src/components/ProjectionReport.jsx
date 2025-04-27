@@ -235,6 +235,7 @@ export default function ProjectionReport() {
                         return convertDate >= addDays(2) && convertDate < addDays(15);
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
+                    .filter((product) => !(product.demoProduct == true))
                     .map((product) => {
                         const convertExpiryDate = 
                             (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
@@ -257,7 +258,9 @@ export default function ProjectionReport() {
                         return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((totalDaysPassed) * 86400000)).toDateString(), type: "discount", productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
                         }
                     );
-                    const upcomingPulls = reportData.filter((product) => {
+                    const upcomingPulls = reportData
+                    .filter((product) => !(product.demoProduct == true))
+                    .filter((product) => {
                         const convertExpiryDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate < addDays(7);
                         return convertExpiryDate < addDays(13);

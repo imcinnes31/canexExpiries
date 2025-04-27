@@ -838,6 +838,7 @@ router.get("/projections", async (req, res) => {
         productExpiry: "$products.expiryDates.dateGiven",
         productDiscounted: "$products.expiryDates.discounted",
         productSection: "$section",
+        demoProduct: "$products.demoProduct",
         demoPulled: "$products.expiryDates.demoPulled",
         demoDiscounted: "$products.expiryDates.demoDiscounted",
       }

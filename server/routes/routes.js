@@ -151,9 +151,14 @@ router.get("/sections/:id", async (req, res) => {
           {
             "input": "$products",
             "cond": {
-              "$gte": [
+              "$or": [
+              {"$gte": [
                   "$$this.smallUPC", null
-              ]
+              ]},
+              {"$eq": [
+                "$$this.demoProduct", true
+              ]},
+            ]
             }
           }
         }
@@ -881,7 +886,7 @@ router.get("/upcoming", async (req, res) => {
         productExpiry: "$products.expiryDates.dateGiven",
         productDiscounted: "$products.expiryDates.discounted",
         productSection: "$section",
-        demoProduct: "products.demoProduct",
+        demoProduct: "$products.demoProduct",
         demoPulled: "$products.expiryDates.demoPulled",
         demoDiscounted: "$products.expiryDates.demoDiscounted",
       }

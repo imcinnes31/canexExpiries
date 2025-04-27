@@ -68,9 +68,9 @@ export default function MainMenu() {
         const productData = await response.json();
         const storeHolidayArray = Object.keys(storeHolidays);
         let businessDaysPassed = 0;
-        let totalDaysPassedPulls = 0;
-        let totalDaysPassedDiscounts = 0;
         let passedDate = new Date(new Date().toDateString());
+        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+        let totalDaysPassedDiscounts = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
         while(true) {
             if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
                 businessDaysPassed++;
@@ -142,7 +142,21 @@ export default function MainMenu() {
   }, []);
 
   const Check = (props) => (
-    <div id={props.section._id} className={`h-20 items-center ${props.section.section.length > 12 ? "pt-3" : "pt-6"} border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>{props.section.section}</div>
+    <div id={props.section._id} className={`h-30 items-center ${props.section.section.length > 12 ? "pt-3" : "pt-6"} pb-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>
+      <div>{props.section.section}</div>
+      <div className="text-sm">
+        {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()
+        ? "Last Checked:"
+        : "Next Check:"
+        }
+      </div>
+      <div className="text-sm">
+        {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()
+        ? convertIntoTodaysDate(props.section.dateLastChecked).toLocaleDateString()
+        : new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)).toLocaleDateString()
+        }
+      </div>
+    </div>
   );
 
   const Month = (props) => (
@@ -230,7 +244,7 @@ export default function MainMenu() {
           <div className="pt-4">
             <h3 className="text-2xl pb-4">Projection Reports</h3>
             <div className="">
-              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/upcoming`)}>Pulls & Discounts For Next 7 Days</div>
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/upcoming`)}>Pulls & Discounts For This Week</div>
               <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/discounts`)}>Non-Credit Pulls - Next Two Weeks</div>
               <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/vendors`)}>Upcoming Expiries By Vendor</div>
             </div>

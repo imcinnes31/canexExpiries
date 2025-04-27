@@ -264,9 +264,9 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             }
             const productData = await response.json();
             const storeHolidayArray = Object.keys(storeHolidays);
-            let businessDaysPassed = 0;
-            let totalDaysPassed = 0;
             let passedDate = new Date(new Date().toDateString());
+            let businessDaysPassed = 0;
+            let totalDaysPassed = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
             if (params.type == "pulls" || params.type == "discounts") {
                 while(true) {
                     if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {

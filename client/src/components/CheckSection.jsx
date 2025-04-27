@@ -76,6 +76,7 @@ export default function CheckSection() {
             }
             const productData = await response.json();
             setCurrentProduct(productData);
+            window.scrollTo(0,0);
         } 
     }
 
@@ -103,6 +104,7 @@ export default function CheckSection() {
             productSmallUPC: "",
             productVendor: null,
         });
+        window.scrollTo(0,0);
     }
 
     function updateNew(value) {
@@ -151,6 +153,7 @@ export default function CheckSection() {
                 }
                 const productData = await response.json();
                 setCurrentProduct(productData); 
+                window.scrollTo(0,0);
             }
         }
     }
@@ -300,8 +303,8 @@ export default function CheckSection() {
                     : null
                     }
                     <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
-                    <input type="number" autoFocus={currentSection.section != "Dairy"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
-                    {currentSection.section == "Dairy" ? 
+                    <input type="number" autoFocus={currentSection.section != "Dairy and Tims"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                    {currentSection.section == "Dairy and Tims" ? 
                         <div>
                             <div className="text-center font-serif text-xl font-bold">Or choose milk product:</div>
                             <div>{milkButtons()}</div>

@@ -65,7 +65,7 @@ export default function ProjectionReport() {
         return(
             props.id != currentDelete ?
             <tr id={props.id} className="h-10 border-none">
-                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.discount == true ? "text-blue-700" : nonCreditVendors.includes(props.product.productVendor) ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.discount == true ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
+                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.type == "discount" ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
                 <td className="border-none w-15 print:hidden"><div className="border border-black bg-red-600 h-10 w-10 p-1" onClick={() => setCurrentDelete(props.id)}><img src={cross}/></div></td>
             </tr>
             :
@@ -103,7 +103,7 @@ export default function ProjectionReport() {
                 <table className="w-full">
                     <tbody>
                     {
-                        props.products.sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection))
+                        props.products.sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection)).sort((a, b) => a.type.localeCompare(b.type))
                         .map((product) => 
                             <Upcoming 
                                 key={product.productUPC + product.productExpiryGroup.replace(" ","")}
@@ -154,11 +154,20 @@ export default function ProjectionReport() {
     }
 
     function upcomingDateList() {
-        return projectionData.map((a) => 
+        let totalDaysPassed = 0;
+        const todaysDate = new Date(new Date().toDateString());
+        while(true) {
+            totalDaysPassed++;
+            if (new Date(addDaysToDate(todaysDate,totalDaysPassed)).getDay() == 0) {
+                break;
+            }
+        }
+        const startOfWeek = new Date(addDaysToDate(todaysDate,totalDaysPassed));
+        return projectionData.filter((a) => new Date(a.date).getTime() <= startOfWeek.getTime()).map((b) => 
             <UpcomingDate 
-                key={a.date}
-                name={a.date}
-                products={a.products}
+                key={b.date}
+                name={b.date}
+                products={b.products}
             />
         );
     }
@@ -177,7 +186,7 @@ export default function ProjectionReport() {
         const vendorDataDict = projectionData.filter((product) => 
             {
                 const convertedDate = convertToTodaysDate(product.productExpiry);
-                return convertedDate <= addDays(currentRange * 7);
+                return convertedDate < addDays(currentRange * 7);
             }
         ).filter((product) => product.productVendor == currentVendor)
         .map((product) => {
@@ -220,54 +229,64 @@ export default function ProjectionReport() {
             switch (params.type) {
                 case "upcoming":
                     const storeHolidayArray = Object.keys(storeHolidays);
-                    // console.log(storeHolidayArray);
                     const upcomingDiscounts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);
-                        return convertDate >= addDays(2) && convertDate < addDays(9);
+                        return convertDate >= addDays(2) && convertDate < addDays(15);
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
-                        const convertExpiryDate = convertToTodaysDate(product.productExpiry);
+                        const convertExpiryDate = 
+                            (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
+                            ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                            : convertToTodaysDate(product.productExpiry)
                         let businessDaysPassed = 0;
                         let totalDaysPassed = 0;
                         let passedDate = convertExpiryDate;
                         while(true) {
-                            if (!((storeClosedSunday == true && convertToTodaysDate(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
+                            passedDate = addDaysToDate(passedDate, -1);
+                            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
                                 businessDaysPassed++;
                             }
-                            passedDate = addDaysToDate(passedDate, -1);
                             totalDaysPassed++;
                             if (businessDaysPassed == 3) {
                                 break;
                             }
                         }
                         // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((convertExpiryDate.getDay() >= 1 && convertExpiryDate.getDay() <= 3 ? 4 : 3) * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)), productExpiryNote: convertExpiryDate.getDay() == 0 ? "Expires Sunday" : null }
-                        return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((totalDaysPassed) * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
+                        return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((totalDaysPassed) * 86400000)).toDateString(), type: "discount", productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
                         }
                     );
                     const upcomingPulls = reportData.filter((product) => {
                         const convertExpiryDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate < addDays(7);
-                        return convertExpiryDate < addDays(7);
+                        return convertExpiryDate < addDays(13);
                     }).map((product) => {
-                        const convertExpiryDate = convertToTodaysDate(product.productExpiry);
-                        let businessDaysPassed = 0;
-                        let totalDaysPassed = 0;
-                        let passedDate = convertExpiryDate;
-                        while(true) {
-                            if (!((storeClosedSunday == true && convertToTodaysDate(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
-                                businessDaysPassed++;
-                            }
-                            passedDate = addDaysToDate(passedDate, 0);
-                            totalDaysPassed++;
-                            if (businessDaysPassed == 1) {
-                                break;
-                            }
-                        }
+                        const convertExpiryDate = 
+                            (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
+                            ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                            : convertToTodaysDate(product.productExpiry)
+                        // let businessDaysPassed = 0;
+                        // let totalDaysPassed = 0;
+                        // let passedDate = convertExpiryDate;
+                        // while(true) {
+                        //     if (!((storeClosedSunday == true && convertToTodaysDate(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
+                        //         businessDaysPassed++;
+                        //     }
+                        //     passedDate = addDaysToDate(passedDate, 0);
+                        //     totalDaysPassed++;
+                        //     if (businessDaysPassed == 1) {
+                        //         break;
+                        //     }
+                        // }
                         // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((convertExpiryDate.getDay() >= 1 && convertExpiryDate.getDay() <= 3 ? 4 : 3) * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)), productExpiryNote: convertExpiryDate.getDay() == 0 ? "Expires Sunday" : null }
                         // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - (totalDaysPassed * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
-                        return { ...product, productExpiryNote: convertExpiryDate.getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(convertExpiryDate).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((totalDaysPassed - 1) * 86400000)).toDateString(), productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
+                            return { ...product, 
+                                type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
+                                productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 
+                                productExpiryGroup: convertToTodaysDate(product.productExpiry).toDateString(), 
+                                productExpiryNumber: String(convertToTodaysDate(product.productExpiry).getFullYear() + ("0" + (convertToTodaysDate(product.productExpiry).getMonth() + 1)).slice(-2) + ("0" + convertToTodaysDate(product.productExpiry).getDate()).slice(-2)) 
+                            }
                         }
                     );
                     const upcomingPullsDiscounts = upcomingPulls.concat(upcomingDiscounts);
@@ -282,8 +301,7 @@ export default function ProjectionReport() {
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
-                        const convertDate = convertToTodaysDate(product.productExpiry);
-                        return { ...product, productExpiry: new Date(convertDate.getTime() - ((convertDate.getDay() == 0 ? 1 : 0) * 86400000)).toDateString() }
+                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString() }
                         }
                     );
                     const discountDictDates = Object.groupBy(discountProducts, product => product.productExpiry);
@@ -293,7 +311,7 @@ export default function ProjectionReport() {
                 case "vendors":
                     const vendorProducts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
-                        return convertDate <= addDays(28);
+                        return convertDate < addDays(28);
                     }).filter((product) => !(nonCreditVendors.includes(product.productVendor)) && product.productVendor != "Tim Hortons")
                     setProjectionData(vendorProducts);
             }

@@ -152,8 +152,8 @@ export default function MainMenu() {
       </div>
       <div className="text-sm">
         {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()
-        ? convertIntoTodaysDate(props.section.dateLastChecked).toLocaleDateString()
-        : new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)).toLocaleDateString()
+        ? convertIntoTodaysDate(props.section.dateLastChecked).toDateString().split(' ').slice(1).join(' ')
+        : new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)).toDateString().split(' ').slice(1).join(' ')
         }
       </div>
     </div>

@@ -42,7 +42,7 @@ const Pull = (props) => (
                             <div className="bg-white border border-black text-center font-serif font-bold text-l">
                                 {props.product.productSection}
                             </div>
-                            <div className="bg-white border border-black text-center text-l tracking-wide">
+                            <div className="bg-white border border-black text-center text-l tracking-wide flex justify-center items-center">
                                 {props.product.productUPC}
                             </div>
                         </div>
@@ -95,7 +95,7 @@ const Pull = (props) => (
                             <div className="bg-white border border-black text-center font-serif font-bold text-l">
                                 {props.product.productSection}
                             </div>
-                            <div className="bg-white border border-black text-center text-l tracking-wide">
+                            <div className="bg-white border border-black text-center text-l tracking-wide flex justify-center items-center">
                                 {props.product.productUPC}
                             </div>
                         </div>

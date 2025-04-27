@@ -335,18 +335,22 @@ export default function CheckSection() {
                     <div className="text-xl">{currentUPC}</div>
                     <div className="font-serif text-2xl">Is Unknown.</div>
                     <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
-                    <div className="flex">
-                        <div className="text-l m-auto font-bold">Product Name:</div>
-                        <input type="text" onChange={(e) => updateNew({ productDesc: (e.target.value).trim() })} className="border border-black text-xl"/>
-                    </div>
-                    <div className="flex">
-                        <div className="text-l m-auto font-bold">Size (Optional):</div>
-                        <input type="text" onChange={(e) => updateNew({ productSize: (e.target.value).trim() })} className="border border-black text-xl"/>
-                    </div>
-                    <div className="flex">
-                        <div className="text-sm m-auto font-bold">Small UPC (If Applicable):</div>
-                        <input type="text" onChange={(e) => updateNew({ productSmallUPC: (e.target.value).trim() })} className="border border-black text-xl"/>
-                    </div>                    
+                    <div className="justify-items-center">
+                        <div className="lg:w-1/2">
+                            <div className="flex">
+                                <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
+                                <input type="text" className="border border-black text-xl lg:w-3/4"/>
+                            </div>
+                            <div className="flex">
+                                <div className="text-l m-auto font-bold lg:w-1/4">Size (Optional):</div>
+                                <input type="text" className="border border-black text-xl lg:w-3/4"/>
+                            </div>
+                            <div className="flex">
+                                <div className="text-sm m-auto font-bold lg:w-1/4">Small UPC (If Applicable):</div>
+                                <input type="text" className="border border-black text-xl lg:w-3/4"/>
+                            </div>        
+                        </div> 
+                    </div>           
                     <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
                         <option disabled value="DEFAULT">--Select Product Vendor</option>
                         {vendors

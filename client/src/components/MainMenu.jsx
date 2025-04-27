@@ -142,7 +142,7 @@ export default function MainMenu() {
   }, []);
 
   const Check = (props) => (
-    <div id={props.section._id} className={`h-30 items-center ${props.section.section.length > 12 ? "pt-3" : "pt-6"} pb-6 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>
+    <div id={props.section._id} className={`h-30 items-center ${props.section.section.length > 12 ? "pt-3 pb-3 lg:pt-3" : "pt-6 pb-6 lg:pt-3 lg:pb-3"} pb-3 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>
       <div>{props.section.section}</div>
       <div className="text-sm">
         {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()

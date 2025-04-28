@@ -106,8 +106,8 @@ export default function ProjectionReport() {
                         props.products.sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection)).sort((a, b) => a.type.localeCompare(b.type))
                         .map((product) => 
                             <Upcoming 
-                                key={product.productUPC + product.productExpiryGroup.replace(" ","")}
-                                id={product.productUPC + product.productExpiryGroup.replace(" ","")}
+                                key={product.productUPC + product.productExpiryGroup.replaceAll(" ","")}
+                                id={product.productUPC + product.productExpiryGroup.replaceAll(" ","")}
                                 product={product}
                             />
                         )

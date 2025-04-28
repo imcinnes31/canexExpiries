@@ -66,7 +66,7 @@ export default function ProjectionReport() {
             props.id != currentDelete ?
             <tr id={props.id} className="h-10 border-none">
                 <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.type == "discount" ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
-                <td>{props.product.productExpiryGroup}</td>
+                <td>${props.product.productExpiryGroup}</td>
                 <td className="border-none w-15 print:hidden"><div className="border border-black bg-red-600 h-10 w-10 p-1" onClick={() => setCurrentDelete(props.id)}><img src={cross}/></div></td>
             </tr>
             :

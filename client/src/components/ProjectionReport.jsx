@@ -265,29 +265,25 @@ export default function ProjectionReport() {
                         // return convertDate < addDays(7);
                         return convertExpiryDate < addDays(13);
                     }).map((product) => {
+                        // OLD VERSION
                         const convertExpiryDate = 
                             (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
                             ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
                             : convertToTodaysDate(product.productExpiry)
-                        // let businessDaysPassed = 0;
-                        // let totalDaysPassed = 0;
-                        // let passedDate = convertExpiryDate;
-                        // while(true) {
-                        //     if (!((storeClosedSunday == true && convertToTodaysDate(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
-                        //         businessDaysPassed++;
-                        //     }
-                        //     passedDate = addDaysToDate(passedDate, 0);
-                        //     totalDaysPassed++;
-                        //     if (businessDaysPassed == 1) {
-                        //         break;
-                        //     }
-                        // }
-                        // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((convertExpiryDate.getDay() >= 1 && convertExpiryDate.getDay() <= 3 ? 4 : 3) * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)), productExpiryNote: convertExpiryDate.getDay() == 0 ? "Expires Sunday" : null }
-                        // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - (totalDaysPassed * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
+        // NEW VERSION
+                        let convertExpiryDate = convertToTodaysDate(product.productExpiry)
+                        while(true) {
+                            if (storeClosedSunday == true && convertExpiryDate.getDay() == 0) || storeHolidayArray.includes(convertExpiryDate.toDateString()) {
+                        convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                    } else {
+                        break;
+
+                        }
+// let businessDaysPassed = 0;
                             return { ...product, 
                                 type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
                                 productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 
-                                productExpiryGroup: convertToTodaysDate(product.productExpiry).toDateString(), 
+                                productExpiryGroup: convertExpiryDate.toDateString(), 
                                 productExpiryNumber: String(convertToTodaysDate(product.productExpiry).getFullYear() + ("0" + (convertToTodaysDate(product.productExpiry).getMonth() + 1)).slice(-2) + ("0" + convertToTodaysDate(product.productExpiry).getDate()).slice(-2)) 
                             }
                         }

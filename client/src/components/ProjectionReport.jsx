@@ -242,7 +242,7 @@ export default function ProjectionReport() {
                             ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
                             : convertToTodaysDate(product.productExpiry)
                         let businessDaysPassed = 0;
-                        let totalDaysPassed = ((storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString())) ? -1 : 0;
+                        let totalDaysPassed = 0;
                         let passedDate = convertExpiryDate;
                         while(true) {
                             passedDate = addDaysToDate(passedDate, -1);

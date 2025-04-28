@@ -266,7 +266,7 @@ export default function ProjectionReport() {
                         return convertExpiryDate < addDays(13);
                     }).map((product) => {
                         // OLD VERSION
-                        const convertExpiryDate = 
+                        // const convertExpiryDate = 
                             (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
                             ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
                             : convertToTodaysDate(product.productExpiry)

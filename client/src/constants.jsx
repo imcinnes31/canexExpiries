@@ -101,7 +101,11 @@ export const fiveDigitJulianProductsList = [
     {
         name: "Homestyle 2Bite Cinnamon Bun 85g",
         productUPC: "770981090412"
-    }
+    },
+    {
+        name: "Homestyle 2Bite Brownies 85g",
+        productUPC: "770981090801"
+    },
 ]
 
 export const fiveDigitJulianProducts = fiveDigitJulianProductsList.map(product => product.productUPC);

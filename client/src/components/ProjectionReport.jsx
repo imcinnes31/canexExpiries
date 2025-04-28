@@ -279,6 +279,7 @@ export default function ProjectionReport() {
                         break;
 
                         }
+                        }
 // let businessDaysPassed = 0;
                             return { ...product, 
                                 type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",

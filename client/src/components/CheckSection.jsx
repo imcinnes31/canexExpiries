@@ -339,15 +339,15 @@ export default function CheckSection() {
                         <div className="lg:w-1/2">
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
-                                <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" className="border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Size (Optional):</div>
-                                <input onChange={(e) => updateNew({ productSize: e.target.value})} type="text" className="border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productSize: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>
                             <div className="flex">
                                 <div className="text-sm m-auto font-bold lg:w-1/4">Small UPC (If Applicable):</div>
-                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>        
                         </div> 
                     </div>           

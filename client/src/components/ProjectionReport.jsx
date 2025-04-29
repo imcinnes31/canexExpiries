@@ -5,6 +5,7 @@ import {REACT_APP_API_URL} from "../../index.js"
 
 import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays} from "../constants.jsx"
 import cross from "../assets/cross.png";
+import tick from "../assets/check.png";
 
 function convertToTodaysDate(dateGiven) {
     const convertDate = new Date(dateGiven);
@@ -23,40 +24,38 @@ function daysIntoFiveJulian(date){
 }
 
 export default function ProjectionReport() {
-    async function soldOutProduct(divID, date) {
+    async function soldOutProduct(divID, productExpiry) {
         const prodUPC = divID.substring(0,12);
-        const productExpiry = date;
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${productExpiry}`, {
                 method: "DELETE",
             });
-            const projectionDataFiltered = projectionData;
-            for (const x in projectionData) {
-                for (const y in projectionData[x].products) {
-                    const pullNumbers = [];
-                    if (projectionData[x].products[y].productUPC == prodUPC) {
-                        pullNumbers.push(y);
-                    }
-                    for (const z in pullNumbers) {
-                        projectionDataFiltered[x].products.splice(pullNumbers[z], 1);
-                    }
-                }
-            }
-            const projectionDataReduced = projectionDataFiltered;
-            const pullDates = [];
-            for (const x in projectionDataFiltered) {
-                if (projectionDataFiltered[x].products.length == 0) {
-                    pullDates.push(x);
-                }
-            }
-            for (const z in pullDates) {
-                projectionDataReduced.splice(pullDates[z], 1);
-            }
+            const projectionDataFiltered = projectionData
+            .map((dateEntry) => {
+                return {date: dateEntry.date, products: dateEntry.products.filter((product) => !(product.productUPC == prodUPC && product.productExpiryNumber == productExpiry))}
+            }).filter((dateEntry) => dateEntry.products.length > 0)
+            setProjectionData(projectionDataFiltered);
             setCurrentDelete(null);
-            setProjectionData(projectionDataReduced);
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);
           alert("Failed to remove expiry date from product. Please try again.")
+        }
+    }
+
+    async function discountProduct(divID, prodExpiry) {
+        const prodUPC = divID.substring(0,12);
+        try {
+            await fetch(`${REACT_APP_API_URL}/expiries/discounts/${prodUPC}&${prodExpiry}`, {
+                method: "PATCH",
+            });
+            const projectionDataFiltered = projectionData
+            .map((dateEntry) => {
+                return {date: dateEntry.date, products: dateEntry.products.filter((product) => !(product.productUPC == prodUPC && product.productExpiryNumber == prodExpiry))}
+            }).filter((dateEntry) => dateEntry.products.length > 0)
+            setProjectionData(projectionDataFiltered);
+        } catch (error) {
+            console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to mark product as discounted. Please try again.")
         }
     }
         
@@ -86,7 +85,10 @@ export default function ProjectionReport() {
     function Discount(props){
         const convertExpiryDate = convertToTodaysDate(props.product.productExpiry);
         return(
-            <div>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""}</div>
+            <tr id={props.id} className="h-10 border-none">
+                <td className={`text-xl border-none pr-3 grow`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""}</td>
+                <td className="border-none w-15 print:hidden"><div className="border border-black bg-green-400 h-10 w-10 p-1" onClick={() => discountProduct(props.id,props.product.productExpiryNumber)}><img src={tick}/></div></td>
+            </tr>
         );
     }
 
@@ -106,8 +108,8 @@ export default function ProjectionReport() {
                         props.products.sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection)).sort((a, b) => a.type.localeCompare(b.type))
                         .map((product) => 
                             <Upcoming 
-                                key={product.productUPC + product.productExpiryGroup.replaceAll(" ","")}
-                                id={product.productUPC + product.productExpiryGroup.replaceAll(" ","")}
+                                key={product.productUPC + product.productExpiryGroup.replaceAll(" ","") + product.type}
+                                id={product.productUPC + product.productExpiryGroup.replaceAll(" ","") + product.type}
                                 product={product}
                             />
                         )
@@ -122,16 +124,21 @@ export default function ProjectionReport() {
         return(
             <div className="break-inside-avoid mb-6">
                 <div className="text-2xl underline font-bold font-serif mb-2">{props.name}</div>
-                {
-                    props.products
-                    .sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection))
-                    .map((product) => 
-                        <Discount 
-                            key={product.productUPC}
-                            product={product}
-                        />
-                    )
-                }
+                <table className="w-full">
+                    <tbody>
+                    {
+                        props.products
+                        .sort((a, b) => a.productVendor.localeCompare(b.productVendor)).sort((a, b) => a.productSection.localeCompare(b.productSection))
+                        .map((product) => 
+                            <Discount 
+                                key={product.productUPC+product.productExpiryNumber}
+                                id={product.productUPC+product.productExpiryNumber}
+                                product={product}
+                            />
+                        )
+                    }
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -291,7 +298,7 @@ export default function ProjectionReport() {
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
-                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString() }
+                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString(), productExpiryNumber: product.productExpiry.split("T")[0].replaceAll("-","") }
                         }
                     );
                     const discountDictDates = Object.groupBy(discountProducts, product => product.productExpiry);
@@ -309,13 +316,22 @@ export default function ProjectionReport() {
         getProjections();
         return;
     }, []);
+
+    let weekDaysPassed = 0;
+    const currentDate = new Date(new Date().toDateString());
+    while(true) {
+        weekDaysPassed++;
+        if (new Date(addDaysToDate(currentDate,weekDaysPassed)).getDay() == 0) {
+            break;
+        }
+    }
     
     return (
         params.type == "upcoming" ?
         <div>
             <div className={"screen:hidden font-bold text-xl pl-1"}>4375 - Winnipeg</div>
-            <div className={"font-bold text-xl pl-1"}>Upcoming Pulls and Discounts For</div>
-            <div className={"font-bold text-xl pl-1"}>{addDays(0).toDateString()} to {addDays(7).toDateString()}</div>
+            <div className={"font-bold text-xl pl-1"}>Upcoming Pulls / Discounts</div>
+            <div className={"font-bold text-xl pl-1"}>{currentDate.toDateString()} to {new Date(addDaysToDate(currentDate,weekDaysPassed)).toDateString()}</div>
             <div className={"font-bold text-xl pl-1 pb-3"}>On Products Entered by CANEX Expiry Date Tracker</div>
 
             <div className={"screen:hidden font-bold text-xl text-black pl-1"}>Legend:</div>
@@ -328,7 +344,7 @@ export default function ProjectionReport() {
         : params.type == "discounts" ?
         <div>
             <div className={"screen:hidden font-bold text-xl pl-1"}>4375 - Winnipeg</div>
-            <div className={"font-bold text-xl pl-1"}>Upcoming Non-Credit Write-Offs For Two Weeks</div>
+            <div className={"font-bold text-xl pl-1"}>Upcoming Non-Credit Write-Offs For Next Two Weeks</div>
             <div className={"font-bold text-xl pl-1 pb-7"}>For Products Entered by CANEX Expiry Date Tracker</div>
             <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
             {discountsDateList()}

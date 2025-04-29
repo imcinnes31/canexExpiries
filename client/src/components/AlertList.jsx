@@ -49,6 +49,10 @@ const Pull = (props) => (
                                 {props.product.productUPC}
                             </div>
                         </div>
+                        <div className="text-center text-xl font-bold font-serif p-1">
+                            {"All Items On Or Before: "}
+                            {monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1] + " " + parseInt(props.product.productExpiry.substring(8,10)) + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date(props.product.productExpiry))) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date(props.product.productExpiry))) + ")" : "")}
+                        </div>
                         <div>
                             {nonCreditVendors.includes(props.product.productVendor) ?
                                 <div className="flex w-full pt-2">

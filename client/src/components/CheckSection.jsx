@@ -346,7 +346,7 @@ export default function CheckSection() {
                                 <input onChange={(e) => updateNew({ productSize: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>
                             <div className="flex">
-                                <div className="text-sm m-auto font-bold lg:w-1/4">Small UPC (If Applicable):</div>
+                                <div className="text-l m-auto font-bold lg:w-1/4">Small UPC (If Exists):</div>
                                 <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>        
                         </div> 

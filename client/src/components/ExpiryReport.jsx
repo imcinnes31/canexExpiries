@@ -12,6 +12,7 @@ export default function ExpiryReport() {
 
     useEffect(() => {
         async function getReport() {
+            window.scrollTo(0,0);
             const monthID = params.reportDate;
             const response = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${monthID.substring(0,2)}&${monthID.substring(2,6)}`);
             if (!response.ok) {

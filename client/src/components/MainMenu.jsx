@@ -255,7 +255,6 @@ export default function MainMenu() {
           <div className="h-50 w-80 overflow-hidden relative"><img className="print:hidden animate-load" src={canexLogo}/></div>
           <div className="h-50 text-3xl text-center font-bold">Loading...</div>
         </div>
-
       }
     </div>
   );

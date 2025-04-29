@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {monthNames, milkProducts} from "../constants.jsx"
+import canexLogo from "../assets/canex.png";
 import {REACT_APP_API_URL} from "../../index.js"
 
 export default function ExpiryReport() {
@@ -133,7 +134,12 @@ export default function ExpiryReport() {
             <div className={"screen:hidden text-xl pl-1"}>On Products Entered by CANEX Expiry Date Tracker</div>
             {Object.keys(milkReport).length > 0 || nonMilkReport.length > 0 ?
                 <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
-            : null}
+            : 
+                <div className="mt-10 justify-items-center">        
+                    <div className="h-50 w-80 overflow-hidden relative"><img className="print:hidden animate-load" src={canexLogo}/></div>
+                    <div className="h-50 text-3xl text-center font-bold">Loading...</div>
+                </div>
+            }
             <div className="print:hidden h-3 font-serif font-bold text-center text-lg">{monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,6)}</div>
             <div className="pt-[24px]">
                 {milkGroups()}

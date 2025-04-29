@@ -272,14 +272,13 @@ export default function ProjectionReport() {
                                 break;
                             }
                         }
-                            return { ...product, 
-                                type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
-                                productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 
-                                productExpiryGroup: convertExpiryDate.toDateString(), 
-                                productExpiryNumber: String(convertToTodaysDate(product.productExpiry).getFullYear() + ("0" + (convertToTodaysDate(product.productExpiry).getMonth() + 1)).slice(-2) + ("0" + convertToTodaysDate(product.productExpiry).getDate()).slice(-2)) 
-                            }
+                        return { ...product, 
+                            type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
+                            productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 
+                            productExpiryGroup: convertExpiryDate.toDateString(), 
+                            productExpiryNumber: String(convertToTodaysDate(product.productExpiry).getFullYear() + ("0" + (convertToTodaysDate(product.productExpiry).getMonth() + 1)).slice(-2) + ("0" + convertToTodaysDate(product.productExpiry).getDate()).slice(-2)) 
                         }
-                    );
+                    });
                     const upcomingPullsDiscounts = upcomingPulls.concat(upcomingDiscounts);
                     const upcomingDictDates = Object.groupBy(upcomingPullsDiscounts, product => product.productExpiryGroup);
                     const upcomingDict = Object.entries(upcomingDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());

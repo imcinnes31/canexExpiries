@@ -262,25 +262,16 @@ export default function ProjectionReport() {
                     .filter((product) => !(product.demoProduct == true))
                     .filter((product) => {
                         const convertExpiryDate = convertToTodaysDate(product.productExpiry);
-                        // return convertDate < addDays(7);
                         return convertExpiryDate < addDays(13);
                     }).map((product) => {
-                        // OLD VERSION
-                        // const convertExpiryDate = 
-                            // (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
-                            // ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
-                            // : convertToTodaysDate(product.productExpiry)
-        // NEW VERSION
                         let convertExpiryDate = convertToTodaysDate(product.productExpiry)
                         while(true) {
                             if ((storeClosedSunday == true && convertExpiryDate.getDay() == 0) || storeHolidayArray.includes(convertExpiryDate.toDateString())) {
-                        convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
-                    } else {
-                        break;
-
+                                convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                            } else {
+                                break;
+                            }
                         }
-                        }
-// let businessDaysPassed = 0;
                             return { ...product, 
                                 type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
                                 productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 

@@ -34,7 +34,7 @@ const Pull = (props) => (
         <div>
             {props.params.type == "pulls" ?
                 <div id={`${props.product.productUPC}`}>
-                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productPullStatus == "overdue" ? 'bg-red-100' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productPullStatus == "overdue" ? 'bg-yellow-200' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
                         <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
                             {props.product.productName + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date())) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date())) + ")" : "")}
                         </div>
@@ -73,7 +73,7 @@ const Pull = (props) => (
                             }
                         </div>
                     </div>
-                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-400 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
                         <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-lg">
                             Mark All Items of {props.product.productName} ({props.product.productUPC}) as Sold Out?
                         </div>
@@ -91,7 +91,7 @@ const Pull = (props) => (
                 </div>
             : props.params.type == "discounts" ?
                 <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`}>                   
-                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productDiscountStatus == "overdue" ? 'bg-red-100' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productDiscountStatus == "overdue" ? 'bg-yellow-200' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
                         <div id={`productName${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}`} className="bg-white text-center p-1 font-bold text-xl">
                             {props.product.productName}
                         </div>
@@ -117,7 +117,7 @@ const Pull = (props) => (
                             </div>
                         </div>
                     </div>
-                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-400 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                    <div id={`${props.product.productUPC}${new Date(props.product.productExpiry).toISOString().split('T')[0].replaceAll("-","")}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
                         <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-xl">
                             Mark All Items of {props.product.productName} ({props.product.productUPC}), Expiring {monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1]} {parseInt(props.product.productExpiry.substring(8,10)) + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date(props.product.productExpiry))) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date(props.product.productExpiry))) + ")" : "")}, as Sold Out?
                         </div>

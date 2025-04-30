@@ -67,7 +67,7 @@ const Pull = (props) => (
                                 </div>
                             :
                                 <div>
-                                    <div className="text-red-600 text-center text-xl font-bold font-serif p-1">{props.product.productVendor == "Tim Hortons" ? "Dispose" : "Credit Product"}</div>
+                                    <div className="text-green-400 text-center text-xl font-bold font-serif p-1">{props.product.productVendor == "Tim Hortons" ? "Dispose" : "Credit Product"}</div>
                                     <div className="grid grid-cols-2">
                                         <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
                                         <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>

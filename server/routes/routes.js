@@ -315,33 +315,10 @@ router.get("/sections/", async (req, res) => {
   let collection = await db.collection("storeSections")
   let results = await collection.aggregate([
     {
-      "$addFields": {
-        "needsChecking": {
-          "$cond": {
-            "if": {
-              $lte: [
-                "$dateLastChecked",
-                {
-                  $dateSubtract: {
-                    startDate: getLocalDate(),
-                    unit: "day",
-                    amount: "$intervalDays"
-                  }
-                }
-              ]
-            },
-            "then": true,
-            "else": false
-          }
-        }
-      }
-    },
-    {
       "$project": {
         "section": 1,
         "dateLastChecked": 1,
         "intervalDays": 1,
-        "needsChecking": 1,
         "demoSection": 1,
       }
     }

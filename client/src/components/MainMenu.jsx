@@ -69,11 +69,11 @@ export default function MainMenu() {
         const storeHolidayArray = Object.keys(storeHolidays);
         let businessDaysPassed = 0;
         let passedDate = new Date(new Date().toDateString());
-        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 4) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
         let totalDaysPassedDiscounts = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
         while(true) {
             passedDate = addDaysToDate(passedDate, 1);
-            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 4) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
                 businessDaysPassed++;
             }
             totalDaysPassedDiscounts++;
@@ -93,6 +93,10 @@ export default function MainMenu() {
             return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
             }
         )
+        .map((product) => {
+          console.log(product);
+          return {...product}
+        })
         .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
         .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
 

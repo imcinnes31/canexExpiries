@@ -93,10 +93,6 @@ export default function MainMenu() {
             return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
             }
         )
-        .map((product) => {
-          console.log(product);
-          return {...product}
-        })
         .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
         .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
 

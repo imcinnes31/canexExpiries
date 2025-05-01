@@ -56,7 +56,7 @@ const Pull = (props) => (
                         <div>
                             {nonCreditVendors.includes(props.product.productVendor) ?
                                 <div className="flex w-full pt-2">
-                                    <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 m-auto py-1">Pull Amt:</div>
+                                    <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 lg:basis-3/4 m-auto py-1">Pull Amt:</div>
                                     <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
                                         {Array.from(Array(50), (e, i) => {
                                             return <option key={i}>{i}</option>

@@ -124,7 +124,7 @@ export default function ProjectionReport() {
         return(
             <div className="break-inside-avoid mb-6">
                 <div className="text-2xl underline font-bold font-serif">{props.name.split('*')[0]}</div>
-<div className="text-xl mb-4 font-serif">Discount on {props.name.split('*')[1]}</div>
+<div className="text-xl mb-6 font-bold font-serif">Discount on {props.name.split('*')[1]}</div>
                 <table className="w-full">
                     <tbody>
                     {

@@ -173,7 +173,6 @@ export default function MainMenu() {
     .map((section) => { 
       const lastCheckDate = convertIntoTodaysDate(section.dateLastChecked);
       let nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,section.intervalDays));
-      console.log(section.section);
       while(true) {
         if (!(storeClosedSunday == true && new Date(nextCheckDate).getDay() == 0) || storeHolidayArray.includes(new Date(nextCheckDate).toDateString())) {
           break;

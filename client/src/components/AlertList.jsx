@@ -279,10 +279,10 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             let totalDaysPassed = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
             if (params.type == "pulls" || params.type == "discounts") {
                 while(true) {
+                    passedDate = addDaysToDate(passedDate, 1);
                     if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
                         businessDaysPassed++;
                     }
-                    passedDate = addDaysToDate(passedDate, 1);
                     totalDaysPassed++;
                     if (businessDaysPassed == (params.type == "pulls" ? 1 : params.type == "discounts" ? 3 : null)) {
                         break;

@@ -69,18 +69,18 @@ export default function MainMenu() {
         const storeHolidayArray = Object.keys(storeHolidays);
         let businessDaysPassed = 0;
         let passedDate = new Date(new Date().toDateString());
-        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 4) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
         let totalDaysPassedDiscounts = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
         while(true) {
-            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+            passedDate = addDaysToDate(passedDate, 1);
+            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 4) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
                 businessDaysPassed++;
             }
-            passedDate = addDaysToDate(passedDate, 1);
             totalDaysPassedDiscounts++;
             if (businessDaysPassed < 1) {
               totalDaysPassedPulls++;
             }
-            if (businessDaysPassed ==  3) {
+            if (businessDaysPassed == 3) {
                 break;
             }
         }

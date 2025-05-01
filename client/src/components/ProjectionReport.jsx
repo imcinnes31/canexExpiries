@@ -233,9 +233,9 @@ export default function ProjectionReport() {
                 return;
             }
             const reportData = await response.json();
+            const storeHolidayArray = Object.keys(storeHolidays);
             switch (params.type) {
                 case "upcoming":
-                    const storeHolidayArray = Object.keys(storeHolidays);
                     const upcomingDiscounts = reportData.filter((product) => {
                         const convertDate = convertToTodaysDate(product.productExpiry);
                         // return convertDate >= addDays(3) && convertDate <= addDays(10);
@@ -298,11 +298,45 @@ export default function ProjectionReport() {
                     }).filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
-                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString(), productExpiryNumber: product.productExpiry.split("T")[0].replaceAll("-","") }
+                        const convertExpiryDate = 
+                            (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
+                            ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                            : convertToTodaysDate(product.productExpiry)
+                        let businessDaysPassed = 0;
+                        let totalDaysPassed = 0;
+                        let passedDate = convertExpiryDate;
+                        while(true) {
+                            passedDate = addDaysToDate(passedDate, -1);
+                            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
+                                businessDaysPassed++;
+                            }
+                            totalDaysPassed++;
+                            if (businessDaysPassed == 3) {
+                                break;
+                            }
                         }
-                    );
+                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString() + " (Discount on " + new Date(passedDate).toDateString() + ")", productExpiryNumber: product.productExpiry.split("T")[0].replaceAll("-","") }
+                        }
+                    )
                     const discountDictDates = Object.groupBy(discountProducts, product => product.productExpiry);
-                    const discountsDict = Object.entries(discountDictDates).map(([date, values]) => ({ date, "products": values })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                    // .map((product) => {
+                    //     console.log(product);
+                    //     // let convertExpiryDate = convertToTodaysDate(product.productExpiry)
+                    //     // while(true) {
+                    //     //     if ((storeClosedSunday == true && date.getDay() == 0) || storeHolidayArray.includes(date.toDateString())) {
+                    //     //         convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                    //     //     } else {
+                    //     //         break;
+                    //     //     }
+                    //     // }
+                    //     return { ...product, 
+                    //         groupDiscountDate: null,
+                    //     }
+                    // })
+                    const discountsDict = Object.entries(discountDictDates)
+                    .map(([date, values]) => ({ date, "products": values }))
+                    .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
                     setProjectionData(discountsDict);
                     break;
                 case "vendors":

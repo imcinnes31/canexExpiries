@@ -145,15 +145,15 @@ export default function MainMenu() {
     <div id={props.section._id} className={`h-30 items-center ${props.section.section.length > 12 ? "pt-3 pb-3 lg:pt-3" : "pt-6 pb-6 lg:pt-3 lg:pb-3"} pb-3 border-2 border-black text-center font-serif text-xl font-bold ${props.section.needsChecking == true ? 'animate-flash' : ''} ${props.section.needsChecking ? "bg-red-400" : "bg-green-400"}`} onClick={()=>goToCheckPage(props.section._id)}>
       <div>{props.section.section}</div>
       <div className="text-sm">
-        {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()
+        {props.section.needsChecking
         ? "Last Checked:"
         : "Next Check:"
         }
       </div>
       <div className="text-sm">
-        {new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)) <= new Date()
-        ? convertIntoTodaysDate(props.section.dateLastChecked).toDateString().split(' ').slice(1).join(' ')
-        : new Date(addDaysToDate(convertIntoTodaysDate(props.section.dateLastChecked),props.section.intervalDays)).toDateString().split(' ').slice(1).join(' ')
+        {props.section.needsChecking
+        ? props.section.lastCheckDate.toDateString().split(' ').slice(1).join(' ')
+        : props.section.nextCheckDate.toDateString().split(' ').slice(1).join(' ')
         }
       </div>
     </div>
@@ -168,12 +168,26 @@ export default function MainMenu() {
   }
 
   function sectionList() {
-    return sections.map((section) => {
+    const storeHolidayArray = Object.keys(storeHolidays);
+    return sections
+    .map((section) => { 
+      const lastCheckDate = convertIntoTodaysDate(section.dateLastChecked);
+      let nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,section.intervalDays));
+      console.log(section.section);
+      while(true) {
+        if (!(storeClosedSunday == true && new Date(nextCheckDate).getDay() == 0) || storeHolidayArray.includes(new Date(nextCheckDate).toDateString())) {
+          break;
+        }
+        nextCheckDate = new Date(addDaysToDate(nextCheckDate,-1));
+      }
+      const needsChecking = nextCheckDate <= new Date();
+      return {...section, lastCheckDate: lastCheckDate, nextCheckDate: nextCheckDate, needsChecking: needsChecking}
+    })
+    .map((section) => {
       return (
         <Check 
           key={section._id} 
           section={section} 
-          // flashes={flashes} 
         />
       );
     });

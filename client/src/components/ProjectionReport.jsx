@@ -123,7 +123,8 @@ export default function ProjectionReport() {
     function DiscountDate(props){
         return(
             <div className="break-inside-avoid mb-6">
-                <div className="text-2xl underline font-bold font-serif mb-2">{props.name}</div>
+                <div className="text-2xl underline font-bold font-serif">{props.name.split('*')[0]}</div>
+<div className="text-lg underline font-bold font-serif">{props.name.split('*')[1]}</div>
                 <table className="w-full">
                     <tbody>
                     {
@@ -315,7 +316,7 @@ export default function ProjectionReport() {
                                 break;
                             }
                         }
-                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString() + " (Discount on " + new Date(passedDate).toDateString() + ")", productExpiryNumber: product.productExpiry.split("T")[0].replaceAll("-","") }
+                        return { ...product, productExpiry: convertToTodaysDate(product.productExpiry).toDateString() + "*" + new Date(passedDate).toDateString(), productExpiryNumber: product.productExpiry.split("T")[0].replaceAll("-","") }
                         }
                     )
                     const discountDictDates = Object.groupBy(discountProducts, product => product.productExpiry);

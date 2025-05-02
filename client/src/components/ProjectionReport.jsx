@@ -124,7 +124,7 @@ export default function ProjectionReport() {
         return(
             <div className="break-inside-avoid mb-6">
                 <div className="text-2xl underline font-bold font-serif">{props.name.split('*')[0]}</div>
-<div className="text-xl mb-6 font-bold font-serif">Discount on {props.name.split('*')[1]}</div>
+                <div className="text-xl mb-6 font-bold font-serif">Discount on {props.name.split('*')[1]}</div>
                 <table className="w-full">
                     <tbody>
                     {
@@ -293,10 +293,8 @@ export default function ProjectionReport() {
                     setProjectionData(upcomingDict);
                     break;
                 case "discounts":
-                    const discountProducts = reportData.filter((product) => {
-                        const convertDate = convertToTodaysDate(product.productExpiry);
-                        return convertDate <= addDays(14);
-                    }).filter((product) => nonCreditVendors.includes(product.productVendor))
+                    const discountProducts = reportData
+                    .filter((product) => nonCreditVendors.includes(product.productVendor))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
                         const convertExpiryDate = 
@@ -320,24 +318,10 @@ export default function ProjectionReport() {
                         }
                     )
                     const discountDictDates = Object.groupBy(discountProducts, product => product.productExpiry);
-                    // .map((product) => {
-                    //     console.log(product);
-                    //     // let convertExpiryDate = convertToTodaysDate(product.productExpiry)
-                    //     // while(true) {
-                    //     //     if ((storeClosedSunday == true && date.getDay() == 0) || storeHolidayArray.includes(date.toDateString())) {
-                    //     //         convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
-                    //     //     } else {
-                    //     //         break;
-                    //     //     }
-                    //     // }
-                    //     return { ...product, 
-                    //         groupDiscountDate: null,
-                    //     }
-                    // })
                     const discountsDict = Object.entries(discountDictDates)
                     .map(([date, values]) => ({ date, "products": values }))
-                    .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
+                    .filter((date) => new Date(date.date.split("*")[0]) <= new Date(addDays(14).toDateString()))
+                    .sort((a,b) => new Date(a.date.split("*")[0]).getTime() - new Date(b.date.split("*")[0]).getTime());                    
                     setProjectionData(discountsDict);
                     break;
                 case "vendors":

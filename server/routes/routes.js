@@ -39,61 +39,6 @@ router.get("/test/", async (req,res) => {
 
   res.send(threeDaysAfter).status(200);
 
-  // console.log(storeClosedSunday);
-  // console.log(new Date(moment().format("MM-DD-YYYY")).toISOString(true));
-  // console.log(new Date(moment("2025-02-13").format("MM-DD-YYYY")).toISOString(true));
-  // const date1 = new Date(moment().format("MM-DD-YYYY"));
-  // console.log(date1.getDay());
-  // const date2 = new Date(moment("2025-03-08").format("MM-DD-YYYY")).toISOString(true);
-  // console.log(new Date("2025-02-13").toISOString(true));
-  // console.log(date1 < date2);
-  // console.log(date1 >= date2);
-  // const date1 = new Date("2025-03-27T00:00:00.000+00:00");
-  // console.log(date1);
-  // const date2 = new Date();
-  // console.log(date2.getTimezoneOffset());
-
-  // console.log("start date");
-  // console.log(date1);
-  // console.log("end date");
-  // console.log(date2);
-  // console.log("fixed date");
-  // console.log(date3);
-  // console.log("data date");
-  // console.log(date4);
-  // console.log(date3 <= date4);
-
-  // const date2 = new Date("2025-03-27T00:00:00.000+00:00");
-  // // console.log(date1);
-  // // console.log(date2);
-  // // console.log(date1.getTimezoneOffset());
-  // // console.log(addDays(3));
-  // res.send().status(200);
-
-  // try {
-  //   // let threeDaysFromNow = new Date(moment().add(3, "days").format("MM-DD-YYYY")).toISOString(true);
-  //   let threeDaysFromNow = addDays(3);
-  //   let collection = await db.collection("storeSections");
-  //   let result = await collection.aggregate([
-  //   {
-  //     "arrayFilters": [
-  //       {
-  //         "x.productUPC": "068700100468"
-  //       },
-  //       {
-  //         "y.dateGiven": {
-  //           "$lte": threeDaysFromNow
-  //         },
-  //         "y.discounted": false
-  //       }
-  //     ]
-  //   }
-  //   ]).toArray();
-  //   res.send(result).status(200);
-  // } catch(err) {
-  //   console.error(err);
-  //   res.status(500).send("Error updating record.");
-  // }
 });
 
 // EXPIRY REPORT
@@ -542,44 +487,62 @@ router.patch("/discountsDemo/:productUPC&:productExpiry", async (req, res) => {
 });
 
 // ALERT LIST*
-router.delete("/products/:productUPC", async (req, res) => {
-  try {
-      let collection = await db.collection("storeSections");
-      // let result = await collection.updateOne({},
-      // {
-      //   $pull: {
-      //     "products.$[x].expiryDates": {
-      //       "dateGiven": {
-      //         "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString(true)
-      //       }
-      //     }
-      //   }
-      // },
-      // {
-      //   arrayFilters: [
-      //     {
-      //       "x.productUPC": req.params.productUPC
-      //     }
-      //   ]
-      // });
+// v1
+// router.delete("/products/:productUPC", async (req, res) => {
+//   try {
+//       let collection = await db.collection("storeSections");
 
-    let businessDaysPassed = 0;
-    let totalDaysPassed = 0;
-    while(true) {
-        if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
-            businessDaysPassed++;
-        }
-        totalDaysPassed++;
-        if (businessDaysPassed == 1) {
-            break;
-        }
-    }
+//     let businessDaysPassed = 0;
+//     let totalDaysPassed = 0;
+//     while(true) {
+//         if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+//             businessDaysPassed++;
+//         }
+//         totalDaysPassed++;
+//         if (businessDaysPassed == 1) {
+//             break;
+//         }
+//     }
+
+//     let result = await collection.updateMany({
+//     "products":{$elemMatch:{
+//       "expiryDates.dateGiven": {
+//         // "$lte": addDays(totalDaysPassed - 2)
+//         "$lte": addDays(totalDaysPassed - 1)
+//           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
+//           },
+//       "productUPC": String(req.params.productUPC)
+//       }}
+//     },
+//     {
+//       $pull: {
+//         "products.$.expiryDates": {
+//           "dateGiven": {
+//             // "$lte": new Date(moment().format("MM-DD-YYYY"))
+//             "$lte": addDays(totalDaysPassed - 1)
+//             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
+//           }
+//         }
+//       }
+//     });
+//     result['expiryRangeLTE'] = addDays(totalDaysPassed - 1);
+//     res.send(result).status(200);
+//   } catch(err) {
+//     console.error(err);
+//     res.status(500).send("Error updating record.");
+//   }
+// });
+// v2
+router.delete("/products/:productUPC&:productExpiry", async (req, res) => {
+  const expiryDateConverted = new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
+  try {
+    let collection = await db.collection("storeSections");
 
     let result = await collection.updateMany({
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
         // "$lte": addDays(totalDaysPassed - 2)
-        "$lte": addDays(totalDaysPassed - 1)
+        "$lte": expiryDateConverted
           // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
@@ -590,36 +553,68 @@ router.delete("/products/:productUPC", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": {
             // "$lte": new Date(moment().format("MM-DD-YYYY"))
-            "$lte": addDays(totalDaysPassed - 1)
+            "$lte": expiryDateConverted
             // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }
       }
     });
-    result['expiryRangeLTE'] = addDays(totalDaysPassed - 1);
     res.send(result).status(200);
   } catch(err) {
     console.error(err);
     res.status(500).send("Error updating record.");
   }
+  res.status(200).send(expiryDateConverted)
 });
 
 // ALERT LIST*DEMO
-router.delete("/productsDemo/:productUPC", async (req, res) => {
-  try {
-      let collection = await db.collection("storeSections");
+// v1
+// router.delete("/productsDemo/:productUPC", async (req, res) => {
+//   try {
+//       let collection = await db.collection("storeSections");
 
-    let businessDaysPassed = 0;
-    let totalDaysPassed = 0;
-    while(true) {
-        if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
-            businessDaysPassed++;
-        }
-        totalDaysPassed++;
-        if (businessDaysPassed == 1) {
-            break;
-        }
-    }
+//     let businessDaysPassed = 0;
+//     let totalDaysPassed = 0;
+//     while(true) {
+//         if (!((storeClosedSunday == true && addDays(totalDaysPassed).getDay() == 0) || storeHolidayArray.includes(addDays(totalDaysPassed).toDateString()))) { // Add holidays to this when function made
+//             businessDaysPassed++;
+//         }
+//         totalDaysPassed++;
+//         if (businessDaysPassed == 1) {
+//             break;
+//         }
+//     }
+
+//     let result = await collection.updateMany({},
+//         {
+//           "$set": {
+//             "products.$[x].expiryDates.$[y].demoPulled": true
+//           }
+//         },
+//         {
+//           "arrayFilters": [
+//             {
+//               "x.productUPC": req.params.productUPC
+//             },
+//             {
+//               "y.dateGiven": {
+//                 "$lte": addDays(totalDaysPassed - 1)
+//               },
+//             }
+//           ]
+//         })
+//     res.send(result).status(200);
+
+//   } catch(err) {
+//     console.error(err);
+//     res.status(500).send("Error updating record.");
+//   }
+// });
+// v2
+router.delete("/productsDemo/:productUPC&:productExpiry", async (req, res) => {
+  const expiryDateConverted = new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
+  try {
+    let collection = await db.collection("storeSections");
 
     let result = await collection.updateMany({},
         {
@@ -634,7 +629,7 @@ router.delete("/productsDemo/:productUPC", async (req, res) => {
             },
             {
               "y.dateGiven": {
-                "$lte": addDays(totalDaysPassed - 1)
+                "$lte": expiryDateConverted
               },
             }
           ]

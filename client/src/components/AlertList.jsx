@@ -33,12 +33,12 @@ const Pull = (props) => (
     <div>
         <div>
             {props.params.type == "pulls" ?
-                <div id={`${props.product.productUPC}`}>
-                    <div id={`${props.product.productUPC}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productPullStatus == "overdue" ? 'bg-yellow-200' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
+                <div id={`${props.pullID}`}>
+                    <div id={`${props.pullID}info`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`${props.product.productPullStatus == "overdue" ? 'bg-yellow-200' : 'bg-gray-100'} p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm != props.pullID ? 'animate-hide' : props.currentConfirm == props.pullID ? 'hidden' : ''}`}>
                         {props.product.productPullStatus == "overdue" ? 
                             <div className="text-red-600 font-bold font-serif text-xl text-center pb-1">Overdue</div> 
                         : null}
-                        <div id={`productName${props.product.productUPC}`} className="bg-white text-center p-1 font-bold text-xl">
+                        <div id={`productName${props.pullID}`} className="bg-white text-center p-1 font-bold text-xl">
                             {props.product.productName + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date())) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date())) + ")" : "")}
                         </div>
                         <div className="grid grid-cols-2">
@@ -57,27 +57,27 @@ const Pull = (props) => (
                             {nonCreditVendors.includes(props.product.productVendor) ?
                                 <div className="flex w-full pt-2">
                                     <div className="border border-black rounded-l-lg text-xl font-bold bg-gray-300 text-center basis-64 lg:basis-3/4 m-auto py-1">Pull Amt:</div>
-                                    <select name="pullNumberMenu" id={`numberPull${props.product.productUPC}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
+                                    <select name="pullNumberMenu" id={`numberPull${props.pullID}`} onChange={(e) => props.setPullNumber(e)} className="text-xl basis-24 font-bold border border-black">
                                         {Array.from(Array(50), (e, i) => {
                                             return <option key={i}>{i}</option>
                                         })}
                                     </select>
-                                    <div id={`pullProduct${props.product.productUPC}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                                    <div id={`pullProduct${props.pullID}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
                                     <div className="bg-red-400 basis-24 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.setCurrentConfirm(props.pullID)}><div className="w-7"><img src={cross}/></div></div>
                                 </div>
                             :
                                 <div>
                                     <div className="text-green-600 text-center text-xl font-bold font-serif p-1">{props.product.productVendor == "Tim Hortons" ? "Dispose" : "Credit Product"}</div>
                                     <div className="grid grid-cols-2">
-                                        <div id={`pullProduct${props.product.productUPC}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                                        <div id={`pullProduct${props.pullID}`} className='bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center' onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
                                         <div className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.deleteProduct(props.pullID,false)}><div className="">Sold Out</div><div className="w-7 ml-1"><img src={cross}/></div></div>
                                     </div>
                                 </div>
                             }
                         </div>
                     </div>
-                    <div id={`${props.product.productUPC}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
-                        <div id={`productName${props.product.productUPC}`} className="bg-red-200 text-center p-1 font-bold text-lg">
+                    <div id={`${props.pullID}confirm`} onAnimationEnd={()=>props.alertAnimationEnd(props.pullID)} className={`bg-red-100 p-2 m-3 border border-gray-400 rounded-sm ${props.pullMenuValue.clicked == true && props.currentConfirm == props.pullID ? 'animate-hide' : props.currentConfirm != props.pullID ? 'hidden': ''}`}>
+                        <div id={`productName${props.pullID}`} className="bg-red-200 text-center p-1 font-bold text-lg">
                             Mark All Items of {props.product.productName} ({props.product.productUPC}) as Sold Out?
                         </div>
                         <div className="grid grid-cols-2 p-1">
@@ -169,8 +169,9 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
         }
 
         const prodUPC = divID.substring(0,12);
+        const prodExpiry = divID.substring(12,20);
         try {
-            await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}&${prodExpiry}`, {
                 method: "DELETE",
             });
             const currentPull = pullAmounts[divID];
@@ -298,16 +299,6 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toDateString() }
                 }
             )
-            // .map((product) => {
-            //     console.log(product);
-            //     console.log(convertIntoTodaysDate(addDaysToDate(product.productExpiry, -1 * totalDaysPassed)).toDateString());
-            //     console.log(new Date(product.productDiscountDate));
-            //     console.log(convertIntoTodaysDate(product.productExpiry));
-            //     console.log(new Date(new Date().toDateString()));
-            //     console.log(convertIntoTodaysDate(product.productExpiry))
-            //     console.log(new Date(product.productExpiry).toISOString().split('T')[0].replaceAll("-",""))
-            //     return {...product}
-            // })
             .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
             .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
             .map((product) => {
@@ -320,6 +311,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 Object.groupBy(
                     productData
                     .filter((product) => !(product.demoProduct == true))
+                    .filter((product) => convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))) <= new Date(new Date().toDateString()))
                     .map((product) => {
                         return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))).toDateString() }
                         }
@@ -331,7 +323,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                     , product => product.productUPC
                 )
             )
-            .map(([k, v]) => ({ "products": v.sort((a,b) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+            .map(([k, v]) => ({ "products": v.sort((b,a) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
             .map((date) => date.products)
             .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
   
@@ -350,10 +342,10 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             } else if (params.type == "pulls") {
                 setProductsLength(productData.length);
                 for (const x in productData) {
-                    initialPullAmounts[productData[x].productUPC] = {};
-                    initialPullAmounts[productData[x].productUPC]['amount'] = 0;
-                    initialPullAmounts[productData[x].productUPC]['clicked'] = false;
-                    initialPullAmounts[productData[x].productUPC]['name'] = productData[x].productName;
+                    initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")] = {};
+                    initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['amount'] = 0;
+                    initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['clicked'] = false;
+                    initialPullAmounts[productData[x].productUPC + new Date(productData[x].productExpiry).toISOString().split('T')[0].replaceAll("-","")]['name'] = productData[x].productName;
                 }
                 // setProducts(productData);
             }
@@ -367,7 +359,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     }, []);
 
     return products.map((product) => {
-        const pullID = params.type == "discounts" ? product.productUPC + (new Date(product.productExpiry).toISOString().split('T')[0].replaceAll("-","")) : product.productUPC;
+        const pullID = product.productUPC + (new Date(product.productExpiry).toISOString().split('T')[0].replaceAll("-",""));
         return (
             <Pull
                 pullID={pullID}

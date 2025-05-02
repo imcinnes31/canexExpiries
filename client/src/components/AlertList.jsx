@@ -159,7 +159,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     async function deleteProduct(divID, recording = null) {
         if (recording == true) {
             try {
-                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID}&${pullAmounts[divID]['amount']}`, {
+                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
                     method: "POST",
                 });
             } catch (error) {

@@ -275,7 +275,7 @@ export default function ProjectionReport() {
                         let convertExpiryDate = convertToTodaysDate(product.productExpiry)
                         while(true) {
                             if ((storeClosedSunday == true && convertExpiryDate.getDay() == 0) || storeHolidayArray.includes(convertExpiryDate.toDateString())) {
-                                convertExpiryDate = new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                                convertExpiryDate = new Date(addDaysToDate(convertExpiryDate,-1))
                             } else {
                                 break;
                             }

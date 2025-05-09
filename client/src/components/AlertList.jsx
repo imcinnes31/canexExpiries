@@ -157,28 +157,28 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
     }
 
     async function deleteProduct(divID, recording = null) {
-        if (recording == true) {
-            try {
-                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
-                    method: "POST",
-                });
-            } catch (error) {
-              console.error('A problem occurred with your fetch operation: ', error);
-              alert("Failed to add written off product to record. Please write it manually.")
-            }
-        }
-
+        // the ID of the div where the buttons are is the product UPC plus the string of the expiry date
         const prodUPC = divID.substring(0,12);
         const prodExpiry = divID.substring(12,20);
         try {
             await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}&${prodExpiry}`, {
                 method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
+            // this calls another fetch which adds the number of products pulled to another collection of records
             const currentPull = pullAmounts[divID];
             currentPull['clicked'] = true;
             setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+            if (recording == true) {
+                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
+                    method: "POST",
+                });
+            }
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);
+          console.error(error);
           alert("Failed to remove expiry date from product. Please try again.")
         }
     } 

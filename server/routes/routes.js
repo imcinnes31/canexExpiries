@@ -534,27 +534,26 @@ router.patch("/discountsDemo/:productUPC&:productExpiry", async (req, res) => {
 // });
 // v2
 router.delete("/products/:productUPC&:productExpiry", async (req, res) => {
+  //convert expiry date string given into date object
   const expiryDateConverted = new Date(req.params.productExpiry.substring(0,4) + "-" + req.params.productExpiry.substring(4,6) + "-" + req.params.productExpiry.substring(6,8))
   try {
     let collection = await db.collection("storeSections");
 
     let result = await collection.updateMany({
+    //look for product with that upc, and any "date given" less than or equal to expiry date in parameter
     "products":{$elemMatch:{
       "expiryDates.dateGiven": {
-        // "$lte": addDays(totalDaysPassed - 2)
         "$lte": expiryDateConverted
-          // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           },
       "productUPC": String(req.params.productUPC)
       }}
     },
     {
+      //remove the expiry date object from the expiry dates array
       $pull: {
         "products.$.expiryDates": {
           "dateGiven": {
-            // "$lte": new Date(moment().format("MM-DD-YYYY"))
             "$lte": expiryDateConverted
-            // "$lte": new Date(moment().format("MM-DD-YYYY")).toISOString("true")
           }
         }
       }
@@ -564,7 +563,6 @@ router.delete("/products/:productUPC&:productExpiry", async (req, res) => {
     console.error(err);
     res.status(500).send("Error updating record.");
   }
-  res.status(200).send(expiryDateConverted)
 });
 
 // ALERT LIST*DEMO
@@ -644,7 +642,7 @@ router.delete("/productsDemo/:productUPC&:productExpiry", async (req, res) => {
 
 // ALERT LIST*
 router.delete("/discounts/:productUPC&:productExpiry", async (req, res) => {
-  try {
+    try {
     let collection = await db.collection("storeSections");
     let result = await collection.updateMany(
       {

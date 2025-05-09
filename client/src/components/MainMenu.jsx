@@ -127,9 +127,21 @@ export default function MainMenu() {
     // }
       
     async function deleteOldRecords() {
-      const response = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`, {
-        method: "DELETE",
-      });
+      // await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`, {
+      //   method: "DELETE",
+      // });
+
+      try {
+        await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`, {
+          method: "DELETE",
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.error('A problem occurred with your fetch operation: ', error);
+        alert("Failed to remove old records. Please try again.")
+      }
     }
 
     deleteOldRecords();

@@ -282,7 +282,7 @@ export default function ProjectionReport() {
                         }
                         return { ...product, 
                             type: nonCreditVendors.includes(product.productVendor) ? "nonCreditTrue" : "nonCreditFalse",
-                            productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(convertExpiryDate).toDateString()]: null, 
+                            productExpiryNote: convertToTodaysDate(product.productExpiry).getDay() == 0 ? "Expires Sunday" : storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) ? "Expires " + storeHolidays[convertToTodaysDate(product.productExpiry).toDateString()]: null, 
                             productExpiryGroup: convertExpiryDate.toDateString(), 
                             productExpiryNumber: String(convertToTodaysDate(product.productExpiry).getFullYear() + ("0" + (convertToTodaysDate(product.productExpiry).getMonth() + 1)).slice(-2) + ("0" + convertToTodaysDate(product.productExpiry).getDate()).slice(-2)) 
                         }

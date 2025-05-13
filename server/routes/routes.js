@@ -758,9 +758,6 @@ router.delete("/expiryRecords", async (req, res) => {
   try {
     let collection = await db.collection("expiryRecords");
     let result = await collection.deleteMany( { writeOffDate : {"$lt" : new Date(twelveMonthsAgoYear, twelveMonthsAgoMonth, 1) } })
-    // let result = await collection.deleteMany(
-    //   {"$lt": ["$writeOffDate", new Date(twelveMonthsAgoYear,twelveMonthsAgoMonth,1).toISOString(true)]},
-    // );
     res.send(result).status(200);
   } catch (err) {
     console.error(err);

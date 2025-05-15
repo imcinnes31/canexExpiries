@@ -246,12 +246,20 @@ export default function ProjectionReport() {
                     .filter((product) => !(product.demoProduct == true))
                     .map((product) => {
                         const convertExpiryDate = 
-                            (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
-                            ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
-                            : convertToTodaysDate(product.productExpiry)
+                            // (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
+                            // ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
+                            // : convertToTodaysDate(product.productExpiry)
+                        convertToTodaysDate(product.productExpiry)
                         let businessDaysPassed = 0;
                         let totalDaysPassed = 0;
                         let passedDate = convertExpiryDate;
+                        while (true) {
+                            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) { // Add holidays to this when function made
+                                break;
+                            } else {
+                                passedDate = addDaysToDate(passedDate, -1);
+                            }
+                        }
                         while(true) {
                             passedDate = addDaysToDate(passedDate, -1);
                             if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(passedDate).toDateString()))) { // Add holidays to this when function made
@@ -263,7 +271,7 @@ export default function ProjectionReport() {
                             }
                         }
                         // return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((convertExpiryDate.getDay() >= 1 && convertExpiryDate.getDay() <= 3 ? 4 : 3) * 86400000)).toDateString(), discount: true, productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)), productExpiryNote: convertExpiryDate.getDay() == 0 ? "Expires Sunday" : null }
-                        return { ...product, productExpiryGroup: new Date(convertExpiryDate.getTime() - ((totalDaysPassed) * 86400000)).toDateString(), type: "discount", productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
+                        return { ...product, productExpiryGroup: new Date(passedDate).toDateString(), type: "discount", productExpiryNumber: String(convertExpiryDate.getFullYear() + ("0" + (convertExpiryDate.getMonth() + 1)).slice(-2) + ("0" + convertExpiryDate.getDate()).slice(-2)) }
                         }
                     );
                     const upcomingPulls = reportData

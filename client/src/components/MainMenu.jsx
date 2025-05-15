@@ -80,10 +80,11 @@ export default function MainMenu() {
             if (businessDaysPassed < 1) {
               totalDaysPassedPulls++;
             }
-            if (businessDaysPassed == 3) {
+            if (businessDaysPassed == 4) {  // WAS 3
                 break;
             }
         }
+        totalDaysPassedDiscounts--; // NEW
 
         const discountData = 
         productData.filter((product) => nonCreditVendors.includes(product.productVendor))

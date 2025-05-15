@@ -159,15 +159,16 @@ export default function MainMenu() {
       <div>{props.section.section}</div>
       <div className="text-sm">
         {props.section.needsChecking
-        ? "Last Checked:"
+        ? "Last Check Due:"
         : "Next Check:"
         }
       </div>
       <div className="text-sm">
-        {props.section.needsChecking
+        {/* {props.section.needsChecking
         ? props.section.lastCheckDate.toDateString().split(' ').slice(1).join(' ')
         : props.section.nextCheckDate.toDateString().split(' ').slice(1).join(' ')
-        }
+        } */}
+        {props.section.nextCheckDate.toDateString().split(' ').slice(1).join(' ')}
       </div>
     </div>
   );

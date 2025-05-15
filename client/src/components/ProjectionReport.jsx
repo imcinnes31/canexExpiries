@@ -246,10 +246,7 @@ export default function ProjectionReport() {
                     .filter((product) => !(product.demoProduct == true))
                     .map((product) => {
                         const convertExpiryDate = 
-                            // (storeClosedSunday == true && convertToTodaysDate(product.productExpiry).getDay() == 0) || storeHolidayArray.includes(convertToTodaysDate(product.productExpiry).toDateString()) 
-                            // ? new Date(addDaysToDate(convertToTodaysDate(product.productExpiry),-1))
-                            // : convertToTodaysDate(product.productExpiry)
-                        convertToTodaysDate(product.productExpiry)
+                            convertToTodaysDate(product.productExpiry)
                         let businessDaysPassed = 0;
                         let totalDaysPassed = 0;
                         let passedDate = convertExpiryDate;

@@ -53,6 +53,11 @@ const Pull = (props) => (
                             {"All Items On Or Before: "}
                             {monthNames[parseInt(props.product.productExpiry.substring(5,7)) - 1] + " " + parseInt(props.product.productExpiry.substring(8,10)) + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date(props.product.productExpiry))) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date(props.product.productExpiry))) + ")" : "")}
                         </div>
+                        { props.product.productPullNote ? 
+                            <div className="text-center text-xl font-bold font-serif p-1">
+                                {props.product.productPullNote}
+                            </div>
+                        : null}
                         <div>
                             {nonCreditVendors.includes(props.product.productVendor) ?
                                 <div className="flex w-full pt-2">
@@ -318,6 +323,9 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                     )
                     .map((product) => {
                         return { ...product, productPullStatus: new Date(product.productPullDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+                    })
+                    .map((product) => {
+                        return { ...product, productPullNote: new Date(product.productPullDate).getDay() == 0 ? "(Sunday)" : storeHolidayArray.includes(convertIntoTodaysDate(product.productExpiry).toDateString()) ? "(" + storeHolidays[convertIntoTodaysDate(product.productExpiry).toDateString()] + ")": null }
                     })
                     .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
                     , product => product.productUPC

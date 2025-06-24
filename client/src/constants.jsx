@@ -199,6 +199,18 @@ export const vendorList = [
         name: "Tim Hortons",
         credit: true
     },
+    {
+        name: "Procter & Gamble",
+        credit: false
+    },
+        {
+        name: "Red Bull Canada Ltd.",
+        credit: true
+    },
+    {
+        name: "Multi Foods NL",
+        credit: false
+    },
 ];
 
 export const vendorArray = vendorList.map(vendor => vendor.name);

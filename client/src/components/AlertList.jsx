@@ -280,62 +280,135 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             }
             const productData = await response.json();
             const storeHolidayArray = Object.keys(storeHolidays);
-            let passedDate = new Date(new Date().toDateString());
-            let businessDaysPassed = 0;
-            let totalDaysPassed = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
-            if (params.type == "pulls" || params.type == "discounts") {
-                while(true) {
-                    passedDate = addDaysToDate(passedDate, 1);
-                    if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
-                        businessDaysPassed++;
-                    }
-                    totalDaysPassed++;
-                    if (businessDaysPassed == (params.type == "pulls" ? 1 : params.type == "discounts" ? 3 : null)) {
-                        break;
-                    }
+
+            // NEW PULL AND DISCOUNT FILTERS
+
+            let passedDate2 = new Date(new Date().toDateString());
+            passedDate2 = addDaysToDate(passedDate2,1);
+            while (true) {
+                if ((storeClosedSunday == true && new Date(passedDate2).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate2).toDateString())) {
+                    passedDate2 = addDaysToDate(passedDate2,1);
+                } else {
+                    break;
                 }
             }
+            passedDate2 = addDaysToDate(passedDate2,-1);
+
             const filteredProductData = 
-            params.type == "discounts" ? 
-            productData.filter((product) => nonCreditVendors.includes(product.productVendor))
-            .filter((product) => !(product.demoProduct == true))
-            .filter((product) => product.productDiscounted == false)
-            .map((product) => {
-                return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toDateString() }
-                }
-            )
-            .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
-            .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
-            .map((product) => {
-                return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
-                }
-            )
-            .sort((a,b) => a.productDiscountStatus.localeCompare(b.productDiscountStatus))
-            : params.type == "pulls" ? 
-            Object.entries(
-                Object.groupBy(
-                    productData
-                    .filter((product) => !(product.demoProduct == true))
-                    .filter((product) => convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))) <= new Date(new Date().toDateString()))
-                    .map((product) => {
-                        return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))).toDateString() }
-                        }
+            params.type == "pulls" ? 
+                Object.entries(
+                    Object.groupBy(
+                        productData
+                        .filter((product) => !(product.demoProduct == true))
+                        .filter((product) => convertIntoTodaysDate(product.productExpiry) <= new Date(passedDate2))
+                        .map((product) => {
+                            return { ...product, productPullStatus: convertIntoTodaysDate(product.productExpiry) < new Date(new Date().toDateString()) ? "overdue" : "match" }
+                        })
+                        .map((product) => {
+                            return { ...product, productPullNote: convertIntoTodaysDate(product.productExpiry).getDay() == 0 ? "(Sunday)" : storeHolidayArray.includes(convertIntoTodaysDate(product.productExpiry).toDateString()) ? "(" + storeHolidays[convertIntoTodaysDate(product.productExpiry).toDateString()] + ")": null }
+                        })
+                        // .map((product) => {console.log(product); return{...product}})
+                        , product => product.productUPC
                     )
-                    .map((product) => {
-                        return { ...product, productPullStatus: new Date(product.productPullDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
-                    })
-                    .map((product) => {
-                        return { ...product, productPullNote: new Date(product.productPullDate).getDay() == 0 ? "(Sunday)" : storeHolidayArray.includes(convertIntoTodaysDate(product.productExpiry).toDateString()) ? "(" + storeHolidays[convertIntoTodaysDate(product.productExpiry).toDateString()] + ")": null }
-                    })
-                    .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
-                    , product => product.productUPC
                 )
-            )
-            .map(([k, v]) => ({ "products": v.sort((b,a) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
-            .map((date) => date.products)
-            .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
-  
+                .map(([k, v]) => ({ "products": v.sort((b,a) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+                .map((date) => date.products)
+                .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
+
+            : params.type == "discounts" ? 
+                productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+                .filter((product) => !(product.demoProduct == true))
+                .filter((product) => product.productDiscounted == false)
+                .map((product) => 
+                    {
+                        let businessDaysPassed3 = 0;
+                        while (true) {
+                            if (convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).getDay() == 0 || storeHolidayArray.includes(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).toDateString())) {
+                                businessDaysPassed3++;
+                            } else {
+                                break;
+                            }
+                        }
+                        for (let i = 0; i < 3; i++) {
+                            while(true) {
+                                businessDaysPassed3++;
+                                if (!(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).getDay() == 0 || storeHolidayArray.includes(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).toDateString()))) {
+                                    break;
+                                }
+                            }
+                        }
+                        return {...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1))}
+                    }
+                )
+                .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+                .map((product) => {
+                    return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+                    }
+                )
+                .sort((a,b) => a.productDiscountStatus.localeCompare(b.productDiscountStatus))
+                // .map((product) => {console.log(product);return {...product}})
+
             : null; 
+
+
+            // OLD PULL AND DISCOUNT FILTERS
+
+            // let passedDate = new Date(new Date().toDateString());
+            // let businessDaysPassed = 0;
+            // let totalDaysPassed = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+            // if (params.type == "pulls" || params.type == "discounts") {
+            //     while(true) {
+            //         passedDate = addDaysToDate(passedDate, 1);
+            //         if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+            //             businessDaysPassed++;
+            //         }
+            //         totalDaysPassed++;
+            //         if (businessDaysPassed == (params.type == "pulls" ? 1 : params.type == "discounts" ? 3 : null)) {
+            //             break;
+            //         }
+            //     }
+            // }
+            // const filteredProductData = 
+            // params.type == "discounts" ? 
+            // productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+            // .filter((product) => !(product.demoProduct == true))
+            // .filter((product) => product.productDiscounted == false)
+            // .map((product) => {
+            //     return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed))).toDateString() }
+            //     }
+            // )
+            // .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+            // .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
+            // .map((product) => {
+            //     return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+            //     }
+            // )
+            // .sort((a,b) => a.productDiscountStatus.localeCompare(b.productDiscountStatus))
+            // : params.type == "pulls" ? 
+            // Object.entries(
+            //     Object.groupBy(
+            //         productData
+            //         .filter((product) => !(product.demoProduct == true))
+            //         .filter((product) => convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))) <= new Date(new Date().toDateString()))
+            //         .map((product) => {
+            //             return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassed + 1))).toDateString() }
+            //             }
+            //         )
+            //         .map((product) => {
+            //             return { ...product, productPullStatus: new Date(product.productPullDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+            //         })
+            //         .map((product) => {
+            //             return { ...product, productPullNote: new Date(product.productPullDate).getDay() == 0 ? "(Sunday)" : storeHolidayArray.includes(convertIntoTodaysDate(product.productExpiry).toDateString()) ? "(" + storeHolidays[convertIntoTodaysDate(product.productExpiry).toDateString()] + ")": null }
+            //         })
+            //         .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+            //         , product => product.productUPC
+            //     )
+            // )
+            // .map(([k, v]) => ({ "products": v.sort((b,a) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+            // .map((date) => date.products)
+            // .sort((a,b) => a.productPullStatus.localeCompare(b.productPullStatus)) 
+  
+            // : null; 
 
             const initialPullAmounts = [];
             if (params.type == "discounts") {

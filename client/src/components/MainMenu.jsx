@@ -67,51 +67,110 @@ export default function MainMenu() {
         }
         const productData = await response.json();
         const storeHolidayArray = Object.keys(storeHolidays);
-        let businessDaysPassed = 0;
-        let passedDate = new Date(new Date().toDateString());
-        let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
-        let totalDaysPassedDiscounts = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
-        while(true) {
-            passedDate = addDaysToDate(passedDate, 1);
-            if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
-                businessDaysPassed++;
-            }
-            totalDaysPassedDiscounts++;
-            if (businessDaysPassed < 1) {
-              totalDaysPassedPulls++;
-            }
-            if (businessDaysPassed == 4) {  // WAS 3
+
+        // NEW PULLS AND DISCOUNTS CHECK
+        let passedDate2 = new Date(new Date().toDateString());
+        passedDate2 = addDaysToDate(passedDate2,1);
+        while (true) {
+            if ((storeClosedSunday == true && new Date(passedDate2).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate2).toDateString())) {
+                passedDate2 = addDaysToDate(passedDate2,1);
+            } else {
                 break;
             }
         }
-        totalDaysPassedDiscounts--; // NEW
+        passedDate2 = addDaysToDate(passedDate2,-1);
 
-        const discountData = 
-        productData.filter((product) => nonCreditVendors.includes(product.productVendor))
-        .filter((product) => product.productDiscounted == false)
-        .filter((product) => !(product.demoProduct == true))
-        .map((product) => {
-            return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
-            }
-        )
-        .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
-        .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
-
-        const pullData =
+        const pullData = 
         Object.entries(
             Object.groupBy(
                 productData
                 .filter((product) => !(product.demoProduct == true))
-                .map((product) => {
-                    return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedPulls))).toDateString() }
-                    }
-                )
-                .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+                .filter((product) => convertIntoTodaysDate(product.productExpiry) <= new Date(passedDate2))
+                // .map((product) => {console.log(product); return{...product}})
                 , product => product.productUPC
             )
         )
-        .map(([k, v]) => ({ "products": v.sort((a,b) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+        .map(([k, v]) => ({ "products": v.sort((b,a) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
         .map((date) => date.products)
+
+        const discountData = 
+        productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+        .filter((product) => !(product.demoProduct == true))
+        .filter((product) => product.productDiscounted == false)
+        .map((product) => 
+            {
+                let businessDaysPassed3 = 0;
+                while (true) {
+                    if (convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).getDay() == 0 || storeHolidayArray.includes(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).toDateString())) {
+                        businessDaysPassed3++;
+                    } else {
+                        break;
+                    }
+                }
+                for (let i = 0; i < 3; i++) {
+                    while(true) {
+                        businessDaysPassed3++;
+                        if (!(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).getDay() == 0 || storeHolidayArray.includes(convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1)).toDateString()))) {
+                            break;
+                        }
+                    }
+                }
+                return {...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,businessDaysPassed3 * -1))}
+            }
+        )
+        .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+        .map((product) => {
+            return { ...product, productDiscountStatus: new Date(product.productDiscountDate).getTime() == new Date(new Date().toDateString()).getTime() ? "match" : "overdue" }
+            }
+        )
+        // .map((product) => {console.log(product);return {...product}})
+
+        // OLD PULLS AND DISCOUNTS CHECK
+        // let businessDaysPassed = 0;
+        // let passedDate = new Date(new Date().toDateString());
+        // let totalDaysPassedPulls = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+        // let totalDaysPassedDiscounts = ((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString())) ? -1 : 0;
+        // while(true) {
+        //     passedDate = addDaysToDate(passedDate, 1);
+        //     if (!((storeClosedSunday == true && new Date(passedDate).getDay() == 0) || storeHolidayArray.includes(new Date(passedDate).toDateString()))) {
+        //         businessDaysPassed++;
+        //     }
+        //     totalDaysPassedDiscounts++;
+        //     if (businessDaysPassed < 1) {
+        //       totalDaysPassedPulls++;
+        //     }
+        //     if (businessDaysPassed == 4) {  // WAS 3
+        //         break;
+        //     }
+        // }
+        // totalDaysPassedDiscounts--; // NEW
+
+        // const discountData = 
+        // productData.filter((product) => nonCreditVendors.includes(product.productVendor))
+        // .filter((product) => product.productDiscounted == false)
+        // .filter((product) => !(product.demoProduct == true))
+        // .map((product) => {
+        //     return { ...product, productDiscountDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedDiscounts))).toDateString() }
+        //     }
+        // )
+        // .filter((product) => new Date(product.productDiscountDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+        // .filter((product) => convertIntoTodaysDate(product.productExpiry).getTime() >= new Date(new Date().toDateString()).getTime() )
+
+        // const pullData =
+        // Object.entries(
+        //     Object.groupBy(
+        //         productData
+        //         .filter((product) => !(product.demoProduct == true))
+        //         .map((product) => {
+        //             return { ...product, productPullDate: convertIntoTodaysDate(addDaysToDate(product.productExpiry,(-1 * totalDaysPassedPulls))).toDateString() }
+        //             }
+        //         )
+        //         .filter((product) => new Date(product.productPullDate).getTime() <= new Date(new Date().toDateString()).getTime() )
+        //         , product => product.productUPC
+        //     )
+        // )
+        // .map(([k, v]) => ({ "products": v.sort((a,b) => new Date(a.productPullDate).getTime() - new Date(b.productPullDate).getTime())[0] }))
+        // .map((date) => date.products)
 
         setPulls(pullData);
         setDiscounts(discountData);

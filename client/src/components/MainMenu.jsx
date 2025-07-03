@@ -204,7 +204,7 @@ export default function MainMenu() {
       }
     }
 
-    deleteOldRecords();
+    // deleteOldRecords();
     // getPulls();
     // getDiscounts();
     getUpcoming();
@@ -229,7 +229,11 @@ export default function MainMenu() {
   );
 
   const Month = (props) => (
-    <div id={props.month.id} className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-yellow-300" onClick={()=>getMonthlyReport(props.month.id)}>{props.month.name}</div>
+    <div id={props.month.id} className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-orange-300" onClick={()=>getMonthlyReport(props.month.id)}>{props.month.name}</div>
+  );
+
+  const Week = (props) => (
+    <div id={props.week.id} className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-yellow-300" onClick={()=>getWeeklyReport(props.week.id)}>{props.week.name}</div>
   );
 
   function goToCheckPage(sectionID) {
@@ -270,6 +274,60 @@ export default function MainMenu() {
     return date;
   }
 
+  function weeklyReportList() {
+    const weekList = [];
+    let d = new Date();
+    let limitDateReached = false;
+
+    // Do this 52 times:
+    // If current day is Sunday
+    // 	only have name as current (month, day, year)
+    // Else
+    // 	have last name as that (month, day, year)
+    // 	go back until day is sunday
+    // 	have first name as that (month, day, year)
+    // 	separate them by dashes
+    // Go back one day
+
+    for (let i = 0; i < 52; i++) {
+      let weekName = monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+      let weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + ((d.getDate() + 1) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear());
+      if (d.getDay() != 0) {
+        while(true) {
+          d = new Date(addDaysToDate(d,-1));
+          if (d.getMonth() == 3 && d.getDate() == 1 && d.getFullYear() == 2025) {
+            limitDateReached = true;
+            weekName = "Apr 1, 2025 - " + weekName;
+            weekID = "04012025" + weekID;
+            break;
+          }
+          if (d.getDay() == 0) {
+            weekName = monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " - " + weekName;
+            weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + ((d.getDate() + 1) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear()) + weekID;
+            break;
+          }
+        }
+      } else {
+        weekID = "" + weekID + weekID;
+      }
+      weekList.push(
+        {
+          id: weekID,
+          name: weekName
+        }
+      );
+      if (limitDateReached) {
+        break;
+      }
+      d = new Date(addDaysToDate(d,-1));
+    }
+    return weekList.map((week) => {
+      return (
+        <Week key={week.id} week={week} />
+      );
+    });
+  }
+
   function reportList() {
     const monthList = [];
     for (let i = 0; i <= 12; i++) {
@@ -300,6 +358,10 @@ export default function MainMenu() {
   function getMonthlyReport(monthID) {
     navigate(`/report/${monthID}`);
   }
+
+  function getWeeklyReport(weekID) {
+    navigate(`/weekReport/${weekID}`);
+  }
   
   return (
     <div>
@@ -318,17 +380,23 @@ export default function MainMenu() {
               </div>
           </div>
           <div className="pt-4">
+            <h3 className="text-2xl pb-4">Projection Reports</h3>
+            <div className="">
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/upcoming`)}>Pulls & Discounts For This Week</div>
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/discounts`)}>Non-Credit Pulls - Next Two Weeks</div>
+              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/vendors`)}>Upcoming Expiries By Vendor</div>
+            </div>
+          </div>
+          <div className="pt-4">
             <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
             <div className="">
                 {reportList()}
             </div>
           </div>
           <div className="pt-4">
-            <h3 className="text-2xl pb-4">Projection Reports</h3>
+            <h3 className="text-2xl pb-4">Weekly Write Off Reports</h3>
             <div className="">
-              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/upcoming`)}>Pulls & Discounts For This Week</div>
-              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/discounts`)}>Non-Credit Pulls - Next Two Weeks</div>
-              <div className="w-90 h-15 p-2 mb-4 border-2 border-black text-center font-serif text-l font-bold bg-blue-300" onClick={()=>navigate(`/projections/vendors`)}>Upcoming Expiries By Vendor</div>
+                {weeklyReportList()}
             </div>
           </div>
         </div>

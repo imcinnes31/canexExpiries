@@ -361,7 +361,7 @@ export default function ProjectionReport() {
             <div className={"screen:hidden font-bold text-xl text-black pl-1"}>Legend:</div>
             <div className={"screen:hidden font-bold text-xl text-red-600 pl-1"}>Credit - Do Not Throw Out</div>
             <div className={"screen:hidden font-bold text-xl text-green-700 pl-1"}>Write Off And Dispose Of</div>
-            <div className={"screen:hidden font-bold text-xl text-blue-700 pl-1 pb-7"}>Place 50% Off Discount Stickers</div>
+            <div className={"screen:hidden font-bold text-xl text-blue-700 pl-1 pb-7"}>Place 50% Off Discount Stickers At End Of Day</div>
             <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
             {upcomingDateList()}
         </div>

@@ -291,7 +291,7 @@ export default function MainMenu() {
 
     for (let i = 0; i < 52; i++) {
       let weekName = monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
-      let weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + ((d.getDate() + 1) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear());
+      let weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + String((d.getDate()) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear());
       if (d.getDay() != 0) {
         while(true) {
           d = new Date(addDaysToDate(d,-1));
@@ -303,7 +303,7 @@ export default function MainMenu() {
           }
           if (d.getDay() == 0) {
             weekName = monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " - " + weekName;
-            weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + ((d.getDate() + 1) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear()) + weekID;
+            weekID = ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + String((d.getDate()) < 10 ? "0" : "") + String(d.getDate()) + String(d.getFullYear()) + weekID;
             break;
           }
         }

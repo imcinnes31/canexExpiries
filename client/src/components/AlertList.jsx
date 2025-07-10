@@ -67,7 +67,7 @@ const Pull = (props) => (
                                             return <option key={i}>{i}</option>
                                         })}
                                     </select>
-                                    <div id={`pullProduct${props.pullID}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 && props.pullMenuValue.clicked != true ? { onClick: () => {props.deleteProduct(props.pullID, true)}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
+                                    <div id={`pullProduct${props.pullID}`} className={`${props.pullMenuValue.amount > 0 ? 'bg-green-400' : 'bg-green-100'} text-xl basis-48 font-bold border border-black flex py-1 justify-center`} {...(props.pullMenuValue.amount > 0 && props.pullMenuValue.clicked != true ? { onClick: () => {props.deleteProduct(props.pullID, true);}} : {})}><div className="">Pull</div><div className="w-7 ml-1"><img src={tick}/></div></div>
                                     <div className="bg-red-400 basis-24 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center" onClick={() => props.setCurrentConfirm(props.pullID)}><div className="w-7"><img src={cross}/></div></div>
                                 </div>
                             :
@@ -174,12 +174,14 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
             });
             // this calls another fetch which adds the number of products pulled to another collection of records
             const currentPull = pullAmounts[divID];
-            currentPull['clicked'] = true;
-            setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
-            if (recording == true) {
-                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
-                    method: "POST",
-                });
+            if (currentPull['clicked'] == false) {
+                currentPull['clicked'] = true;
+                setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+                if (recording == true) {
+                    await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
+                        method: "POST",
+                    });
+                }
             }
         } catch (error) {
           console.error('A problem occurred with your fetch operation: ', error);

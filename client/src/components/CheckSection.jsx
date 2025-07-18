@@ -266,6 +266,18 @@ export default function CheckSection() {
                 milkDesc: "Tim's Dispenser Milk",
                 milkUPC: "057957101953"
             },
+                        {
+                milkDesc: "Milk 2% 237 ML",
+                milkUPC: "068700100697"
+            },
+                        {
+                milkDesc: "Milk 1% 237 ML",
+                milkUPC: "068700100727"
+            },
+                        {
+                milkDesc: "Chocolate Milk 237 ML",
+                milkUPC: "068700100611"
+            },
         ];
         for (const x in milkProducts) {
             for (const y in milkProducts[x].products) {
@@ -328,7 +340,7 @@ export default function CheckSection() {
                     }
                     <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
                     <input type="number" autoFocus={currentSection.section != "Dairy and Tims"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
-                    {currentSection.section == "Dairy and Tims" ? 
+                    {currentSection.section == "Dairy, Tims (Cooler 10)" ? 
                         <div>
                             <div className="text-center font-serif text-xl font-bold">Or choose a popular milk product:</div>
                             <div>{milkButtons()}</div>

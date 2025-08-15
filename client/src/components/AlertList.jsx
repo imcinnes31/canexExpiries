@@ -20,11 +20,13 @@ function getLocalDate() {
 }
 
 function daysIntoFourJulian(date){
+    date = convertIntoTodaysDate(date);
     const dayNumber = (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
     return (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber) + String(date.getFullYear() - 2020 - 1);
 }
 
 function daysIntoFiveJulian(date){
+    date = convertIntoTodaysDate(date);
     const dayNumber = (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
     return String(date.getFullYear() - 2000 - 1) + (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber);
 }
@@ -39,7 +41,7 @@ const Pull = (props) => (
                             <div className="text-red-600 font-bold font-serif text-xl text-center pb-1">Overdue</div> 
                         : null}
                         <div id={`productName${props.pullID}`} className="bg-white text-center p-1 font-bold text-xl">
-                            {props.product.productName + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date())) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date())) + ")" : "")}
+                            {props.product.productName + (props.product.productVendor == "M&M Food Market" ? " (Lot# " + String(daysIntoFourJulian(new Date(props.product.productExpiry))) + ")" : props.product.productSection == "Cottage Candy" || fiveDigitJulianProducts.includes(props.product.productUPC) ? " (Lot# " + String(daysIntoFiveJulian(new Date(props.product.productExpiry))) + ")" : "")}
                         </div>
                         <div className="grid grid-cols-2">
                             <div className="bg-white border border-black text-center font-serif font-bold text-l">

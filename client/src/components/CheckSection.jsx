@@ -340,7 +340,7 @@ export default function CheckSection() {
                     }
                     <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
                     <input type="number" autoFocus={currentSection.section != "Dairy and Tims"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
-                    {currentSection.section == "Dairy, Tims (Cooler 10)" ? 
+                    {params.id == "6795e982c4e5586be7dc5bfc" ? 
                         <div>
                             <div className="text-center font-serif text-xl font-bold">Or choose a popular milk product:</div>
                             <div>{milkButtons()}</div>

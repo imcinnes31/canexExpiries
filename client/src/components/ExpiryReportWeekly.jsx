@@ -133,7 +133,7 @@ export default function ExpiryReportWeekly() {
     return (
         <div>
             <div className={"screen:hidden text-xl pl-1"}>4375 - Winnipeg</div>
-            <div className={"screen:hidden text-xl pl-1"}>Store Spoilage log - {monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,6)}</div>
+            <div className={"screen:hidden text-xl pl-1"}>Store Spoilage log - {monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,4)} to {monthNames[parseInt(params.reportDate.substring(8,10)) - 1]} {params.reportDate.substring(10,12)}</div>
             <div className={"screen:hidden text-xl pl-1"}>On Products Entered by CANEX Expiry Date Tracker</div>
             {reportLoaded == true ?
                 <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>

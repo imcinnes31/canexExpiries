@@ -245,7 +245,20 @@ export default function MainMenu() {
     return sections
     .map((section) => { 
       const lastCheckDate = convertIntoTodaysDate(section.dateLastChecked);
-      let nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,section.intervalDays));
+      let nextCheckDate = null;
+      if (section._id == "6795e982c4e5586be7dc5bfc") {
+        let daysPassed = 1;
+        while (true) {
+          if (convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,daysPassed)).getDay() == 3) {
+            break;
+          } else {
+            daysPassed++;
+          }
+        }
+        nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,daysPassed));
+      } else {
+        nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,section.intervalDays));
+      }
       while(true) {
         if (!(storeClosedSunday == true && new Date(nextCheckDate).getDay() == 0) || storeHolidayArray.includes(new Date(nextCheckDate).toDateString())) {
           break;

@@ -39,15 +39,6 @@ export default function CheckSection() {
                 return;
             }
             const sectionData = await response.json();
-            // const upcomingMonths = [];
-            // for (let i = 0; i <= sectionData.expiryRange; i++) {
-            //     const currentMonth = addDays(i).getMonth();
-            //     const currentYear = addDays(i).getFullYear();
-            //     if (!(upcomingMonths.includes(monthNames[currentMonth] + " " + currentYear))) {
-            //         upcomingMonths.push(monthNames[currentMonth] + " " + currentYear);
-            //     }
-            // }
-            // sectionData['upcomingMonths'] = upcomingMonths;
             const smallUPCDict = Object.fromEntries(sectionData.products.map(x => [x.smallUPC, x.productUPC]));
             setSmallUPCProducts(smallUPCDict);
             setCurrentSection(sectionData);
@@ -234,7 +225,7 @@ export default function CheckSection() {
                     expiryDateList.push({
                         id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
                         name: (monthNames[d.getMonth()] + " " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
-                        last: i == currentSection.expriryRange ? true : false,
+                        last: i == currentSection.expiryRange ? true : false,
                         section: currentSection.section,
                         expiryMonth: d.getMonth()
                     });
@@ -243,7 +234,7 @@ export default function CheckSection() {
                 expiryDateList.push({
                     id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
                     name: (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
-                    last: i == currentSection.expriryRange ? true : false,
+                    last: i == currentSection.expiryRange ? true : false,
                     section: currentSection.section,
                     expiryMonth: d.getMonth()
                 });
@@ -311,13 +302,13 @@ export default function CheckSection() {
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR ending in ${addDays(currentSection.expriryRange).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(On M&M products, any four digit number ending in ${new Date().getFullYear() - 2020 - 1} OR ending in ${addDays(currentSection.expiryRange).getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                             <br/>
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(Or on rare items, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(Or on rare items, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(Or on rare items, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>   
                     : currentSection.section == "Cottage Candy" ?
@@ -325,7 +316,7 @@ export default function CheckSection() {
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(On Cottage Candy, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : currentSection.section == "Pastry" ?
@@ -333,7 +324,7 @@ export default function CheckSection() {
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(On some products, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On some products, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${new Date().getFullYear() % 4 == 0 ? 366 : 365} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(On some products, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : null

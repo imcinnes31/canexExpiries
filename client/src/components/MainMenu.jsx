@@ -260,7 +260,7 @@ export default function MainMenu() {
         nextCheckDate = convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,section.intervalDays));
       }
       while(true) {
-        if (!(storeClosedSunday == true && new Date(nextCheckDate).getDay() == 0) || storeHolidayArray.includes(new Date(nextCheckDate).toDateString())) {
+        if (!((storeClosedSunday == true && new Date(nextCheckDate).getDay() == 0) || storeHolidayArray.includes(new Date(nextCheckDate).toDateString()))) {
           break;
         }
         nextCheckDate = new Date(addDaysToDate(nextCheckDate,-1));

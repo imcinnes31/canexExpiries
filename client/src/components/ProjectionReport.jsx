@@ -380,10 +380,18 @@ export default function ProjectionReport() {
                 <div className={"font-bold text-xl pl-1 pb-3"}>Upcoming Expiries For {currentVendor}, Next {currentRange * 7} Days</div>
             : null }
             <div className="print:hidden">
-                <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => setCurrentVendor(e.target.value)} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => setCurrentVendor(e.target.value.split(" (")[0])} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
                     <option disabled value="DEFAULT">--Select Product Vendor</option>
                     {vendorArray.filter((vendor) => vendor != "Tim Hortons" && !(nonCreditVendors.includes(vendor))).map(function(option,idx) {
-                        return <option key={idx}>{option}</option>;
+                        return <option key={idx}>{
+                            option +=
+                            option == "Direct Plus" ? " (Sandwiches & McSweeney Beef Jerky)" :
+                            option == "Scholtens Candy" ? " (Cottage Country Candy)" :
+                            option == "United Distribution" ? " (Pastries)" :
+                            option == "Coldhaus Direct" ? " (Jack Links Beef Jerky)" :
+                            option == "Frito Lay Canada" ? " (Doritos, Ruffles & Lays Chips)" :
+                            ""
+                        }</option>;
                     })}
                 </select>
             </div>

@@ -226,6 +226,7 @@ const easterSunday = convertToTodaysDate(easterSundayCalc).toDateString();
 const goodFriday = convertToTodaysDate(easterSundayCalc.getTime() - (2 * 86400000)).toDateString();
 const easterMonday = convertToTodaysDate(easterSundayCalc.getTime() + (1 * 86400000)).toDateString();
 const christmasDay = convertToTodaysDate(getLocalDate().getFullYear() + "-12-25").toDateString();
+const boxingDay = convertToTodaysDate(getLocalDate().getFullYear() + "-12-26").toDateString();
 const newYearsDay = convertToTodaysDate((getLocalDate().getFullYear() + 1) + "-01-01").toDateString();
 const truthDay = convertToTodaysDate(getLocalDate().getFullYear() + "-09-30").toDateString();
 const remembranceDay = convertToTodaysDate(getLocalDate().getFullYear() + "-11-11").toDateString();
@@ -256,6 +257,7 @@ export const storeHolidays = {
     [goodFriday]: "Good Friday",
     [easterMonday]: "Easter Monday",
     [christmasDay]: "Christmas Day",
+    [boxingDay]: "Boxing Day",
     [newYearsDay]: "New Years Day",
     [truthDay]: "Truth and Reconciliation Day",
     [tgDayCanada]: "Thanksgiving Monday",

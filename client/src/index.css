@@ -8,3 +8,13 @@
     @apply border border-2;
   }
 }
+
+@media print {
+  @page {
+    margin-top: 3cm;
+  }
+
+  @page :first {
+    margin-top: 0cm;
+  }
+}

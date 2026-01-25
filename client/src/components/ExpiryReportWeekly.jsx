@@ -44,7 +44,15 @@ export default function ExpiryReportWeekly() {
                 }, {})
             )).map(product => [product.prodUPC, product.sumQuantity]));
             setMilkReport(milkData);
-            const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
+            // const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
+            const nonMilkData = Object.values(
+                filteredReportData.map(({ writeOffDate, _id, ...reducedDictionary }) => reducedDictionary).filter(item => !(milkProductsArray.includes(item["productUPC"])))
+                .reduce((agg, prod) => {
+                    if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { productName: prod.productName, productUPC: prod.productUPC, amount: 0 }
+                    agg[prod.productUPC].amount += +prod.amount
+                    return agg;
+                }, {})
+            );
             setNonMilkReport(nonMilkData);
             setReportLoaded(true);
         }

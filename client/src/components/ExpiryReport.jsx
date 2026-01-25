@@ -44,7 +44,22 @@ export default function ExpiryReport() {
                 }, {})
             )).map(product => [product.prodUPC, product.sumQuantity]));
             setMilkReport(milkData);
-            const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
+            // const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
+            const nonMilkData = Object.values(
+                filteredReportData.map(({ writeOffDate, _id, ...reducedDictionary }) => reducedDictionary).filter(item => !(milkProductsArray.includes(item["productUPC"])))
+                .reduce((accumulator, currentItem) => {
+                    const upc = currentItem.productUPC;
+
+                    if (accumulator[upc]) {
+                        accumulator[upc].amount += parseInt(currentItem.amount);
+                    } else {
+                        accumulator[upc] = { ...currentItem };
+                        accumulator[upc].amount = parseInt(currentItem.amount);
+                    }
+
+                    return accumulator;
+                }, {})
+            );
             setNonMilkReport(nonMilkData);
             setReportLoaded(true);
         }

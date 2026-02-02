@@ -203,9 +203,13 @@ export const vendorList = [
         name: "Procter & Gamble",
         credit: false
     },
-        {
+    {
         name: "Red Bull Canada Ltd.",
         credit: true
+    },
+    {
+        name: "Dexter Industries",
+        credit: false
     },
 ];
 

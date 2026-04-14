@@ -203,9 +203,13 @@ export const vendorList = [
         name: "Procter & Gamble",
         credit: false
     },
-        {
+    {
         name: "Red Bull Canada Ltd.",
         credit: true
+    },
+    {
+        name: "Dexter Industries",
+        credit: false
     },
 ];
 
@@ -265,8 +269,8 @@ export const storeHolidays = {
     [victoriaDay]: "Victoria Day",
     [canadaDay]: "Canada Day",
     [laborDayCanada]: "Labor Day",
-    [terryFoxDay]: "Terry Fox Day",
-    [louisRielDay]: "Louis Riel Day",
+    // [terryFoxDay]: "Terry Fox Day",
+    // [louisRielDay]: "Louis Riel Day",
     // "Tue Apr 22 2025" : "Test Holiday",
 }
 

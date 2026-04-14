@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import {REACT_APP_API_URL} from "../../index.js"
 
-import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays} from "../constants.jsx"
+import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays, monthNames} from "../constants.jsx"
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
 
@@ -64,7 +64,7 @@ export default function ProjectionReport() {
         return(
             props.id != currentDelete ?
             <tr id={props.id} className="h-10 border-none">
-                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.type == "discount" ? " - MARK AS 50% OFF": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
+                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.type == "discount" ? " - 50% OFF (Exp. " + monthNames[parseInt((props.product.productExpiry.substring(5,7))) - 1] + " " + parseInt((props.product.productExpiry.substring(8,10))) + ")": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
                 <td className="border-none w-15 print:hidden"><div className="border border-black bg-red-600 h-10 w-10 p-1" onClick={() => setCurrentDelete(props.id)}><img src={cross}/></div></td>
             </tr>
             :

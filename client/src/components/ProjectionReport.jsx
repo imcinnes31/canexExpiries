@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import {REACT_APP_API_URL} from "../../index.js"
 
-import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays, monthNames} from "../constants.jsx"
+import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays, monthNames, milkProductUPCs} from "../constants.jsx"
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
 
@@ -223,6 +223,12 @@ export default function ProjectionReport() {
     const [currentDelete, setCurrentDelete] = useState(null);
     const [currentVendor, setCurrentVendor] = useState(null);
     const [currentRange, setCurrentRange] = useState(1);
+    const [selectedRange, setSelectedRange] = useState('1');
+
+    function changeRange(e) {
+        setCurrentRange(e.target.value);
+        setSelectedRange(e.target.value);
+    }
 
     useEffect(() => {
         async function getProjections() {
@@ -301,6 +307,7 @@ export default function ProjectionReport() {
                 case "discounts":
                     const discountProducts = reportData
                     .filter((product) => nonCreditVendors.includes(product.productVendor))
+                    .filter((product) => !(milkProductUPCs.includes(product.productUPC)))
                     .filter((product) => product.productDiscounted == false)
                     .map((product) => {
                         const convertExpiryDate = 
@@ -381,7 +388,19 @@ export default function ProjectionReport() {
                 <div className={"font-bold text-xl pl-1 pb-3"}>Upcoming Expiries For {currentVendor}, Next {currentRange * 7} Days</div>
             : null }
             <div className="print:hidden">
-                <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => setCurrentVendor(e.target.value.split(" (")[0])} className="w-11/12 border border-black p-1 rounded-md m-4 text-xl font-bold">
+                <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={
+                        (e) => {
+                            const vendorChosen = e.target.value.split(" (")[0];
+                            setCurrentVendor(vendorChosen);
+                            if (vendorChosen == "United Distribution" || vendorChosen == "Frito Lay Canada") {
+                                if (currentRange == 4) {
+                                    setCurrentRange(2);
+                                    setSelectedRange('2');
+                                }
+                            }
+                        }
+                    } 
+                    className="w-11/12 border border-black p-1 rounded-md m-4 text-xl font-bold">
                     <option disabled value="DEFAULT">--Select Product Vendor</option>
                     {vendorArray.filter((vendor) => vendor != "Tim Hortons" && !(nonCreditVendors.includes(vendor))).map(function(option,idx) {
                         return <option key={idx}>{
@@ -396,14 +415,26 @@ export default function ProjectionReport() {
                     })}
                 </select>
             </div>
-            <div className="print:hidden pb-5">
-                <input className="w-7 h-7" type="radio" id="1Week" name="dateRange" value="1" defaultChecked={currentRange==1} onChange={(e) => setCurrentRange(e.target.value)}/>
-                <label className="text-2xl" htmlFor="1Week">1 Week</label><br/>
-                <input className="w-7 h-7" type="radio" id="2Weeks" name="dateRange" value="2" onChange={(e) => setCurrentRange(e.target.value)}/>
-                <label className="text-2xl" htmlFor="2Weeks">2 Weeks</label><br/>
-                <input className="w-7 h-7" type="radio" id="4Weeks" name="dateRange" value="4" onChange={(e) => setCurrentRange(e.target.value)}/>
-                <label className="text-2xl" htmlFor="4Weeks">4 Weeks</label>
-            </div>
+            {currentVendor != null ? 
+                <div className="print:hidden pb-5">
+                    <div>
+                        <input className="w-7 h-7" type="radio" id="1Week" name="dateRange" value="1" checked={selectedRange === '1'} onChange={(e) => changeRange(e)}/>
+                        <label className="text-2xl" htmlFor="1Week">1 Week</label>
+                    </div>
+                    <div>
+                        <input className="w-7 h-7" type="radio" id="2Weeks" name="dateRange" value="2" checked={selectedRange === '2'} onChange={(e) => changeRange(e)}/>
+                        <label className="text-2xl" htmlFor="2Weeks">2 Weeks</label>
+                    </div>
+                    { currentVendor != "United Distribution" && currentVendor != "Frito Lay Canada" ?
+                        <div>
+                            <input className="w-7 h-7" type="radio" id="4Weeks" name="dateRange" value="4" checked={selectedRange === '4'} onChange={(e) => changeRange(e)}/>
+                            <label className="text-2xl" htmlFor="4Weeks">4 Weeks</label>
+                        </div>
+                        : null
+                    }
+                </div>
+            : null
+            }
             {currentVendor != null && vendorDateList().length > 0 ?
                 <div>
                 <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>

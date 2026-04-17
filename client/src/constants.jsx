@@ -93,6 +93,8 @@ export const milkProducts = [
     },
 ];
 
+export const milkProductUPCs = milkProducts.map(size => size.products).flat(1).map(product => product.productUPC);
+
 export const fiveDigitJulianProductsList = [
     {
         name: "Jimmy Dean Sausage Egg Cheese Muffin 5oz",

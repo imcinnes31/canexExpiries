@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {monthNames, milkProducts, vendorList, addDays, titleCase, fiveDigitJulianProducts} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
+import Barcode from 'react-barcode';
 import moment from "moment";
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
@@ -361,6 +362,15 @@ export default function CheckSection() {
                     <div className="font-serif text-2xl">Product with UPC:</div>
                     <div className="text-xl">{currentUPC}</div>
                     <div className="font-serif text-2xl">Is Unknown.</div>
+                    <div className="justify-items-center">
+                        <Barcode 
+                            value={currentUPC} 
+                            format="CODE128" 
+                            width={2} 
+                            height={100}
+                            displayValue={true}
+                        />
+                    </div>
                     <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
                     <div className="justify-items-center">
                         <div className="lg:w-1/2">

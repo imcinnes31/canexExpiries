@@ -359,15 +359,13 @@ export default function CheckSection() {
                 </div>
             :
                 <div className="pt-6">
-                    <div className="font-serif text-2xl">Product with UPC:</div>
-                    <div className="text-xl">{currentUPC}</div>
-                    <div className="font-serif text-2xl">Is Unknown.</div>
+                    <div className="font-serif text-2xl">Unknown product with UPC:</div>
                     <div className="justify-items-center">
                         <Barcode 
                             value={currentUPC} 
                             format="CODE128" 
                             width={2} 
-                            height={100}
+                            height={75}
                             displayValue={true}
                         />
                     </div>

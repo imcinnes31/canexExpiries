@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import {monthNames, milkProducts} from "../constants.jsx"
 import canexLogo from "../assets/canex.png";
 import {REACT_APP_API_URL} from "../../index.js"
+import Barcode from 'react-barcode';
 
 export default function ExpiryReportWeekly() {
     const params = useParams();
@@ -67,7 +68,18 @@ export default function ExpiryReportWeekly() {
                 <td className={'text-center text-xs leading-none'}>{props.product.productName}</td>
                 <td className={'text-center text-base leading-none'}>{props.product.productUPC}</td>
                 <td className={'text-center text-base font-bold leading-none'}>{props.product.amount}</td>
-                <td className={'text-center text-base leading-none'}>Expired</td>
+                <td className={'text-center text-base leading-none'}>
+                    <div className="flex justify-center items-center h-full w-full">
+                        <Barcode 
+                            value={props.product.productUPC} 
+                            format="CODE128" 
+                            width={1.5} 
+                            height={15}
+                            margin={0,5,0,5}
+                            displayValue={false}
+                        />
+                    </div>
+                </td>
             </tr>
         );
     }
@@ -81,7 +93,21 @@ export default function ExpiryReportWeekly() {
                 <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
                 <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
                 <td className={'text-center font-bold text-base leading-none'}>{milkReport[props.currentProduct.productUPC] > 0 ? milkReport[props.currentProduct.productUPC] : null}</td>
-                <td className={'text-center text-base text-base leading-none leading-none'}>{milkReport[props.currentProduct.productUPC] > 0 ? "Expired" : null}</td>
+                <td className={'text-center text-base text-base leading-none leading-none'}>
+                    {milkReport[props.currentProduct.productUPC] > 0 ? 
+                        <div className="flex justify-center items-center h-full w-full">
+                            <Barcode 
+                                value={props.currentProduct.productUPC} 
+                                format="CODE128" 
+                                width={1.5} 
+                                height={15}
+                                margin={0,5,0,5}
+                                displayValue={false}
+                                background="transparent"
+                            /> 
+                        </div>
+                    : null}
+                </td>
             </tr>
         );
     }
@@ -94,9 +120,9 @@ export default function ExpiryReportWeekly() {
                         <tr className={`${props.groupIndex > 0 ? "invisible" : ""} h-[27px]`}>
                             <th className={'w-[8.75%] bg-white'}></th>
                             <th className={'w-[12.75%] bg-white'}></th>
-                            <th className={`w-[20.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
-                            <th className={`w-[45.50%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
-                            <th className={`w-[12.25%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Reason</th>
+                            <th className={`w-[30.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
+                            <th className={`w-[22.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
+                            <th className={`w-[25.00%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Barcode</th>
                         </tr> 
                         {
                             props.products.map((product,index) => 
@@ -160,16 +186,16 @@ export default function ExpiryReportWeekly() {
                     <tr className={"invisible h-[24px]"}>
                         <th className={'w-[8.75%]'}>0</th>
                         <th className={'w-[33.50%]'}>0</th>
-                        <th className={`w-[35.50%]`}>0</th>
+                        <th className={`w-[22.75%]`}>0</th>
                         <th className={`w-[10.00%]`}>0</th>
-                        <th className={`w-[12.25%]`}>0</th>
+                        <th className={`w-[25.00%]`}>0</th>
                     </tr>
                     <tr className="h-[25px]">
                         <th className={'w-[8.75%] invisible'}></th>
                         <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
-                        <th className={'w-[35.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
+                        <th className={'w-[22.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
                         <th className={'w-[10.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
-                        <th className={'w-[12.25%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
+                        <th className={'w-[25.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Barcode</th>
                     </tr>
                     {nonMilkGroups()}
                 </tbody>

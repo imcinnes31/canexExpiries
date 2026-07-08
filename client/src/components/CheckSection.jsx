@@ -377,6 +377,12 @@ export default function CheckSection() {
                     <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
                     <div className="justify-items-center">
                         <div className="lg:w-1/2">
+                            <div className="pt-4">
+                                <div className="font-serif text-2xl">Set Initial Expiry Date:</div>
+                                <select name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                                    {dateList(true)}
+                                </select>
+                            </div>        
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
                                 <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
@@ -389,12 +395,6 @@ export default function CheckSection() {
                                 <div className="text-l m-auto font-bold lg:w-1/4">Small UPC (If Exists):</div>
                                 <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
                             </div>
-                            <div className="pt-4">
-                                <div className="font-serif text-2xl">Set Initial Expiry Date:</div>
-                                <select name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
-                                    {dateList(true)}
-                                </select>
-                            </div>        
                         </div> 
                     </div>           
                     <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">

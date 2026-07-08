@@ -6,6 +6,7 @@ import {REACT_APP_API_URL} from "../../index.js"
 import {nonCreditVendors, addDays, fiveDigitJulianProducts, vendorArray, addDaysToDate, storeClosedSunday, storeHolidays, monthNames, milkProductUPCs} from "../constants.jsx"
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
+import Barcode from 'react-barcode';
 
 function convertToTodaysDate(dateGiven) {
     const convertDate = new Date(dateGiven);

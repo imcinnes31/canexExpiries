@@ -18,6 +18,7 @@ export default function CheckSection() {
         productSize: "",
         productSmallUPC: "",
         productVendor: null,
+        productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
     });
     const [vendors, setVendors] = useState([]);
     const [currentDate, setCurrentDate] = useState(null);
@@ -95,6 +96,7 @@ export default function CheckSection() {
             productSize: "",
             productSmallUPC: "",
             productVendor: null,
+            productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
         });
         window.scrollTo(0,0);
     }
@@ -131,6 +133,7 @@ export default function CheckSection() {
                     productSize: "",
                     productSmallUPC: "",
                     productVendor: null,
+                    productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
                 });
             } catch (error) {
                 console.error('A problem occurred with your fetch operation: ', error);
@@ -144,7 +147,7 @@ export default function CheckSection() {
                     return;
                 }
                 const productData = await response.json();
-                setCurrentProduct(productData); 
+                setCurrentProduct(null); 
                 window.scrollTo(0,0);
             }
         }
@@ -152,9 +155,9 @@ export default function CheckSection() {
 
     async function enterExpiryDate(dateID) {
         const productUPC = currentUPC;
-        const productExprity = dateID == null ? moment().subtract(1, "days").format("YYYYMMDD") : dateID.replace("confirm","");
+        const productExpiry = dateID == null ? moment().subtract(1, "days").format("YYYYMMDD") : dateID.replace("confirm","");
         try {
-            await fetch(`${REACT_APP_API_URL}/expiries/products/${productUPC}&${productExprity}`, {
+            await fetch(`${REACT_APP_API_URL}/expiries/products/${productUPC}&${productExpiry}`, {
                 method: "PATCH",
             });
         } catch (error) {
@@ -209,7 +212,7 @@ export default function CheckSection() {
         <div id={props.milk.milkUPC} className="bg-yellow-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={() => setMilk(props.milk.milkUPC)}>{props.milk.milkDesc}</div>
     );
 
-    function dateList() {
+    function dateList(inDropdown) {
         const expiryDateList = [];
         const alreadyExpiredDate = addDays(-1);
         expiryDateList.push({
@@ -225,7 +228,7 @@ export default function CheckSection() {
                 if (d.getDate() == 1) {
                     expiryDateList.push({
                         id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                        name: (monthNames[d.getMonth()] + " " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
+                        name: (monthNames[d.getMonth()] + " " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                         last: i == currentSection.expiryRange ? true : false,
                         section: currentSection.section,
                         expiryMonth: d.getMonth()
@@ -234,7 +237,7 @@ export default function CheckSection() {
             } else {
                 expiryDateList.push({
                     id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                    name: (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
+                    name: (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                     last: i == currentSection.expiryRange ? true : false,
                     section: currentSection.section,
                     expiryMonth: d.getMonth()
@@ -243,7 +246,9 @@ export default function CheckSection() {
         }
         return expiryDateList.map((date) => {
             return (
-                <DateSelect key={date.id} date={date}/>
+                inDropdown 
+                ? <option key={date.id} id={date.id}>{date.name}</option>
+                : <DateSelect key={date.id} date={date}/>
             );
         });
     }
@@ -303,21 +308,21 @@ export default function CheckSection() {
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(On M&M products, the four digit number ending in ${new Date().getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On M&M products, any four digit number ending in ${new Date().getFullYear() - 2020 - 1} OR ending in ${addDays(currentSection.expiryRange).getFullYear() - 2020 - 1} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(On M&M products, any four digit number ending in ${new Date().getFullYear() - 2020 - 1} OR ending in ${addDays(currentSection.expiryRange).getFullYear() - 2020} and the first three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                             <br/>
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
                                 `(Or on rare items, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(Or on rare items, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(Or on rare items, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>   
                     : currentSection.section == "Cottage Candy" ?
                         <div className="text-xl font-bold">
                             {(new Date().getFullYear()) == (addDays(currentSection.expiryRange).getFullYear()) ?
-                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
+                                `(On Cottage Candy, the five digit number beginning with ${new Date().getFullYear() - 2000} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))}.)` 
                             : 
-                                `(On Cottage Candy, any five digit number beginning with ${new Date().getFullYear() - 2000 - 1} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000 - 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
+                                `(On Cottage Candy, any five digit number beginning with ${new Date().getFullYear() - 2000} OR beginning with ${addDays(currentSection.expiryRange).getFullYear() - 2000 + 1} and the last three digits equal to or less than ${daysIntoJulian(addDays(currentSection.expiryRange))})`
                             }
                         </div>
                     : currentSection.section == "Pastry" ?
@@ -354,7 +359,7 @@ export default function CheckSection() {
                         </div>
                     </div>
                     {/* <div className="bg-green-400 h-10 my-4 pb-1 pt-1 border-2 border-black text-center font-serif text-xl font-bold" onClick={(e) => enterExpiryDate(null)}>Already Expired</div> */}
-                    <div>{dateList()}</div>
+                    <div>{dateList(false)}</div>
                     <div className="h-10" id="pageBottom"></div>
                 </div>
             :
@@ -383,6 +388,12 @@ export default function CheckSection() {
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Small UPC (If Exists):</div>
                                 <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
+                            </div>
+                            <div className="pt-4">
+                                <div className="font-serif text-2xl">Set Initial Expiry Date:</div>
+                                <select name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                                    {dateList(true)}
+                                </select>
                             </div>        
                         </div> 
                     </div>           

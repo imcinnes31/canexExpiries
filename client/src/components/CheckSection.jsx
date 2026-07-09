@@ -18,7 +18,7 @@ export default function CheckSection() {
         productSize: "",
         productSmallUPC: "",
         productVendor: null,
-        productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
+        productExpiry: null
     });
     const [vendors, setVendors] = useState([]);
     const [currentDate, setCurrentDate] = useState(null);
@@ -96,7 +96,7 @@ export default function CheckSection() {
             productSize: "",
             productSmallUPC: "",
             productVendor: null,
-            productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
+            productExpiry: null
         });
         window.scrollTo(0,0);
     }
@@ -108,7 +108,7 @@ export default function CheckSection() {
     }
 
     async function enterNewProduct() {
-        if (newProduct.productVendor && newProduct.productDesc.length > 0) {
+        if (newProduct.productExpiry && newProduct.productVendor && newProduct.productDesc.length > 0) {
             const numbers = /^[0-9]+$/;
             const newProductEntered = newProduct;
             newProductEntered.productDesc = titleCase(newProduct.productDesc);
@@ -133,7 +133,7 @@ export default function CheckSection() {
                     productSize: "",
                     productSmallUPC: "",
                     productVendor: null,
-                    productExpiry: String(addDays(-1).getFullYear()) + ((addDays(-1).getMonth() + 1) < 10 ? "0" : "") + String(addDays(-1).getMonth() + 1) + (addDays(-1).getDate() < 10 ? "0" : "") + String(addDays(-1).getDate())
+                    productExpiry: null
                 });
             } catch (error) {
                 console.error('A problem occurred with your fetch operation: ', error);
@@ -376,13 +376,11 @@ export default function CheckSection() {
                     </div>
                     <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
                     <div className="justify-items-center">
+                        <select defaultValue={'DEFAULT'} name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                            <option disabled value="DEFAULT">--Set Initial Expiry Date</option>
+                            {dateList(true)}
+                        </select>
                         <div className="lg:w-1/2">
-                            <div className="pt-4">
-                                <div className="font-serif text-2xl">Set Initial Expiry Date:</div>
-                                <select name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
-                                    {dateList(true)}
-                                </select>
-                            </div>        
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
                                 <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
@@ -408,7 +406,7 @@ export default function CheckSection() {
                         })}
                     </select>
                     <div className="flex">
-                        <div onClick={() => enterNewProduct()} className={`m-auto mr-0 basis-70 ${(newProduct.productVendor && newProduct.productDesc.length > 0) ? "bg-green-400" : "bg-green-100"} text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center`}>
+                        <div onClick={() => enterNewProduct()} className={`m-auto mr-0 basis-70 ${(newProduct.productExpiry && newProduct.productVendor && newProduct.productDesc.length > 0) ? "bg-green-400" : "bg-green-100"} text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center`}>
                             <div>Enter New Product</div>
                             <div className="w-7 ml-1"><img src={tick}/></div>
                         </div>

@@ -293,7 +293,7 @@ export default function CheckSection() {
             {currentProduct == null ?
                 <div>
                     <div className="text-3xl font-serif pt-4">Current Section:</div>
-                    <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
+                    <div className="text-2xl font-serif font-bold">{currentSection.section}{params.id == "6795e982c4e5586be7dc5bfc" && (new Date().getDay() == 6 || new Date().getDay() < 3) ? ' *Saturday Check - Just Tim\'s Dispenser / Dairyland Cartons and Jugs*' : ''}</div>
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
                     {currentSection.section == "Health & Beauty" 
                         ?
@@ -335,11 +335,17 @@ export default function CheckSection() {
                         </div>
                     : null
                     }
-                    <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
-                    <input type="number" autoFocus={currentSection.section != "Dairy and Tims"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                    {
+                        params.id == "6795e982c4e5586be7dc5bfc" && (new Date().getDay() == 6 || new Date().getDay() < 3) ?
+                        null :
+                        <div>
+                            <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
+                            <input type="number" autoFocus={currentSection.section != "Dairy, Tims Section (Cooler 10)"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                        </div>
+                    }
                     {params.id == "6795e982c4e5586be7dc5bfc" ? 
                         <div>
-                            <div className="text-center font-serif text-xl font-bold">Or choose a popular milk product:</div>
+                            <div className="text-center font-serif text-xl font-bold">{new Date().getDay() == 6 || new Date().getDay() < 3 ? 'C' : 'Or c'}hoose a popular milk product:</div>
                             <div>{milkButtons()}</div>
                         </div> 
                     : 

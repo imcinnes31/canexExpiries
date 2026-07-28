@@ -249,7 +249,7 @@ export default function MainMenu() {
       if (section._id == "6795e982c4e5586be7dc5bfc") {
         let daysPassed = 1;
         while (true) {
-          if (convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,daysPassed)).getDay() == 3) {
+          if (convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,daysPassed)).getDay() == 3 || convertIntoTodaysDate(addDaysToDate(section.dateLastChecked,daysPassed)).getDay() == 6) {
             break;
           } else {
             daysPassed++;
@@ -401,15 +401,15 @@ export default function MainMenu() {
             </div>
           </div>
           <div className="pt-4">
-            <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
-            <div className="">
-                {reportList()}
-            </div>
-          </div>
-          <div className="pt-4">
             <h3 className="text-2xl pb-4">Weekly Write Off Reports</h3>
             <div className="">
                 {weeklyReportList()}
+            </div>
+          </div>
+          <div className="pt-4">
+            <h3 className="text-2xl pb-4">Monthly Write Off Reports</h3>
+            <div className="">
+                {reportList()}
             </div>
           </div>
         </div>

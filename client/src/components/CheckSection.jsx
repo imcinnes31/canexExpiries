@@ -293,7 +293,10 @@ export default function CheckSection() {
             {currentProduct == null ?
                 <div>
                     <div className="text-3xl font-serif pt-4">Current Section:</div>
-                    <div className="text-2xl font-serif font-bold">{currentSection.section}{params.id == "6795e982c4e5586be7dc5bfc" && (new Date().getDay() == 6 || new Date().getDay() < 3) ? ' *Saturday Check - Just Tim\'s Dispenser / Dairyland Cartons and Jugs*' : ''}</div>
+                    <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
+                    {params.id == "6795e982c4e5586be7dc5bfc" && (new Date().getDay() == 6 || new Date().getDay() < 3) ? 
+                        <div className="text-2xl font-serif font-bold">*Saturday Check - Just Tim's Dispenser / Dairyland Cartons and Jugs*</div>
+                    : null}
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
                     {currentSection.section == "Health & Beauty" 
                         ?

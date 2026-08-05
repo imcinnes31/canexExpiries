@@ -388,7 +388,7 @@ export default function MainMenu() {
           </NavLink>
           <div className="my-4 pt-4 border-y border-black">
             <NavLink to={"other"}>
-              <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold bg-purple-400`}>{`Other Write Offs (Damage, Store Use)`}</div>
+              <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold bg-purple-400`}>{`Other Write Offs`}</div>
             </NavLink>
           </div>
           <div className="px-3 py-2 bg-gray-200 border border-black">

@@ -452,7 +452,7 @@ export default function ExpiryReport() {
         // }
 
         return Object.entries(sortedDictionary).map(([key, value]) => (
-            <div>
+            <div className="mt-4">
                 <div className="font-bold text-xl font-serif underline">{monthNames[parseInt(key.substring(5,7)) - 1] + " " + parseInt(key.substring(8,10)) + ", " + key.substring(0,4)}</div>
                 {
                     <DateEntry
@@ -481,7 +481,7 @@ export default function ExpiryReport() {
             <div className="print:hidden flex justify-center pt-6">
                 {!(editItem || editingAmounts) ? 
                     <div className="print:hidden flex justify-center items-center h-10 font-serif font-bold text-center text-lg w-3/4">{monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,6)}</div>
-                : null},
+                : null}
                 { 
                     reportLoaded ? 
                         !(editingAmounts) ?
@@ -490,7 +490,7 @@ export default function ExpiryReport() {
                             !(editItem) ?
                                 <div className="flex">
                                     <div className="print:hidden flex justify-center items-center h-10 font-serif font-bold text-center text-lg mx-1">{`Editing Records for ${monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} ${params.reportDate.substring(2,6)}`}</div>
-                                    <div className="flex h-10 p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => setEditingAmounts(false)}>Cancel Modify</div>
+                                    <div className="flex h-10 p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => setEditingAmounts(false)}>Back</div>
                                 </div>
                             : null
                     : null
@@ -546,16 +546,16 @@ export default function ExpiryReport() {
                                     <th className={'w-[33.50%]'}>0</th>
                                     <th className={`w-[16.50%]`}>0</th>
                                     <th className={`w-[25.00%]`}>0</th>
-                                    <th className={`w-[6.50%]`}>0</th>
-                                    <th className={`w-[9.75%]`}>0</th>
+                                    <th className={`w-[5.50%]`}>0</th>
+                                    <th className={`w-[10.75%]`}>0</th>
                                 </tr>
                                 <tr className="h-[25px]">
                                     <th className={'w-[8.75%] invisible'}></th>
                                     <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
                                     <th className={'w-[16.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
                                     <th className={'w-[25.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Barcode</th>
-                                    <th className={'w-[6.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
-                                    <th className={'w-[9.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
+                                    <th className={'w-[5.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
+                                    <th className={'w-[10.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
                                 </tr>
                                 {nonMilkGroups()}
                             </tbody>

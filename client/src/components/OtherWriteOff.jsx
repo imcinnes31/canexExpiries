@@ -172,7 +172,7 @@ export default function OtherWriteOff() {
                     <div className="font-serif pt-6 text-xl font-bold">Current Product:</div>
                     <div className="text-xl">{currentProduct[0].name}</div>
                     <div>
-                        <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => setReason(e.target.value)} className={`${amount > 0 ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md m-4 text-xl font-bold`}>
+                        <select defaultValue={'DEFAULT'} name="reasonMenu" onChange={(e) => setReason(e.target.value)} className={`${reason ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md m-4 text-xl font-bold`}>
                             <option disabled value={'DEFAULT'}>--Select Write Off Reason</option>
                             <option value="damaged">Damaged</option>
                             <option value="store">Store Use</option>
@@ -207,13 +207,12 @@ export default function OtherWriteOff() {
                                     <div className="text-lg font-bold text-red-600">Place all of the {reason == 'damaged' ? 'damaged' : 'expired'} product in the back for the vendor to pick up.</div>  
                                 :
                                 reason == 'store' ?
-                                    <h1>This product cannot be written off for store use.</h1>  
+                                    <div className="text-lg font-bold text-red-600">This product cannot be written off for store use.</div>  
                                 :
                                     null
                                 }
                                 <div onClick={() => setCurrentProduct(null)} className="mx-auto my-2 w-1/4 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-lg flex py-1 justify-center">
-                                    <div>Cancel</div>
-                                    <div className="w-7 ml-1"><img src={cross}/></div>
+                                    <div>Back</div>
                                 </div>
                             </div>
                         }

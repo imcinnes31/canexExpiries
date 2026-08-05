@@ -386,6 +386,11 @@ export default function MainMenu() {
           <NavLink to={discounts.length > 0 ? "alert/discounts" : null}>
             <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold ${discounts.length > 0 == true ? 'animate-flash' : ''} ${discounts.length > 0 ? "bg-red-400" : "bg-green-400"}`}>{discounts.length == 0 ? "No Products to Discount" : "Products to Mark as 50% Off"}</div>
           </NavLink>
+          <div className="my-4 pt-4 border-y border-black">
+            <NavLink to={"other"}>
+              <div className={`w-90 h-10 p-2 mb-4 border-2 border-black text-center font-serif text-xl font-bold bg-purple-400`}>{`Other Write Offs (Damage, Store Use)`}</div>
+            </NavLink>
+          </div>
           <div className="px-3 py-2 bg-gray-200 border border-black">
             <h1 className="text-3xl pb-4">Store Sections</h1>
               <div className="grid grid-cols-2 gap-4 pb-4">

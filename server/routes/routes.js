@@ -73,6 +73,70 @@ router.get("/expiryRecords/:expiryMonth&:expiryYear", async (req, res) => {
   res.send(result).status(200);
 });
 
+// EXPIRY REPORT
+router.get("/expiryRecords/:weekDates", async (req, res) => {
+  let collection = await db.collection("expiryRecords");
+  const firstDate = req.params.weekDates.slice(4,8) + "-" + req.params.weekDates.slice(0,2) + "-" + req.params.weekDates.slice(2,4);
+  const lastDate = req.params.weekDates.slice(12,16) + "-" + req.params.weekDates.slice(8,10) + "-" + req.params.weekDates.slice(10,12);
+  let result = await collection.aggregate([
+    {
+      "$match" : 
+      {
+        $expr: {
+          $and: [
+            {$gte: [{$toDate: "$writeOffDate"}, new Date(firstDate)]},
+            {$lte: [{$toDate: "$writeOffDate"}, new Date(lastDate)]}
+          ]
+        }
+      }
+    },
+    {
+      "$sort" : {
+        "writeOffDate": 1
+      }
+    }
+  ]).toArray();
+  res.send(result).status(200);
+});
+
+// EXPIRY REPORT
+router.patch("/expiryRecords/:recordID&:newAmount&:newReason", async (req, res) => {
+  console.log(req.params);
+  try {
+    let collection = await db.collection("expiryRecords");
+    let result;
+    if (req.params.newReason == "expired") {
+      result = await collection.updateOne(
+        { "_id": new ObjectId(req.params.recordID) },
+        { "$set": { "amount": req.params.newAmount }, "$unset": { "reason": "" } },
+      );
+    } else {
+      result = await collection.updateOne(
+        { "_id": new ObjectId(req.params.recordID) },
+        { "$set": { "amount": req.params.newAmount, "reason": req.params.newReason } }
+      );
+    }
+    res.send(result).status(200);
+  } catch(err) {
+    console.error(err);
+    res.status(500).send("Error modifying record");
+  }
+});
+
+// EXPIRY REPORT
+router.delete("/expiryRecords/:recordID", async (req, res) => {
+  try {
+    let collection = await db.collection("expiryRecords");
+    let result = await collection.deleteOne(
+      { "_id": new ObjectId(req.params.recordID) }
+    );
+    res.send(result).status(200);
+  } catch(err) {
+    console.error(err);
+    res.status(500).send("Error deleting record");
+  }
+});
+
 // CHECK SECTION*
 router.get("/sections/:id", async (req, res) => {
   let collection = await db.collection("storeSections")
@@ -138,30 +202,6 @@ router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
   const dateConverted = dateGiven.substring(0,4) + "-" + dateGiven.substring(4,6) + "-" + dateGiven.substring(6,8) + "T00:00:00.000+00:00";
   try {
     let collection = await db.collection("storeSections");
-      // let result = await collection.updateOne({
-      //   "products.expiryDates.dateGiven": {
-      //     $ne: new Date(moment(dateConverted)).toISOString(true)
-      //     // $ne: "2025-02-24T00:00:00.000Z"
-      //   },
-      //   },
-      //   {
-      //     $push: {
-      //       "products.$[x].expiryDates": {
-      //         "dateGiven": new Date(moment(dateConverted)).toISOString(true),
-      //         // "dateGiven": "2025-02-24T00:00:00.000Z",
-      //         "discounted": false
-      //       }
-      //     }
-      //   },
-      //   {
-      //     arrayFilters: [
-      //       {
-      //         "x.productUPC": String(req.params.productUPC)
-      //         // "x.productUPC": "068700100734"
-      //       }
-      //     ]
-      //   })
-
     let result = await collection.updateOne({
       "products":{$elemMatch:{
         "expiryDates.dateGiven": {
@@ -175,7 +215,7 @@ router.patch("/products/:productUPC&:expiryDate", async (req, res) => {
         "products.$.expiryDates": {
           "dateGiven": new Date(dateConverted),
           // "dateGiven": new Date(moment(dateConverted)).toISOString(true),
-          "discounted": false
+          "discounted": new Date(dateConverted) < getLocalDate()
         }
       }
     })
@@ -207,6 +247,7 @@ router.get("/products/:productUPC", async (req, res) => {
       "$project": {
         "productUPC": 1,
         "name": 1,
+        "vendor": 1,
       }
     }
   ]).toArray();
@@ -217,6 +258,11 @@ router.get("/products/:productUPC", async (req, res) => {
 router.post("/sections/:id&:productUPC", async (req, res) => {
   const productDescription = req.body.productDesc + (String(req.body.productSize).length > 0 ? " " + req.body.productSize : "");
   const results = [];
+  const dateGiven = req.body.productExpiry;
+  const dateConverted = dateGiven.substring(0,4) + "-" + dateGiven.substring(4,6) + "-" + dateGiven.substring(6,8) + "T00:00:00.000+00:00";
+  console.log(dateGiven);
+  console.log(dateConverted);
+
   try {
     let collection = await db.collection("storeSections");
     let result = await collection.updateOne({
@@ -228,7 +274,12 @@ router.post("/sections/:id&:productUPC", async (req, res) => {
           productUPC: req.params.productUPC,
           name: productDescription,
           vendor: req.body.productVendor,
-          expiryDates: []
+          expiryDates: [
+            {
+              "dateGiven": new Date(dateConverted),
+              "discounted": new Date(dateConverted) < getLocalDate()
+            }
+          ]
         }
       }
     });
@@ -264,6 +315,7 @@ router.get("/sections/", async (req, res) => {
         "section": 1,
         "dateLastChecked": 1,
         "intervalDays": 1,
+        "sectionNumber": 1,
         "demoSection": 1,
       }
     }
@@ -719,20 +771,48 @@ router.delete("/discountsDemo/:productUPC&:productExpiry", async (req, res) => {
 });
 
 // ALERT LIST*
-router.post("/expiryRecords/:productUPC&:productAmount", async (req, res) => {
+// OTHER WRITE OFF*
+router.post("/expiryRecords/:productUPC&:productAmount&:productReason", async (req, res) => {
   try {
     let collection = await db.collection("expiryRecords");
-    let result = await collection.insertOne({
-        productUPC: req.params.productUPC,
-        amount: req.params.productAmount,
-        writeOffDate: getLocalDate()
-    });
+    let result;
+    if (req.params.productReason == 'expired') {
+      result = await collection.insertOne({
+          productUPC: req.params.productUPC,
+          amount: req.params.productAmount,
+          writeOffDate: getLocalDate()
+      });
+    } else {
+      result = await collection.insertOne({
+          productUPC: req.params.productUPC,
+          amount: req.params.productAmount,
+          reason: req.params.productReason,
+          writeOffDate: getLocalDate()
+      });
+    }
     res.send(result).status(200);
   } catch(err) {
     console.error(err);
     res.status(500).send("Error making record");
   }
 });
+
+// OTHER WRITE OFF*
+// router.post("/expiryRecords/:productUPC&:productAmount&:productReason", async (req, res) => {
+//   try {
+//     let collection = await db.collection("expiryRecords");
+//     let result = await collection.insertOne({
+//         productUPC: req.params.productUPC,
+//         amount: req.params.productAmount,
+//         reason: req.params.productReason,
+//         writeOffDate: getLocalDate()
+//     });
+//     res.send(result).status(200);
+//   } catch(err) {
+//     console.error(err);
+//     res.status(500).send("Error making record");
+//   }
+// });
 
 // ALERT LIST*DEMO
 router.post("/expiryRecordsDemo/:productUPC&:productAmount", async (req, res) => {
@@ -753,6 +833,9 @@ router.post("/expiryRecordsDemo/:productUPC&:productAmount", async (req, res) =>
 
 // MAIN MENU*
 router.delete("/expiryRecords", async (req, res) => {
+  // go back until you get a sunday
+  // subtract 364 days from it
+  // delete all records prior to that day
   const twelveMonthsAgoYear = getLocalDate().getFullYear() - 1;
   const twelveMonthsAgoMonth = getLocalDate().getMonth();
   try {
@@ -829,12 +912,14 @@ router.get("/projections", async (req, res) => {
 router.get("/upcoming", async (req, res) => {
   let collection = await db.collection("storeSections");
   let results = await collection.aggregate([
+    // separate mongodb object into products and expiry dates
     {
       $unwind: "$products"
     },
     {
       $unwind: "$products.expiryDates"
     },
+    // get all products that expire within seven days from now
     {
       "$match": {
         $expr: {
@@ -845,6 +930,7 @@ router.get("/upcoming", async (req, res) => {
         }
       }
     },
+    // convert into objects to be used by the front end
     {
       "$project": {
         _id: 0,
@@ -859,6 +945,7 @@ router.get("/upcoming", async (req, res) => {
         demoDiscounted: "$products.expiryDates.demoDiscounted",
       }
     },
+    // sort products by expiry date and section found in
     {
       "$sort":{
         "productExpiry": 1,

@@ -10,6 +10,7 @@ import AlertList from "./components/AlertList";
 import CheckSection from "./components/CheckSection";
 import ExpiryReport from "./components/ExpiryReport";
 import ExpiryReportWeekly from "./components/ExpiryReportWeekly";
+import OtherWriteOff from "./components/OtherWriteOff";
 import ProjectionReport from "./components/ProjectionReport";
 import "./index.css";
 
@@ -101,6 +102,16 @@ const router = createBrowserRouter([
       {
         path: "/projections/:type",
         element: <ProjectionReport />,
+      },
+    ],
+  },
+  {
+    path: "/other/",
+    element: <App />,
+    children: [
+      {
+        path: "/other/",
+        element: <OtherWriteOff />,
       },
     ],
   },

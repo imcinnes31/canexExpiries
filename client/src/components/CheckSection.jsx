@@ -23,6 +23,7 @@ export default function CheckSection() {
     const [vendors, setVendors] = useState([]);
     const [currentDate, setCurrentDate] = useState(null);
     const [smallUPCProducts, setSmallUPCProducts] = useState([]);
+    const [smallAlert, setSmallAlert] = useState(null);
 
     const params = useParams();
     const navigate = useNavigate();
@@ -55,7 +56,11 @@ export default function CheckSection() {
         if (inputtedValue.length == 8 && inputtedValue.match(numbers)) {
             if (inputtedValue in smallUPCProducts) {
                 inputtedValue = smallUPCProducts[inputtedValue];
+            } else {
+                setSmallAlert("If you are currently entering a small barcode, it is not recognized. Bring it to Product Lookup and find the full UPC and enter it.")
             }
+        } else {
+            setSmallAlert(null);
         }
         if (inputtedValue.length == 12 && inputtedValue.match(numbers)) {
             setCurrentUPC(inputtedValue);
@@ -344,6 +349,7 @@ export default function CheckSection() {
                         <div>
                             <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
                             <input type="number" autoFocus={currentSection.section != "Dairy, Tims Section (Cooler 10)"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                            <div className="text-lg text-red-600 font-bold py-1">{smallAlert}</div>
                         </div>
                     }
                     {params.id == "6795e982c4e5586be7dc5bfc" ? 
@@ -383,28 +389,28 @@ export default function CheckSection() {
                             displayValue={true}
                         />
                     </div>
-                    <div className="font-serif text-3xl pb-4">Enter Product Info:</div>
+                    <div className="font-serif text-3xl pb-4">Enter Expiry Date, then Scan Barcode in Product Lookup and Enter Info:</div>
                     <div className="justify-items-center">
-                        <select defaultValue={'DEFAULT'} name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                        <select defaultValue={'DEFAULT'} name="currentDateDropdown" onChange={(e) => {updateNew({ productExpiry: e.target.childNodes[e.target.selectedIndex].id})}} className={`${newProduct.productExpiry ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md mx-4 my-2 text-xl font-bold`}>
                             <option disabled value="DEFAULT">--Set Initial Expiry Date</option>
                             {dateList(true)}
                         </select>
                         <div className="lg:w-1/2">
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
-                                <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productDesc: e.target.value})} type="text" placeholder="Enter Product Name" className={`${newProduct.productDesc ? 'border-2 border-black' : 'border-2 border-red-500'} px-2 text-xl lg:w-3/4`}/>
                             </div>
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Size (Optional):</div>
-                                <input onChange={(e) => updateNew({ productSize: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productSize: e.target.value})} type="text" className="px-2 border-2 border-black text-xl lg:w-3/4"/>
                             </div>
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Small UPC (If Exists):</div>
-                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border-2 border-black text-xl lg:w-3/4"/>
                             </div>
                         </div> 
                     </div>           
-                    <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className="border border-black p-1 rounded-md m-4 text-xl font-bold">
+                    <select defaultValue={'DEFAULT'} name="vendorMenu" onChange={(e) => updateNew({ productVendor: e.target.value})} className={`${newProduct.productVendor ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md m-4 text-xl font-bold`}>
                         <option disabled value="DEFAULT">--Select Product Vendor</option>
                         {vendors
                         .filter((vendor) => vendor != "Tim Hortons")

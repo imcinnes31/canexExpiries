@@ -180,7 +180,7 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
                 currentPull['clicked'] = true;
                 setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
                 if (recording == true) {
-                    await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}`, {
+                    await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}&expired`, {
                         method: "POST",
                     });
                 }

@@ -129,8 +129,18 @@ export default function OtherWriteOff() {
                 console.error('A problem occurred with your fetch operation: ', error);
                 alert("Failed to add new product. Please try again.")
             } finally {
+                const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${currentUPC}`);
+                if (!response.ok) {
+                    const message = `An error occurred: ${response.statusText}`;
+                    console.error(message);
+                    alert("Failed to retrieve product data. Please try again.")
+                    return;
+                }
+                const productData = await response.json();
                 setSectionSelect(null);
-                setCurrentProduct(null); 
+                setReason(null);
+                setAmount(0);
+                setCurrentProduct(productData); 
                 window.scrollTo(0,0);
             }
         }

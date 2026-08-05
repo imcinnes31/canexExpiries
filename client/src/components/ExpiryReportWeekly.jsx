@@ -395,7 +395,7 @@ export default function ExpiryReportWeekly() {
                 console.error('A problem occurred with your fetch operation: ', error);
                 alert("Failed to delete this expiry record. Please try again.")
             }
-        } else if (editAmount !== productReport[recordId].amount || editReason !== productReport[recordId].reason) {
+        } else if (editAmount !== expiryRecords[recordId].amount || editReason !== expiryRecords[recordId].reason) {
             try {
                 await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${recordId}&${editAmount}&${editReason}`, {
                     method: "PATCH",

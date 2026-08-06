@@ -182,16 +182,16 @@ export default function OtherWriteOff() {
                     <div className="font-serif pt-6 text-xl font-bold">Current Product:</div>
                     <div className="text-xl">{currentProduct[0].name}</div>
                     <div>
-                        <select defaultValue={'DEFAULT'} name="reasonMenu" onChange={(e) => setReason(e.target.value)} className={`${reason ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md m-4 text-xl font-bold`}>
-                            <option disabled value={'DEFAULT'}>--Select Write Off Reason</option>
-                            <option value="damaged">Damaged</option>
-                            <option value="store">Store Use</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                    </div>
-                    <div>
                         { nonCreditVendors.includes(currentProduct[0].vendor) ?
                             <div>
+                                <div>
+                                    <select defaultValue={'DEFAULT'} name="reasonMenu" onChange={(e) => setReason(e.target.value)} className={`${reason ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md m-4 text-xl font-bold`}>
+                                        <option disabled value={'DEFAULT'}>--Select Write Off Reason</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="store">Store Use</option>
+                                        <option value="expired">Expired</option>
+                                    </select>
+                                </div>
                                 <div className="flex m-2 justify-center">
                                     <div className="text-lg font-bold mx-2">Write Off Amount:</div>
                                     <select name="writeOffAmount" value={amount} onChange={(e) => setAmount(e.target.value)} className={`${amount > 0 ? 'border-2 border-black' : 'border-2 border-red-500'} text-xl basis-24 font-bold rounded-md`}>
@@ -213,14 +213,7 @@ export default function OtherWriteOff() {
                             </div>
                         :
                             <div className="justify-center">
-                                {reason == 'expired' || reason == 'damaged' ?
-                                    <div className="text-lg font-bold text-red-600">Place all of the {reason == 'damaged' ? 'damaged' : 'expired'} product in the back for the vendor to pick up.</div>  
-                                :
-                                reason == 'store' ?
-                                    <div className="text-lg font-bold text-red-600">This product cannot be written off for store use.</div>  
-                                :
-                                    null
-                                }
+                                <div className="text-lg font-bold text-red-600 mt-4">This product cannot be written off for store use. If damaged or expired, place all of the product in the back for the vendor to pick up.</div>  
                                 <div onClick={() => setCurrentProduct(null)} className="mx-auto my-2 w-1/4 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-lg flex py-1 justify-center">
                                     <div>Back</div>
                                 </div>

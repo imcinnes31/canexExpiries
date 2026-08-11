@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import {monthNames, milkProducts, vendorList, addDays, titleCase, fiveDigitJulianProducts} from "../constants.jsx"
+import {monthNames, milkProducts, vendorList, addDays, titleCase, fiveDigitJulianProducts, nonCreditVendors} from "../constants.jsx"
 import {REACT_APP_API_URL} from "../../index.js"
 
 import Barcode from 'react-barcode';
@@ -24,7 +24,16 @@ export default function CheckSection() {
     const [currentDate, setCurrentDate] = useState(null);
     const [smallUPCProducts, setSmallUPCProducts] = useState([]);
     const [smallAlert, setSmallAlert] = useState(null);
-
+    const [editProduct, setEditProduct] = useState({
+        newName: "",
+        newVendor: null,
+        newSmallUPC: null
+    });
+    const [editingProducts, setEditingProducts] = useState(false);
+    const [editUPC, setEditUPC] = useState(null);
+    const [productList, setProductList] = useState(null);
+    const [validUPCs, setValidUPCs] = useState(null);
+    const [currentDelete, setCurrentDelete] = useState(null);
     const params = useParams();
     const navigate = useNavigate();
 
@@ -46,8 +55,33 @@ export default function CheckSection() {
             setSmallUPCProducts(smallUPCDict);
             setCurrentSection(sectionData);
         }
+        async function getList() {
+            const responseList = await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${params.id}`);
+            if (!responseList.ok) {
+                const message = `An error occurred: ${response.statusText}`;
+                console.error(message);
+                alert("Failed to get list data. Please go back and try again.");
+                return;
+            }
+            const listData = await responseList.json();
+            const sortedListData = listData.sort((a, b) => a.productName.localeCompare(b.productName));
+            setProductList(sortedListData);
+        };
+        async function getValidUPCs() {
+            const responseArray = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`);
+            if (!responseArray.ok) {
+                const message = `An error occurred: ${response.statusText}`;
+                console.error(message);
+                alert("Failed to get list data. Please go back and try again.");
+                return;
+            }
+            const upcArray = await responseArray.json();
+            setValidUPCs(upcArray);
+        }
         getVendors();
         getCurrentSection();
+        getList();
+        getValidUPCs();
         return;
     }, []);
 
@@ -293,9 +327,45 @@ export default function CheckSection() {
         });
     }
 
+    function productEditRows() {
+        window.scrollTo(0,0);
+        return productList.map((product) => {
+            return (
+                <tr className={`${!(nonCreditVendors.includes(product.productVendor)) ? 'bg-green-200' : validUPCs.includes(product.productUPC) ? 'bg-gray-200' : 'bg-red-200'} h-[26px]`}>
+                    <td className={'text-center text-base leading-none'}>{product.productUPC}</td>
+                    <td className={'text-center text-base leading-none'}>{product.productName}</td>
+                    <td className={'text-center text-base leading-none'}>{product.productVendor}</td>
+                    <td className={'text-center text-base leading-none'}>{product.productSmallUPC ? product.productSmallUPC : null}</td>
+                </tr>
+            );
+        });
+    }
+
     return (
         <div className="text-center">
             {currentProduct == null ?
+                editingProducts ?
+                    editUPC ?
+                        <div>Specific UPC Edit</div>
+                    :
+                        <div>
+                            <div className="flex justify-center">
+                                <div className="print:hidden flex justify-center items-center h-10 font-serif font-bold text-center text-lg ml-1 mr-4">{`Product List for ${currentSection.section}`}</div>
+                                <div className="flex h-10 p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => setEditingProducts(false)}>Back to Section Check</div>
+                            </div>
+                            <table className={"w-full"}>
+                                <tbody>
+                                    <tr className={"h-[24px]"}>
+                                        <th className={`w-[20.00%]`}>UPC</th>
+                                        <th className={`w-[60.00%]`}>Product Name</th>
+                                        <th className={`w-[10.00%]`}>Vendor</th>
+                                        <th className={`w-[10.00%]`}>Small UPC</th>
+                                    </tr>
+                                    {productEditRows()}
+                                </tbody>
+                            </table>
+                        </div>
+                :
                 <div>
                     <div className="text-3xl font-serif pt-4">Current Section:</div>
                     <div className="text-2xl font-serif font-bold">{currentSection.section}</div>
@@ -361,6 +431,11 @@ export default function CheckSection() {
                         null
                     }
                     <div className="bg-gray-300 border border-black m-2 text-xl font-bold py-1" onClick={()=> setNewCheckedDate()}>Finished Checking Section</div>
+                    { productList && validUPCs ? 
+                        <div className="flex justify-center my-8">
+                            <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => setEditingProducts(true)}>See Product List</div>                
+                        </div>
+                    : null }
                 </div>
             : currentProduct.length > 0 ?
                 <div>

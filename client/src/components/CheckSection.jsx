@@ -431,11 +431,11 @@ export default function CheckSection() {
                         null
                     }
                     <div className="bg-gray-300 border border-black m-2 text-xl font-bold py-1" onClick={()=> setNewCheckedDate()}>Finished Checking Section</div>
-                    { productList && validUPCs ? 
+                    {/* { productList && validUPCs ? 
                         <div className="flex justify-center my-8">
                             <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => setEditingProducts(true)}>See Product List</div>                
                         </div>
-                    : null }
+                    : null } */}
                 </div>
             : currentProduct.length > 0 ?
                 <div>

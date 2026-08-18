@@ -35,38 +35,6 @@ export default function ExpiryReportWeekly() {
             return;
         }
         const reportData = await response.json();
-        // const filteredReportData = reportData.filter((report) => !(report.demoRecord == true))
-        // for (const x in filteredReportData) {
-        //     const responseProduct = await fetch(`${REACT_APP_API_URL}/expiries/products/${filteredReportData[x].productUPC}`);
-        //     if (!responseProduct.ok) {
-        //         const message = `An error occurred: ${response.statusText}`;
-        //         console.error(message);
-        //         alert("Failed to get report data. Please go back and try again.");
-        //         return;
-        //     }
-        //     const productData = await responseProduct.json();
-        //     filteredReportData[x].productName = productData[0].name;
-        // }
-        // const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
-        // const milkData = Object.fromEntries((Object.values(
-        //     (filteredReportData.filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
-        //         if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
-        //         agg[prod.productUPC].sumQuantity += +prod.amount
-        //         return agg;
-        //     }, {})
-        // )).map(product => [product.prodUPC, product.sumQuantity]));
-        // setMilkReport(milkData);
-        // // const nonMilkData = filteredReportData.filter(item => !(milkProductsArray.includes(item["productUPC"])));
-        // const nonMilkData = Object.values(
-        //     filteredReportData.map(({ writeOffDate, _id, ...reducedDictionary }) => reducedDictionary).filter(item => !(milkProductsArray.includes(item["productUPC"])))
-        //     .reduce((agg, prod) => {
-        //         if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { productName: prod.productName, productUPC: prod.productUPC, amount: 0 }
-        //         agg[prod.productUPC].amount += +prod.amount
-        //         return agg;
-        //     }, {})
-        // );
-        // setNonMilkReport(nonMilkData);
-        // setReportLoaded(true);
 
         const filteredReport2 = reportData.filter((report) => !(report.demoRecord == true)).reduce((accumulator, currentObject) => {
             accumulator[currentObject._id] = currentObject;
@@ -102,10 +70,9 @@ export default function ExpiryReportWeekly() {
         setProductReport(groupedWithInner);
 
         setReportLoaded(true);
-
     }
 
-        function organizeAmounts(numbers) {
+    function organizeAmounts(numbers) {
         let amountString = "";
         if (numbers['expired']) {
             amountString += (" " + numbers['expired'] + " Expired,");
@@ -122,53 +89,55 @@ export default function ExpiryReportWeekly() {
         
     function NonMilkRow(props) {
         return (
-            <tr className="h-[25px]">
-                <td className={'border-none leading-none'}></td>
-                <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
-                <td className={'text-center text-base leading-none'}>{props.productUPC}</td>
-                <td className={'text-center text-base text-base leading-none leading-none'}>
-                    {props.totalProducts > 0 ? 
-                        <div className="flex justify-center items-center h-full w-full">
-                            <Barcode 
-                                value={props.productUPC} 
-                                format="CODE128" 
-                                width={1.5} 
-                                height={15}
-                                margin={0,5,0,5}
-                                displayValue={false}
-                                background="transparent"
-                            /> 
-                        </div>
-                    : null}
-                </td>
-                <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
-                <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
-            </tr>
+            <>
+                <tr className="hidden md:table-row h-[25px]">
+                    <td className={'border-none leading-none'}></td>
+                    <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
+                    <td className={'text-center text-base leading-none'}>{props.productUPC}</td>
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {props.totalProducts > 0 ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                    <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
+                    <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
+                </tr>
+                <tr className="table-row md:hidden border-black border-l-4 border-t-4 border-r-4 h-[25px]">
+                    <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
+                    <td className={'text-center text-base leading-none'} colspan='2'>{props.productUPC}</td>
+                </tr>
+                <tr className="table-row md:hidden border-black border-l-4 border-b-4 border-r-4 h-[25px]">
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {props.totalProducts > 0 ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                    <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
+                    <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
+                </tr>
+            </>
         );
     }
-
-    // function NonMilkProduct(props) {
-    //     return (
-    //         <tr className="h-[25px]">
-    //             <td className={'border-none leading-none'}></td>
-    //             <td className={'text-center text-xs leading-none'}>{props.product.productName}</td>
-    //             <td className={'text-center text-base leading-none'}>{props.product.productUPC}</td>
-    //             <td className={'text-center text-base font-bold leading-none'}>{props.product.amount}</td>
-    //             <td className={'text-center text-base leading-none'}>
-    //                 <div className="flex justify-center items-center h-full w-full">
-    //                     <Barcode 
-    //                         value={props.product.productUPC} 
-    //                         format="CODE128" 
-    //                         width={1.5} 
-    //                         height={15}
-    //                         margin={0,5,0,5}
-    //                         displayValue={false}
-    //                     />
-    //                 </div>
-    //             </td>
-    //         </tr>
-    //     );
-    // }
 
     function NonMilkProduct(props) {
         return Object.entries(props.productInfo.totals).map(([type, amount]) => (
@@ -182,34 +151,6 @@ export default function ExpiryReportWeekly() {
         ))
     }
 
-    // function MilkProduct(props){
-    //     return(
-    //         <tr className={`${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
-    //             {props.productIndex == 0 ? 
-    //                 <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
-    //             : null}
-    //             <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
-    //             <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
-    //             <td className={'text-center font-bold text-base leading-none'}>{milkReport[props.currentProduct.productUPC] > 0 ? milkReport[props.currentProduct.productUPC] : null}</td>
-    //             <td className={'text-center text-base text-base leading-none leading-none'}>
-    //                 {milkReport[props.currentProduct.productUPC] > 0 ? 
-    //                     <div className="flex justify-center items-center h-full w-full">
-    //                         <Barcode 
-    //                             value={props.currentProduct.productUPC} 
-    //                             format="CODE128" 
-    //                             width={1.5} 
-    //                             height={15}
-    //                             margin={0,5,0,5}
-    //                             displayValue={false}
-    //                             background="transparent"
-    //                         /> 
-    //                     </div>
-    //                 : null}
-    //             </td>
-    //         </tr>
-    //     );
-    // }
-
     function MilkProduct(props){
         let productAmounts = null;
         if (props.milkReport[props.currentProduct.productUPC]) {
@@ -217,62 +158,58 @@ export default function ExpiryReportWeekly() {
         }
 
         return(
-            <tr className={`${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
-                {props.productIndex == 0 ? 
-                    <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
-                : null}
-                <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
-                <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
-                <td className={'text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
-                <td className={'text-center text-base text-base leading-none leading-none'}>
-                    {productAmounts ? 
-                        <div className="flex justify-center items-center h-full w-full">
-                            <Barcode 
-                                value={props.currentProduct.productUPC} 
-                                format="CODE128" 
-                                width={1.5} 
-                                height={15}
-                                margin={0,5,0,5}
-                                displayValue={false}
-                                background="transparent"
-                            /> 
-                        </div>
+            <>
+                <tr className={`hidden md:table-row ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    {props.productIndex == 0 ? 
+                        <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
                     : null}
-                </td>
-            </tr>
+                    <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
+                    <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
+                    <td className={'text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {productAmounts ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.currentProduct.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                </tr>
+                <tr className={`table-row md:hidden border-l-4 border-t-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    {props.productIndex == 0 ? 
+                        <td className={'text-center border-none'} rowSpan={props.totalProducts * 2}>{props.productSize}</td> 
+                    : null}
+                    <td className={'border-l-4 border-black text-center text-base leading-none'}>{props.currentProduct.desc}</td>
+                    <td className={'border-l-4 border-black text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
+                </tr>
+                <tr className={`table-row md:hidden border-l-4 border-b-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    <td className={'border-l-4 border-black text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
+                    <td className={'border-l-4 border-black text-center text-base text-base leading-none leading-none'}>
+                        {productAmounts ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.currentProduct.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                </tr>
+            </>
         );
     }
-
-    // function MilkGroup(props){
-    //     return(
-    //         <div>
-    //             <table className={`w-full`}>
-    //                 <tbody>
-    //                     <tr className={`${props.groupIndex > 0 ? "invisible" : ""} h-[27px]`}>
-    //                         <th className={'w-[8.75%] bg-white'}></th>
-    //                         <th className={'w-[12.75%] bg-white'}></th>
-    //                         <th className={`w-[30.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
-    //                         <th className={`w-[22.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
-    //                         <th className={`w-[25.00%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Barcode</th>
-    //                     </tr> 
-    //                     {
-    //                         props.products.map((product,index) => 
-    //                             <MilkProduct 
-    //                                 key={product.productUPC}
-    //                                 productUPC={product.productUPC}
-    //                                 productSize={props.sizeDesc}
-    //                                 productIndex={index}
-    //                                 groupIndex={props.groupIndex}
-    //                                 totalProducts={props.products.length}
-    //                                 currentProduct={milkProducts[props.groupIndex].products[index]}
-    //                             />
-    //                         )
-    //                     }
-    //                 </tbody>
-    //             </table>
-    //         </div>
-    //     );
-    // }
 
     function MilkGroup(props){
         const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
@@ -281,7 +218,6 @@ export default function ExpiryReportWeekly() {
         ); 
 
         for (const [key, value] of Object.entries(groupedMilkProducts)) {
-            // console.log(value.records);
             const totalByReason = value.records.reduce((accumulator, current) => {
                 accumulator[current.reason] = (accumulator[current.reason] || 0) + parseInt(current.amount);
                 return accumulator;
@@ -292,12 +228,17 @@ export default function ExpiryReportWeekly() {
             <div>
                 <table className={`w-full`}>
                     <tbody>
-                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} h-[27px]`}>
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} hidden md:table-row h-[27px]`}>
                             <th className={'w-[8.75%] bg-white'}></th>
                             <th className={'w-[12.75%] bg-white'}></th>
                             <th className={`w-[20.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
                             <th className={`w-[32.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
                             <th className={`w-[25.00%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Barcode</th>
+                        </tr> 
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} table-row md:hidden h-[27px]`}>
+                            <th className={'w-[20.00%] bg-white'}></th>
+                            <th className={'w-[35.00%] bg-white'}></th>
+                            <th className={`w-[45.00%] bg-white`}></th>
                         </tr> 
                         {
                             props.products.map((product,index) => 
@@ -329,16 +270,6 @@ export default function ExpiryReportWeekly() {
             />
         ); 
     }
-
-    // function nonMilkGroups() {  
-    //     return nonMilkReport.map((product, index) =>
-    //         <NonMilkProduct 
-    //             key={product._id}
-    //             product={product}
-    //             index={index}
-    //         />
-    //     ); 
-    // }
 
     function nonMilkGroups() {  
         const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
@@ -481,45 +412,6 @@ export default function ExpiryReportWeekly() {
         ));
     }
 
-    // return (
-    //     <div>
-    //         <div className={"screen:hidden text-xl pl-1"}>4375 - Winnipeg</div>
-    //         <div className={"screen:hidden text-xl pl-1"}>Store Spoilage log - {monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {params.reportDate.substring(2,4)} to {monthNames[parseInt(params.reportDate.substring(8,10)) - 1]} {params.reportDate.substring(10,12)}</div>
-    //         <div className={"screen:hidden text-xl pl-1"}>On Products Entered by CANEX Expiry Date Tracker</div>
-    //         {reportLoaded == true ?
-    //             <div className="print:hidden w-15 h-15 p-2 my-2 mx-10 border-2 border-black text-center font-serif text-l font-bold bg-gray-200" onClick={() => window.print()}>Print Report</div>
-    //         : 
-    //             <div className="mt-10 justify-items-center">        
-    //                 <div className="h-50 w-80 overflow-hidden relative"><img className="print:hidden animate-load" src={canexLogo}/></div>
-    //                 <div className="h-50 text-3xl text-center font-bold">Loading...</div>
-    //             </div>
-    //         }
-    //         <div className="print:hidden h-3 font-serif font-bold text-center text-lg">{monthNames[parseInt(params.reportDate.substring(0,2)) - 1]} {parseInt(params.reportDate.substring(2,4))}, {params.reportDate.substring(4,8)} to {monthNames[parseInt(params.reportDate.substring(8,10)) - 1]} {parseInt(params.reportDate.substring(10,12))}, {params.reportDate.substring(12,16)}</div>
-    //         <div className="pt-[24px]">
-    //             {milkGroups()}
-    //         </div>
-    //         <table className={'w-full'}>
-    //             <tbody>
-    //                 <tr className={"invisible h-[24px]"}>
-    //                     <th className={'w-[8.75%]'}>0</th>
-    //                     <th className={'w-[33.50%]'}>0</th>
-    //                     <th className={`w-[22.75%]`}>0</th>
-    //                     <th className={`w-[10.00%]`}>0</th>
-    //                     <th className={`w-[25.00%]`}>0</th>
-    //                 </tr>
-    //                 <tr className="h-[25px]">
-    //                     <th className={'w-[8.75%] invisible'}></th>
-    //                     <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
-    //                     <th className={'w-[22.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
-    //                     <th className={'w-[10.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
-    //                     <th className={'w-[25.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Barcode</th>
-    //                 </tr>
-    //                 {nonMilkGroups()}
-    //             </tbody>
-    //         </table>
-    //     </div>
-    // );
-
     return (
         <div>
             <div className={"screen:hidden text-xl pl-1"}>4375 - Winnipeg</div>
@@ -597,7 +489,7 @@ export default function ExpiryReportWeekly() {
                         </div>
                         <table className={'w-full'}>
                             <tbody>
-                                <tr className={"invisible h-[24px]"}>
+                                <tr className={"hidden md:table-row invisible h-[24px]"}>
                                     <th className={'w-[8.75%]'}>0</th>
                                     <th className={'w-[33.50%]'}>0</th>
                                     <th className={`w-[16.50%]`}>0</th>
@@ -605,13 +497,18 @@ export default function ExpiryReportWeekly() {
                                     <th className={`w-[5.50%]`}>0</th>
                                     <th className={`w-[10.75%]`}>0</th>
                                 </tr>
-                                <tr className="h-[25px]">
+                                <tr className="hidden md:table-row h-[25px]">
                                     <th className={'w-[8.75%] invisible'}></th>
                                     <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
                                     <th className={'w-[16.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
                                     <th className={'w-[25.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Barcode</th>
                                     <th className={'w-[5.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
                                     <th className={'w-[10.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
+                                </tr>
+                                <tr className="h-[25px] table-row md:hidden">
+                                    <th className={'w-[50.00%] bg-white'}></th>
+                                    <th className={'w-[25.00%] bg-white'}></th>
+                                    <th className={'w-[25.00%] bg-white'}></th>
                                 </tr>
                                 {nonMilkGroups()}
                             </tbody>

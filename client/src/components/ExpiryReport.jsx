@@ -43,24 +43,6 @@ export default function ExpiryReport() {
 
         setExpiryRecords(filteredReport2);
 
-        // const filteredReport = reportData.filter((report) => !(report.demoRecord == true)).reduce((accumulator, currentObject) => {
-        //     accumulator[currentObject._id] = currentObject;
-        //     return accumulator;
-        // }, {});
-
-        // for (const x in filteredReport) {
-        //     const responseProduct = await fetch(`${REACT_APP_API_URL}/expiries/products/${filteredReport[x].productUPC}`);
-        //     if (!responseProduct.ok) {
-        //         const message = `An error occurred: ${response.statusText}`;
-        //         console.error(message);
-        //         alert("Failed to get report data. Please go back and try again.");
-        //         return;
-        //     }
-        //     const productData = await responseProduct.json();
-        //     filteredReport[x].productName = productData[0].name;
-        //     filteredReport[x].reason = filteredReport[x].reason ? filteredReport[x].reason : "expired";
-        // }
-
         const grouped = Object.groupBy(
             Object.values(filteredReport2), 
             (item) => item.productUPC
@@ -85,68 +67,7 @@ export default function ExpiryReport() {
             }
         }
 
-        // const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
-        // const groupedMilkProducts = Object.fromEntries(
-        //     Object.entries(groupedWithInner).filter(([key]) => milkProductsArray.includes(key))
-        // ); 
-        // console.log(groupedMilkProducts);
-
-        // for (const [key, value] of Object.entries(groupedMilkProducts)) {
-        //     console.log(value.records);
-        //     const totalByReason = value.records.reduce((accumulator, current) => {
-        //         // If the item doesn't exist in the accumulator yet, initialize it at 0
-        //         accumulator[current.reason] = (accumulator[current.reason] || 0) + parseInt(current.amount);
-        //         return accumulator;
-        //     }, {});
-        //     value['reasonTotals'] = totalByReason;
-        // }
-        // console.log(groupedMilkProducts);
-
         setProductReport(groupedWithInner);
-
-        // const groupedByDateData = Object.groupBy(filteredReportData, item => item.writeOffDate);
-        // const sortedDictionary = Object.fromEntries(
-        //     Object.entries(groupedByDateData).sort(([keyA], [keyB]) => new Date(keyB) - new Date(keyA))
-        // );
-        // for (const [key, value] of Object.entries(sortedDictionary)) {
-        //     const idMap = sortedDictionary[key].reduce((accumulator, currentEntry) => {
-        //         accumulator[currentEntry._id] = currentEntry;
-        //         return accumulator;
-        //     }, {}); 
-        //     sortedDictionary[key] = idMap;
-        // }
-        // setDateReport(sortedDictionary);
-        // const merged = Object.assign({}, ...Object.values(sortedDictionary));        
-        // console.log(merged); 
-
-        // const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
-
-        // const milkData = Object.fromEntries((Object.values(
-        //     (Object.values(filteredReport).filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
-        //         if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
-        //         agg[prod.productUPC].sumQuantity += +prod.amount
-        //         return agg;
-        //     }, {})
-        // )).map(product => [product.prodUPC, product.sumQuantity]));
-
-        // const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
-
-        // const nonMilkData = Object.values(
-        //     Object.values(filteredReport).map(({ writeOffDate, _id, ...reducedDictionary }) => reducedDictionary).filter(item => !(milkProductsArray.includes(item["productUPC"])))
-        //     .reduce((accumulator, currentItem) => {
-        //         const upc = currentItem.productUPC;
-
-        //         if (accumulator[upc]) {
-        //             accumulator[upc].amount += parseInt(currentItem.amount);
-        //         } else {
-        //             accumulator[upc] = { ...currentItem };
-        //             accumulator[upc].amount = parseInt(currentItem.amount);
-        //         }
-
-        //         return accumulator;
-        //     }, {})
-        // );
-        // setNonMilkReport(nonMilkData);
 
         setReportLoaded(true);
     }
@@ -168,28 +89,53 @@ export default function ExpiryReport() {
         
     function NonMilkRow(props) {
         return (
-            <tr className="h-[25px]">
-                <td className={'border-none leading-none'}></td>
-                <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
-                <td className={'text-center text-base leading-none'}>{props.productUPC}</td>
-                <td className={'text-center text-base text-base leading-none leading-none'}>
-                    {props.totalProducts > 0 ? 
-                        <div className="flex justify-center items-center h-full w-full">
-                            <Barcode 
-                                value={props.productUPC} 
-                                format="CODE128" 
-                                width={1.5} 
-                                height={15}
-                                margin={0,5,0,5}
-                                displayValue={false}
-                                background="transparent"
-                            /> 
-                        </div>
-                    : null}
-                </td>
-                <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
-                <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
-            </tr>
+            <>
+                <tr className="hidden md:table-row h-[25px]">
+                    <td className={'border-none leading-none'}></td>
+                    <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
+                    <td className={'text-center text-base leading-none'}>{props.productUPC}</td>
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {props.totalProducts > 0 ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                    <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
+                    <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
+                </tr>
+                <tr className="table-row md:hidden border-black border-l-4 border-t-4 border-r-4 h-[25px]">
+                    <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
+                    <td className={'text-center text-base leading-none'} colspan='2'>{props.productUPC}</td>
+                </tr>
+                <tr className="table-row md:hidden border-black border-l-4 border-b-4 border-r-4 h-[25px]">
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {props.totalProducts > 0 ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                    <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
+                    <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
+                </tr>
+            </>
         );
     }
 
@@ -212,29 +158,59 @@ export default function ExpiryReport() {
         }
 
         return(
-            <tr className={`${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
-                {props.productIndex == 0 ? 
-                    <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
-                : null}
-                <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
-                <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
-                <td className={'text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
-                <td className={'text-center text-base text-base leading-none leading-none'}>
-                    {productAmounts ? 
-                        <div className="flex justify-center items-center h-full w-full">
-                            <Barcode 
-                                value={props.currentProduct.productUPC} 
-                                format="CODE128" 
-                                width={1.5} 
-                                height={15}
-                                margin={0,5,0,5}
-                                displayValue={false}
-                                background="transparent"
-                            /> 
-                        </div>
+            <>
+                <tr className={`hidden md:table-row ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    {props.productIndex == 0 ? 
+                        <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
                     : null}
-                </td>
-            </tr>
+                    <td className={'text-center text-base leading-none'}>{props.currentProduct.desc}</td>
+                    <td className={'text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
+                    <td className={'text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
+                    <td className={'text-center text-base text-base leading-none leading-none'}>
+                        {productAmounts ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.currentProduct.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                </tr>
+                <tr className={`table-row md:hidden border-l-4 border-t-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    {props.productIndex == 0 ? 
+                        <td className={'text-center border-none'} rowSpan={props.totalProducts * 2}>{props.productSize}</td> 
+                    : null}
+                    <td className={'border-l-4 border-black text-center text-base leading-none'}>{props.currentProduct.desc}</td>
+                    <td className={'border-l-4 border-black text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
+                </tr>
+                <tr className={`table-row md:hidden border-l-4 border-b-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                    {/* {props.productIndex == 0 ? 
+                        <td className={'text-center border-none'} rowSpan={props.totalProducts * 2}>{props.productSize}</td> 
+                    : null} */}
+                    <td className={'border-l-4 border-black text-center text-base leading-none'}>{props.currentProduct.productUPC}</td>
+                    <td className={'border-l-4 border-black text-center text-base text-base leading-none leading-none'}>
+                        {productAmounts ? 
+                            <div className="flex justify-center items-center h-full w-full">
+                                <Barcode 
+                                    value={props.currentProduct.productUPC} 
+                                    format="CODE128" 
+                                    width={1.5} 
+                                    height={15}
+                                    margin={0,5,0,5}
+                                    displayValue={false}
+                                    background="transparent"
+                                /> 
+                            </div>
+                        : null}
+                    </td>
+                </tr>
+            </>
         );
     }
 
@@ -245,7 +221,6 @@ export default function ExpiryReport() {
         ); 
 
         for (const [key, value] of Object.entries(groupedMilkProducts)) {
-            // console.log(value.records);
             const totalByReason = value.records.reduce((accumulator, current) => {
                 accumulator[current.reason] = (accumulator[current.reason] || 0) + parseInt(current.amount);
                 return accumulator;
@@ -253,26 +228,21 @@ export default function ExpiryReport() {
             value['reasonTotals'] = totalByReason;
         }
 
-        // const milkProductsArray = [].concat.apply([], milkProducts.map(type => type.products)).map(product => product.productUPC);
-
-        // const milkData = Object.fromEntries((Object.values(
-        //     (Object.values(productReport).filter(item => milkProductsArray.includes(item["productUPC"]))).reduce((agg, prod) => {
-        //         if (agg[prod.productUPC] === undefined) agg[prod.productUPC] = { prodUPC: prod.productUPC, sumQuantity: 0 }
-        //         agg[prod.productUPC].sumQuantity += +prod.amount
-        //         return agg;
-        //     }, {})
-        // )).map(product => [product.prodUPC, product.sumQuantity]));
-
         return(
             <div>
                 <table className={`w-full`}>
                     <tbody>
-                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} h-[27px]`}>
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} hidden md:table-row h-[27px]`}>
                             <th className={'w-[8.75%] bg-white'}></th>
                             <th className={'w-[12.75%] bg-white'}></th>
                             <th className={`w-[20.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
                             <th className={`w-[32.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
                             <th className={`w-[25.00%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Barcode</th>
+                        </tr> 
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} table-row md:hidden h-[27px]`}>
+                            <th className={'w-[20.00%] bg-white'}></th>
+                            <th className={'w-[35.00%] bg-white'}></th>
+                            <th className={`w-[45.00%] bg-white`}></th>
                         </tr> 
                         {
                             props.products.map((product,index) => 
@@ -339,16 +309,6 @@ export default function ExpiryReport() {
                 return accumulator;
             }, {})
         );
-
-        // console.log(nonMilkData);
-        // console.log(groupedNonMilkProducts);
-        // return groupedNonMilkProducts.map((product, index) =>
-        //     <NonMilkProduct 
-        //         key={product._id}
-        //         product={product}
-        //         index={index}
-        //     />
-        // ); 
 
         return Object.entries(groupedNonMilkProducts).map(([productUPC, productInfo]) => (
             <NonMilkProduct 
@@ -443,14 +403,6 @@ export default function ExpiryReport() {
             Object.entries(groupedByDateData).sort((a, b) => new Date(b[0]) - new Date(a[0]))
         );
 
-        // for (const [key, value] of Object.entries(sortedDictionary)) {
-        //     const idMap = sortedDictionary[key].reduce((accumulator, currentEntry) => {
-        //         accumulator[currentEntry._id] = currentEntry;
-        //         return accumulator;
-        //     }, {}); 
-        //     sortedDictionary[key] = idMap;
-        // }
-
         return Object.entries(sortedDictionary).map(([key, value]) => (
             <div className="mt-4">
                 <div className="font-bold text-xl font-serif underline">{monthNames[parseInt(key.substring(5,7)) - 1] + " " + parseInt(key.substring(8,10)) + ", " + key.substring(0,4)}</div>
@@ -541,7 +493,7 @@ export default function ExpiryReport() {
                         </div>
                         <table className={'w-full'}>
                             <tbody>
-                                <tr className={"invisible h-[24px]"}>
+                                <tr className={"hidden md:table-row invisible h-[24px]"}>
                                     <th className={'w-[8.75%]'}>0</th>
                                     <th className={'w-[33.50%]'}>0</th>
                                     <th className={`w-[16.50%]`}>0</th>
@@ -549,13 +501,18 @@ export default function ExpiryReport() {
                                     <th className={`w-[5.50%]`}>0</th>
                                     <th className={`w-[10.75%]`}>0</th>
                                 </tr>
-                                <tr className="h-[25px]">
+                                <tr className="hidden md:table-row h-[25px]">
                                     <th className={'w-[8.75%] invisible'}></th>
                                     <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
                                     <th className={'w-[16.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
                                     <th className={'w-[25.00%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Barcode</th>
                                     <th className={'w-[5.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
                                     <th className={'w-[10.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
+                                </tr>
+                                <tr className="h-[25px] table-row md:hidden">
+                                    <th className={'w-[50.00%] bg-white'}></th>
+                                    <th className={'w-[25.00%] bg-white'}></th>
+                                    <th className={'w-[25.00%] bg-white'}></th>
                                 </tr>
                                 {nonMilkGroups()}
                             </tbody>

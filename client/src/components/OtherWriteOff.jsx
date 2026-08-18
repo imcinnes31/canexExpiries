@@ -173,7 +173,7 @@ export default function OtherWriteOff() {
                     <div className="text-3xl font-serif pt-4">Other Write Offs</div>
                     <div>
                         <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
-                        <input type="number" autoFocus onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                        <input type="text" inputmmode="numeric" pattern="[0-9]*" autoFocus onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
                         <div className="text-lg text-red-600 font-bold py-1">{smallAlert}</div>
                     </div>
                 </div>

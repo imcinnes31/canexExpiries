@@ -8,6 +8,9 @@ import Barcode from 'react-barcode';
 import moment from "moment";
 import cross from "../assets/cross.png";
 import tick from "../assets/check.png";
+import fix from "../assets/wrench.png";
+import move from "../assets/arrow.png";
+import e from "cors";
 
 export default function CheckSection() {
     const [currentSection, setCurrentSection] = useState({});
@@ -21,22 +24,40 @@ export default function CheckSection() {
         productExpiry: null
     });
     const [vendors, setVendors] = useState([]);
+    const [vendorSelect, setVendorSelect] = useState(null);
+    const [sections, setSections] = useState([]);
+    const [sectionSelect, setSectionSelect] = useState(null);
     const [currentDate, setCurrentDate] = useState(null);
     const [smallUPCProducts, setSmallUPCProducts] = useState([]);
     const [smallAlert, setSmallAlert] = useState(null);
-    const [editProduct, setEditProduct] = useState({
-        newName: "",
+    const [changeProduct, setChangeProduct] = useState({
+        newName: null,
         newVendor: null,
         newSmallUPC: null
     });
     const [editingProducts, setEditingProducts] = useState(false);
-    const [editUPC, setEditUPC] = useState(null);
+    const [editProduct, setEditProduct] = useState(null);
+    const [deleteUPC, setDeleteUPC] = useState(null);
+    const [moveUPC, setMoveUPC] = useState(null);
     const [productList, setProductList] = useState(null);
     const [validUPCs, setValidUPCs] = useState(null);
     const [currentDelete, setCurrentDelete] = useState(null);
     const params = useParams();
     const navigate = useNavigate();
 
+    async function getList() {
+        const responseList = await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${params.id}`);
+        if (!responseList.ok) {
+            const message = `An error occurred: ${response.statusText}`;
+            console.error(message);
+            alert("Failed to get list data. Please go back and try again.");
+            return;
+        }
+        const listData = await responseList.json();
+        const sortedListData = listData.sort((a, b) => a.productName.localeCompare(b.productName));
+        setProductList(sortedListData);
+    };
+        
     useEffect(() => {
         function getVendors() {
             const vendorArray = vendorList.map(vendor => vendor.name);
@@ -55,18 +76,6 @@ export default function CheckSection() {
             setSmallUPCProducts(smallUPCDict);
             setCurrentSection(sectionData);
         }
-        async function getList() {
-            const responseList = await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${params.id}`);
-            if (!responseList.ok) {
-                const message = `An error occurred: ${response.statusText}`;
-                console.error(message);
-                alert("Failed to get list data. Please go back and try again.");
-                return;
-            }
-            const listData = await responseList.json();
-            const sortedListData = listData.sort((a, b) => a.productName.localeCompare(b.productName));
-            setProductList(sortedListData);
-        };
         async function getValidUPCs() {
             const responseArray = await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords`);
             if (!responseArray.ok) {
@@ -78,10 +87,26 @@ export default function CheckSection() {
             const upcArray = await responseArray.json();
             setValidUPCs(upcArray);
         }
+        async function getSectionNames() {
+            const response = await fetch(`${REACT_APP_API_URL}/expiries/sections/`); 
+            if (!response.ok) {
+                const message = `An error occurred: ${response.statusText}`;
+                console.error(message);
+                alert("Failed to retrieve section name data. Please try again.")
+                return;
+            }
+            const sectionData = await response.json();
+
+            const filteredSectionData = 
+                sectionData.filter(section => section.sectionNumber > 0).sort((a, b) => a.sectionNumber - b.sectionNumber);
+
+            setSections(filteredSectionData);
+        }
         getVendors();
         getCurrentSection();
         getList();
         getValidUPCs();
+        getSectionNames();
         return;
     }, []);
 
@@ -144,6 +169,32 @@ export default function CheckSection() {
         return setNewProduct((prev) => {
             return { ...prev, ...value };
         });
+    }
+
+    function updateEdit(value) {
+        return setChangeProduct((prev) => {
+            return { ...prev, ...value };
+        });
+    }
+
+    async function enterChangeProduct(upcToEdit) {
+        try {
+            await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${upcToEdit}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(changeProduct)
+            });
+        } catch (error) {
+            console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to edit product. Please try again.")
+        } finally {
+            setChangeProduct({newName: null,newVendor: null,newSmallUPC: null});
+            getList();
+            setEditProduct(null); 
+            window.scrollTo(0,0);
+        }
     }
 
     async function enterNewProduct() {
@@ -327,16 +378,73 @@ export default function CheckSection() {
         });
     }
 
+    async function deleteListProduct(upcToDelete) {
+        try {
+            await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${currentSection._id}&${upcToDelete}`, {
+                method: "DELETE",
+            });
+            setProductList(prevProducts => 
+                prevProducts.filter(product => product.productUPC !== upcToDelete)
+            );
+        } catch (error) {
+            console.error('A problem occurred with your fetch operation: ', error);
+            alert("Failed to delete this product. Please try again.")
+        } finally {
+            setDeleteUPC(null);
+        }
+    }
+
+    async function moveListProduct(upcToMove, sectionMoveTo) {
+        if (sectionMoveTo) {
+            try {
+                await fetch(`${REACT_APP_API_URL}/expiries/allProducts/${currentSection._id}&${sectionMoveTo}&${upcToMove}`, {
+                    method: "PUT",
+                });
+                setProductList(prevProducts => 
+                    prevProducts.filter(product => product.productUPC !== upcToMove)
+                );
+            } catch (error) {
+                console.error('A problem occurred with your fetch operation: ', error);
+                alert("Failed to delete this product. Please try again.")
+            } finally {
+                setMoveUPC(null);
+            }
+        }
+    }
+
     function productEditRows() {
         window.scrollTo(0,0);
         return productList.map((product) => {
             return (
-                <tr className={`${!(nonCreditVendors.includes(product.productVendor)) ? 'bg-green-200' : validUPCs.includes(product.productUPC) ? 'bg-gray-200' : 'bg-red-200'} h-[26px]`}>
-                    <td className={'text-center text-base leading-none'}>{product.productUPC}</td>
-                    <td className={'text-center text-base leading-none'}>{product.productName}</td>
-                    <td className={'text-center text-base leading-none'}>{product.productVendor}</td>
-                    <td className={'text-center text-base leading-none'}>{product.productSmallUPC ? product.productSmallUPC : null}</td>
-                </tr>
+                <>
+                    <tr className={`hidden md:table-row ${validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? 'bg-green-200' : !(nonCreditVendors.includes(product.productVendor)) ? 'bg-yellow-200' : 'bg-red-200'} h-[26px]`}>
+                        <td>
+                            <div className={"flex"}>
+                                <div className={"flex mx-4 w-1/2 items-center justify-center"}>{product.productUPC}</div>                    
+                                <div className={"flex w-1/4 items-center justify-center"}><img className={"w-10 md:w-25 pr-2"} src={fix} onClick={() => {setEditProduct(product)}}/><img className={"w-10 md:w-25 pr-2"} src={move} onClick={() => {setMoveUPC(product.productUPC);}}/>{validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? null : <img className={"w-10 md:w-25 pr-2"} src={cross} onClick={() => {setDeleteUPC(product.productUPC);}}/>}</div>
+                            </div>
+                        </td>
+                        {/* <td className={'text-center text-base leading-none'}>{product.productUPC}</td> */}
+                        <td className={'text-center text-base leading-none'}>{product.productName}</td>
+                        <td className={'text-center text-base leading-none'}>{product.productVendor}</td>
+                        <td className={'text-center text-base leading-none'}>{product.productSmallUPC ? product.productSmallUPC : null}</td>
+                    </tr>
+                    <tr className={`table-row md:hidden border-black border-l-4 border-t-4 border-r-4 ${validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? 'bg-green-200' : !(nonCreditVendors.includes(product.productVendor)) ? 'bg-yellow-200' : 'bg-red-200'} h-[26px]`}>
+                        <td colspan='2'>
+                            <div className={"flex"}>
+                                <div className={"flex mx-4 w-1/2 items-center justify-center text-xl"}>{product.productUPC}</div>                    
+                                <div className={"flex w-1/4 items-center justify-center"}><img className={"w-1/2 py-1 pr-2"} src={fix} onClick={() => {setEditProduct(product);updateEdit({ newName: product.productName, newVendor: product.productVendor, newSmallUPC: product.productSmallUPC ? product.productSmallUPC : null})}}/><img className={"w-1/2 py-1 pr-2"} src={move} onClick={() => {setMoveUPC(product.productUPC);}}/>{validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? null : <img className={"w-1/2 py-1 pr-2"} src={cross} onClick={() => {setDeleteUPC(product.productUPC);}}/>}</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr className={`table-row md:hidden border-black border-l-4 border-r-4 ${validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? 'bg-green-200' : !(nonCreditVendors.includes(product.productVendor)) ? 'bg-yellow-200' : 'bg-red-200'} h-[26px]`}>
+                        <td colspan='2' className={'text-center text-base leading-none py-2 font-bold text-lg'}>{product.productName}</td>
+                    </tr>
+                    <tr className={`table-row md:hidden border-black border-l-4 border-b-4 border-r-4 ${validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? 'bg-green-200' : !(nonCreditVendors.includes(product.productVendor)) ? 'bg-yellow-200' : 'bg-red-200'} h-[26px]`}>
+                        <td className={'text-center text-base leading-none text-md font-bold py-2'}>{product.productVendor}</td>
+                        <td className={'text-center text-base leading-none text-md font-bold py-2'}>{product.productSmallUPC ? product.productSmallUPC : null}</td>
+                    </tr>
+                </>
             );
         });
     }
@@ -345,21 +453,101 @@ export default function CheckSection() {
         <div className="text-center">
             {currentProduct == null ?
                 editingProducts ?
-                    editUPC ?
-                        <div>Specific UPC Edit</div>
+                    editProduct ?
+                        <div className="text-center p-1 font-bold text-lg">
+                            <div className="text-center p-1 font-bold text-2xl mb-4">Editing Product Info For: </div>
+                            <div className="text-center p-1 font-bold text-xl mb-4">{editProduct.productName}</div>
+                            <div className="text-center p-1 font-bold text-xl mb-4">(UPC {editProduct.productUPC})</div>
+                            <div className="justify-items-center">
+                                <div className="lg:w-1/2">
+                                    <div className="">
+                                        <div className="text-l m-auto font-bold lg:w-1/4">Product Name:</div>
+                                        <input defaultValue={editProduct.productName} onChange={(e) => updateEdit({ newName: e.target.value})} type="text" placeholder="Enter Product Name" className={`border-2 border-black px-2 text-xl w-full mb-2 text-center`}/>
+                                    </div>
+                                    <div className="flex">
+                                        <div className="text-l m-auto font-bold w-1/2">Small UPC (If Exists):</div>
+                                        <input defaultValue={editProduct.productSmallUPC ? editProduct.productSmallUPC : ""} onChange={(e) => updateEdit({ newSmallUPC: e.target.value})} type="text" inputmmode="numeric" pattern="[0-9]*" className="px-2 border-2 border-black text-xl w-1/2 text-center"/>
+                                    </div>
+                                </div>
+                            </div> 
+                            <div className="mt-4">
+                                Product Vendor:
+                            </div>  
+                            <select defaultValue={editProduct.productVendor} name="changeVendorMenu" onChange={(e) => {updateEdit({ newVendor: e.target.value})}} className={`border-2 border-black p-1 rounded-md m-4 text-xl font-bold`}>
+                                {vendors
+                                .filter((vendor) => vendor != "Tim Hortons")
+                                .filter((vendor) => vendor != "Farmers Favorite")
+                                .filter((vendor) => vendor != "Quality Deli")
+                                .map(function(i) {
+                                    return <option key={i.replace(" ","")}>{i}</option>;
+                                })}
+                            </select>
+                            {/* <div className={`${((changeProduct.newVendor && changeProduct.newVendor != editProduct.productVendor) || (changeProduct.newName && changeProduct.newName.length > 0 && changeProduct.newName != editProduct.productName) || ((!(editProduct.productSmallUPC) && changeProduct.newSmallUPC && changeProduct.newSmallUPC.length == 8) || (editProduct.productSmallUPC && !(changeProduct.newSmallUPC)) || (editProduct.productSmallUPC && changeProduct.newSmallUPC && changeProduct.newSmallUPC.length == 8 && editProduct.productSmallUPC != changeProduct.newSmallUPC))) ? 'bg-green-400' : 'bg-green-100'}`} onClick={() => {enterChangeProduct(editProduct.productUPC)}}>Save Product Info</div> 
+                            <div className='bg-red-400' onClick={() => {setEditProduct(null);}}>Cancel</div> */}
+                            <div className="flex">
+                                <div onClick={() => {enterChangeProduct(editProduct.productUPC)}} className={`m-auto mr-0 basis-70 text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center ${((changeProduct.newVendor && changeProduct.newVendor != editProduct.productVendor) || (changeProduct.newName && changeProduct.newName.length > 0 && changeProduct.newName != editProduct.productName) || ((!(editProduct.productSmallUPC) && changeProduct.newSmallUPC && changeProduct.newSmallUPC.length == 8) || (editProduct.productSmallUPC && !(changeProduct.newSmallUPC)) || (editProduct.productSmallUPC && changeProduct.newSmallUPC && changeProduct.newSmallUPC.length == 8 && editProduct.productSmallUPC != changeProduct.newSmallUPC))) ? 'bg-green-400' : 'bg-green-100'}`}>
+                                    <div>Save Product Info</div>
+                                    <div className="w-7 ml-1"><img src={tick}/></div>
+                                </div> 
+                                <div onClick={() => {setEditProduct(null);}} className='m-auto ml-0 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center'>
+                                    <div>Cancel</div>
+                                    <div className="w-7 ml-1"><img src={cross}/></div>
+                                </div>
+                            </div>
+                        </div>
+                    : moveUPC ?
+                        <div className="text-center p-1 font-bold text-xl">
+                            <div>
+                                Moving Product: {productList.find(product => product.productUPC === moveUPC).productName} ({moveUPC}) To:
+                            </div>
+                            <select defaultValue={currentSection._id} onChange={(e) => setSectionSelect(e.target.value)} className={`${sectionSelect && (sectionSelect != currentSection._id) ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md mx-4 my-2 text-xl font-bold`}>
+                                {Object.entries(sections).map(([key, value]) => (
+                                    <option key={key} id={value._id} value={value._id}>{value.section}</option>
+                                ))}
+                            </select>
+                            <div className="flex">
+                                <div className={`m-auto mr-0 basis-70 text-xl font-bold border border-black rounded-l-lg flex py-1 text-center justify-center ${sectionSelect && (sectionSelect != currentSection._id) ? 'bg-green-400' : 'bg-green-100'}`} onClick={() => moveListProduct(moveUPC, sectionSelect)}>
+                                    <div>Move Product</div>
+                                    <div className="w-7 ml-1"><img src={tick}/></div>
+                                </div> 
+                                <div className='m-auto ml-0 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center' onClick={() => setMoveUPC(null)}>
+                                    <div>Cancel</div>
+                                    <div className="w-7 ml-1"><img src={cross}/></div>
+                                </div>
+                            </div>
+                        </div>
+                    : deleteUPC ?
+                        <div className="bg-red-200 text-center p-1 font-bold text-xl">
+                            Delete Product: {productList.find(product => product.productUPC === deleteUPC).productName} ({deleteUPC}) From App Database?
+                            <div className="grid grid-cols-2 p-1">
+                                <div onClick={() => deleteListProduct(deleteUPC)} className="bg-green-400 text-xl font-bold border border-black rounded-l-lg flex py-1 justify-center">
+                                    <div className="">Confirm</div>
+                                    <div className="w-7 ml-1"><img src={tick}/></div>
+                                </div>
+                                <div onClick={() => setDeleteUPC(null)} className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center">
+                                    <div className="">Cancel</div>
+                                    <div className="w-7 ml-1"><img src={cross}/></div>
+                                </div>
+                            </div>
+
+                        </div>
                     :
                         <div>
-                            <div className="flex justify-center">
-                                <div className="print:hidden flex justify-center items-center h-10 font-serif font-bold text-center text-lg ml-1 mr-4">{`Product List for ${currentSection.section}`}</div>
-                                <div className="flex h-10 p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => setEditingProducts(false)}>Back to Section Check</div>
+                            <div className="flex justify-center mt-4">
+                                <div className="print:hidden flex justify-center items-center font-serif font-bold text-center text-lg ml-1 mr-4">{`Product List for ${currentSection.section}`}</div>
+                                <div className="flex p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => {setEditingProducts(false)}}>Back to Section Check</div>
                             </div>
                             <table className={"w-full"}>
                                 <tbody>
-                                    <tr className={"h-[24px]"}>
+                                    <tr className={"hidden md:table-row h-[24px]"}>
                                         <th className={`w-[20.00%]`}>UPC</th>
                                         <th className={`w-[60.00%]`}>Product Name</th>
                                         <th className={`w-[10.00%]`}>Vendor</th>
                                         <th className={`w-[10.00%]`}>Small UPC</th>
+                                    </tr>
+                                    <tr className={"table-row md:hidden h-[24px]"}>
+                                        <th className={`w-[50.00%]`}></th>
+                                        <th className={`w-[50.00%]`}></th>
                                     </tr>
                                     {productEditRows()}
                                 </tbody>
@@ -418,7 +606,7 @@ export default function CheckSection() {
                         null :
                         <div>
                             <div className="text-xl font-bold pt-4">Input or Scan Product UPC:</div>
-                            <input type="number" autoFocus={currentSection.section != "Dairy, Tims Section (Cooler 10)"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
+                            <input type="text" inputmmode="numeric" pattern="[0-9]*" autoFocus={currentSection.section != "Dairy, Tims Section (Cooler 10)"} onInput={(e)=>checkInput(e.target.value)} onPaste={(e)=>checkInput(e.target.value)} className="my-3 text-2xl text-center border border-black rounded-md bg-gray-100"/>
                             <div className="text-lg text-red-600 font-bold py-1">{smallAlert}</div>
                         </div>
                     }
@@ -431,11 +619,11 @@ export default function CheckSection() {
                         null
                     }
                     <div className="bg-gray-300 border border-black m-2 text-xl font-bold py-1" onClick={()=> setNewCheckedDate()}>Finished Checking Section</div>
-                    {/* { productList && validUPCs ? 
-                        <div className="flex justify-center my-8">
-                            <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => setEditingProducts(true)}>See Product List</div>                
+                    { productList && validUPCs ? 
+                        <div className="flex justify-center mb-8 mt-16">
+                            <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => setEditingProducts(true)}>Product List</div>                
                         </div>
-                    : null } */}
+                    : null }
                 </div>
             : currentProduct.length > 0 ?
                 <div>
@@ -481,7 +669,7 @@ export default function CheckSection() {
                             </div>
                             <div className="flex">
                                 <div className="text-l m-auto font-bold lg:w-1/4">Small UPC (If Exists):</div>
-                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" className="px-2 border-2 border-black text-xl lg:w-3/4"/>
+                                <input onChange={(e) => updateNew({ productSmallUPC: e.target.value})} type="text" inputmmode="numeric" pattern="[0-9]*" className="px-2 border-2 border-black text-xl lg:w-3/4"/>
                             </div>
                         </div> 
                     </div>           

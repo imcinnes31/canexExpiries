@@ -498,7 +498,7 @@ export default function CheckSection() {
                     : moveUPC ?
                         <div className="text-center p-1 font-bold text-xl">
                             Moving Product: {productList.find(product => product.productUPC === moveUPC).productName} ({moveUPC}) To:
-                            <select defaultValue={currentSection._id} onChange={(e) => setSectionSelect(e.target.value)} className={`${sectionSelect && (sectionSelect != currentSection._id) ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md mx-4 my-2 text-xl font-bold`}>
+                            <select defaultValue={currentSection._id} onChange={(e) => setSectionSelect(e.target.value)} className={`${sectionSelect && (sectionSelect != currentSection._id) ? 'border-2 border-black' : 'border-2 border-red-500'} p-1 rounded-md my-2 text-xl font-bold`}>
                                 {Object.entries(sections).map(([key, value]) => (
                                     <option key={key} id={value._id} value={value._id}>{value.section}</option>
                                 ))}

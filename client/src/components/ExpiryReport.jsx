@@ -90,7 +90,7 @@ export default function ExpiryReport() {
     function NonMilkRow(props) {
         return (
             <>
-                <tr className="hidden md:table-row h-[25px]">
+                <tr className="hidden print:table-row md:table-row h-[25px]">
                     <td className={'border-none leading-none'}></td>
                     <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
                     <td className={'text-center text-base leading-none'}>{props.productUPC}</td>
@@ -112,11 +112,11 @@ export default function ExpiryReport() {
                     <td className={'text-center text-base font-bold leading-none'}>{props.totalProducts}</td>
                     <td className={'text-center text-base leading-none'}>{props.totalType == "store" ? "Store Use" : titleCase(props.totalType)}</td>
                 </tr>
-                <tr className="table-row md:hidden border-black border-l-4 border-t-4 border-r-4 h-[25px]">
+                <tr className="table-row print:hidden md:hidden border-black border-l-4 border-t-4 border-r-4 h-[25px]">
                     <td className={'text-center text-xs leading-none'}>{props.productInfo.productName}</td>
                     <td className={'text-center text-base leading-none'} colspan='2'>{props.productUPC}</td>
                 </tr>
-                <tr className="table-row md:hidden border-black border-l-4 border-b-4 border-r-4 h-[25px]">
+                <tr className="table-row print:hidden md:hidden border-black border-l-4 border-b-4 border-r-4 h-[25px]">
                     <td className={'text-center text-base text-base leading-none leading-none'}>
                         {props.totalProducts > 0 ? 
                             <div className="flex justify-center items-center h-full w-full">
@@ -159,7 +159,7 @@ export default function ExpiryReport() {
 
         return(
             <>
-                <tr className={`hidden md:table-row ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                <tr className={`hidden print:table-row md:table-row ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
                     {props.productIndex == 0 ? 
                         <td className={'text-center border-none'} rowSpan={props.totalProducts}>{props.productSize}</td> 
                     : null}
@@ -182,14 +182,14 @@ export default function ExpiryReport() {
                         : null}
                     </td>
                 </tr>
-                <tr className={`table-row md:hidden border-l-4 border-t-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                <tr className={`table-row print:hidden md:hidden border-l-4 border-t-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
                     {props.productIndex == 0 ? 
                         <td className={'text-center border-none'} rowSpan={props.totalProducts * 2}>{props.productSize}</td> 
                     : null}
                     <td className={'border-l-4 border-black text-center text-base leading-none'}>{props.currentProduct.desc}</td>
                     <td className={'border-l-4 border-black text-center font-bold text-base leading-none'}>{productAmounts ? productAmounts : null}</td>
                 </tr>
-                <tr className={`table-row md:hidden border-l-4 border-b-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
+                <tr className={`table-row print:hidden md:hidden border-l-4 border-b-4 border-r-4 border-black ${props.groupIndex == 0 ? 'bg-green-100' : props.groupIndex == 1 ? 'bg-blue-100' : props.groupIndex == 2 ? 'bg-orange-100' : 'bg-red-200'} h-[26px]`}>
                     {/* {props.productIndex == 0 ? 
                         <td className={'text-center border-none'} rowSpan={props.totalProducts * 2}>{props.productSize}</td> 
                     : null} */}
@@ -232,14 +232,14 @@ export default function ExpiryReport() {
             <div>
                 <table className={`w-full`}>
                     <tbody>
-                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} hidden md:table-row h-[27px]`}>
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} hidden print:table-row md:table-row h-[27px]`}>
                             <th className={'w-[8.75%] bg-white'}></th>
                             <th className={'w-[12.75%] bg-white'}></th>
                             <th className={`w-[20.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>UPC</th>
                             <th className={`w-[32.75%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Qty</th>
                             <th className={`w-[25.00%] ${props.groupIndex == 0 ? "border-black border-2" : ""} bg-gray-100 text-xl font-normal leading-none`}>Barcode</th>
                         </tr> 
-                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} table-row md:hidden h-[27px]`}>
+                        <tr className={`${props.groupIndex > 0 ? "invisible" : ""} table-row print:hidden md:hidden h-[27px]`}>
                             <th className={'w-[20.00%] bg-white'}></th>
                             <th className={'w-[35.00%] bg-white'}></th>
                             <th className={`w-[45.00%] bg-white`}></th>
@@ -493,7 +493,7 @@ export default function ExpiryReport() {
                         </div>
                         <table className={'w-full'}>
                             <tbody>
-                                <tr className={"hidden md:table-row invisible h-[24px]"}>
+                                <tr className={"hidden print:table-row md:table-row invisible h-[24px]"}>
                                     <th className={'w-[8.75%]'}>0</th>
                                     <th className={'w-[33.50%]'}>0</th>
                                     <th className={`w-[16.50%]`}>0</th>
@@ -501,7 +501,7 @@ export default function ExpiryReport() {
                                     <th className={`w-[5.50%]`}>0</th>
                                     <th className={`w-[10.75%]`}>0</th>
                                 </tr>
-                                <tr className="hidden md:table-row h-[25px]">
+                                <tr className="hidden print:table-row md:table-row h-[25px]">
                                     <th className={'w-[8.75%] invisible'}></th>
                                     <th className={'w-[33.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Item Description</th>
                                     <th className={'w-[16.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>UPC</th>
@@ -509,7 +509,7 @@ export default function ExpiryReport() {
                                     <th className={'w-[5.50%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Qty</th>
                                     <th className={'w-[10.75%] bg-gray-100 border-2 border-black text-xl font-normal leading-none'}>Reason</th>
                                 </tr>
-                                <tr className="h-[25px] table-row md:hidden">
+                                <tr className="h-[25px] table-row print:hidden md:hidden">
                                     <th className={'w-[50.00%] bg-white'}></th>
                                     <th className={'w-[25.00%] bg-white'}></th>
                                     <th className={'w-[25.00%] bg-white'}></th>

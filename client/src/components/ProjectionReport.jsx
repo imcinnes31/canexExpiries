@@ -19,9 +19,9 @@ function daysIntoFourJulian(date){
     return (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber) + String(date.getFullYear() - 2020 - 1);
 }
 
-function daysIntoFiveJulian(date){
+function daysIntoFiveJulian(date,isCurrentYear){
     const dayNumber = (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
-    return String(date.getFullYear() - 2000 - 1) + (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber);
+    return String(date.getFullYear() - 2000 - (isCurrentYear ? 1 : 0)) + (dayNumber < 100 ? "0" : "") + (dayNumber < 10 ? "0" : "") + String(dayNumber);
 }
 
 export default function ProjectionReport() {
@@ -65,13 +65,13 @@ export default function ProjectionReport() {
         return(
             props.id != currentDelete ?
             <tr id={props.id} className="h-10 border-none">
-                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} {props.product.type == "discount" ? " - 50% OFF (Exp. " + monthNames[parseInt((props.product.productExpiry.substring(5,7))) - 1] + " " + parseInt((props.product.productExpiry.substring(8,10))) + ")": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
+                <td className={`text-xl border-none pr-3 grow ${props.product.productVendor == "Tim Hortons" ? "text-black" : props.product.type == "discount" ? "text-blue-700" : props.product.type == "nonCreditTrue" ? "text-green-700" : "text-red-600"}`}>* {props.product.productName} {fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate,true) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate,false) + ")" :""} {props.product.type == "discount" ? " - 50% OFF (Exp. " + monthNames[parseInt((props.product.productExpiry.substring(5,7))) - 1] + " " + parseInt((props.product.productExpiry.substring(8,10))) + ")": ""} {props.product.productExpiryNote != null ? " - " + props.product.productExpiryNote : null}</td>
                 <td className="border-none w-15 print:hidden"><div className="border border-black bg-red-600 h-10 w-10 p-1" onClick={() => setCurrentDelete(props.id)}><img src={cross}/></div></td>
             </tr>
             :
             <tr id={props.id} className="h-10 border-none bg-red-200">
                 <td colSpan="2">
-                    <div className="text-center text-lg font-bold m-1">{`Confirm all items of ${props.product.productName} expiring ${convertExpiryDate.toDateString()} ${fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate) + ")" :""} are gone?`}</div>
+                    <div className="text-center text-lg font-bold m-1">{`Confirm all items of ${props.product.productName} expiring ${convertExpiryDate.toDateString()} ${fiveDigitJulianProducts.includes(props.product.productUPC) ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate,true) + ")" : props.product.productVendor == "M&M Food Market" ? "(Lot# " + daysIntoFourJulian(convertExpiryDate) + ")" : props.product.productSection == "Cottage Candy" ? "(Lot# " + daysIntoFiveJulian(convertExpiryDate,false) + ")" :""} are gone?`}</div>
                     <div className="flex">
                         <div className="w-1/2 bg-green-400 font-serif font-bold m-2 text-center border border-black" onClick={() => soldOutProduct(props.id,props.product.productExpiryNumber)}>Confirm</div>
                         <div className="w-1/2 bg-red-400 font-serif font-bold m-2 text-center border border-black" onClick={() => setCurrentDelete(null)}>Cancel</div>

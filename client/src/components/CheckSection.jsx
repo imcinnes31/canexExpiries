@@ -318,7 +318,7 @@ export default function CheckSection() {
                 if (d.getDate() == 1) {
                     expiryDateList.push({
                         id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                        name: (monthNames[d.getMonth()] + " " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
+                        name: (monthNames[d.getMonth()] + " " + d.getFullYear()),
                         last: i == currentSection.expiryRange ? true : false,
                         section: currentSection.section,
                         expiryMonth: d.getMonth()
@@ -327,7 +327,7 @@ export default function CheckSection() {
             } else {
                 expiryDateList.push({
                     id: String(d.getFullYear()) + ((d.getMonth() + 1) < 10 ? "0" : "") + String(d.getMonth() + 1) + (d.getDate() < 10 ? "0" : "") + String(d.getDate()),
-                    name: (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" || fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
+                    name: (monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()) + (currentSection.section == "Cottage Candy" ? ` OR ${d.getFullYear() - 2000}${daysIntoJulian(d)}` : fiveDigitJulianProducts.includes(currentUPC) ? ` OR ${d.getFullYear() - 2000 - 1}${daysIntoJulian(d)}` : currentSection.section == "Frozen" ? ` OR ${daysIntoJulian(d)}${d.getFullYear() - 2020 - 1}` : ""),
                     last: i == currentSection.expiryRange ? true : false,
                     section: currentSection.section,
                     expiryMonth: d.getMonth()

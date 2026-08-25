@@ -453,7 +453,7 @@ export default function ExpiryReport() {
                     <div className="text-center justify-center">
                         <div className="font-serif text-2xl font-bold">Correcting Record For:</div>
                         <div className="text-xl">{`${productReport[expiryRecords[editItem].productUPC].productName} (${expiryRecords[editItem].productUPC})`}</div>
-                        <div className="text-xl font-bold">{"Written off on " + monthNames[parseInt(expiryRecords[editItem].writeOffDate.substring(5,7)) - 1] + " " + parseInt(expiryRecords[editItem].writeOffDate.substring(9,11)) + ", " + expiryRecords[editItem].writeOffDate.substring(0,4)}</div>
+                        <div className="text-xl font-bold">{"Written off on " + monthNames[parseInt(expiryRecords[editItem].writeOffDate.substring(5,7)) - 1] + " " + parseInt(expiryRecords[editItem].writeOffDate.substring(8,10)) + ", " + expiryRecords[editItem].writeOffDate.substring(0,4)}</div>
                         <div className="flex mt-4 justify-center">
                             <div className="mx-1 my-auto text-lg font-serif font-bold">Edit Amount:</div>
                             <select name="editAmountMenu" value={editAmount} onChange={(e) => setEditAmount(e.target.value)} className="text-xl basis-24 py-1 font-bold border border-black rounded-md">

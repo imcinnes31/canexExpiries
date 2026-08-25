@@ -193,7 +193,6 @@ export default function CheckSection() {
             setChangeProduct({newName: null,newVendor: null,newSmallUPC: null});
             getList();
             setEditProduct(null); 
-            window.scrollTo(0,0);
         }
     }
 
@@ -229,14 +228,6 @@ export default function CheckSection() {
                 console.error('A problem occurred with your fetch operation: ', error);
                 alert("Failed to add new product. Please try again.")
             } finally {
-                const response = await fetch(`${REACT_APP_API_URL}/expiries/products/${currentUPC}`);
-                if (!response.ok) {
-                    const message = `An error occurred: ${response.statusText}`;
-                    console.error(message);
-                    alert("Failed to retrieve product data. Please try again.")
-                    return;
-                }
-                const productData = await response.json();
                 setCurrentProduct(null); 
                 window.scrollTo(0,0);
             }
@@ -413,7 +404,6 @@ export default function CheckSection() {
     }
 
     function productEditRows() {
-        window.scrollTo(0,0);
         return productList.map((product) => {
             return (
                 <>
@@ -533,7 +523,7 @@ export default function CheckSection() {
                         <div>
                             <div className="flex justify-center mt-4">
                                 <div className="print:hidden flex justify-center items-center font-serif font-bold text-center text-lg ml-1 mr-4">{`Product List for ${currentSection.section}`}</div>
-                                <div className="flex p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => {setEditingProducts(false)}}>Back to Section Check</div>
+                                <div className="flex p-1 items-center border-2 border-black text-center font-serif text-l font-bold bg-red-400 justify-center rounded-lg" onClick={() => {setEditingProducts(false);}}>Back to Section Check</div>
                             </div>
                             <table className={"w-full"}>
                                 <tbody>
@@ -619,7 +609,7 @@ export default function CheckSection() {
                     <div className="bg-gray-300 border border-black m-2 text-xl font-bold py-1" onClick={()=> setNewCheckedDate()}>Finished Checking Section</div>
                     { productList && validUPCs ? 
                         <div className="flex justify-center mb-8 mt-16">
-                            <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => setEditingProducts(true)}>Product List</div>                
+                            <div className="flex w-1/2 h-10 p-1 items-center mx-1 border-2 border-black text-center font-serif text-l font-bold bg-purple-400 justify-center rounded-lg" onClick={() => {setEditingProducts(true);window.scrollTo(0,0);}}>Product List</div>                
                         </div>
                     : null }
                 </div>

@@ -352,7 +352,7 @@ export default function ExpiryReport() {
                 <td>
                     <div className={"flex"}>
                         <div className={"flex w-1/2 flex items-center justify-center"}>{props.entry.recordAmount}</div>                    
-                        <div className={"flex w-1/2 flex items-center justify-center"}><img className={"w-100 sm:w-1/2 pr-2"} src={fix} onClick={() => {setEditItem(props.entry.recordId);setEditAmount(props.entry.recordAmount);setEditReason(props.entry.recordReason ? props.entry.recordReason : 'expired')}}/></div>
+                        <div className={"flex w-1/2 flex items-center justify-center"}><img className={"w-100 sm:w-1/2 pr-2"} src={fix} onClick={() => {setEditItem(props.entry.recordId);setEditAmount(props.entry.recordAmount);setEditReason(props.entry.recordReason ? props.entry.recordReason : 'expired');}}/></div>
                     </div>
                 </td>
                 <td className={"text-center"}>{props.entry.recordReason == "store" ? 'Store Use' : titleCase(props.entry.recordReason)}</td>

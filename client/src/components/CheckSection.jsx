@@ -404,14 +404,14 @@ export default function CheckSection() {
     }
 
     function productEditRows() {
-        return productList.map((product) => {
+        return productList.map((product, index) => {
             return (
                 <>
                     <tr className={`hidden md:table-row ${validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? 'bg-green-200' : !(nonCreditVendors.includes(product.productVendor)) ? 'bg-yellow-200' : 'bg-red-200'} h-[26px]`}>
                         <td>
                             <div className={"flex"}>
                                 <div className={"flex mx-4 w-1/2 items-center justify-center"}>{product.productUPC}</div>                    
-                                <div className={"flex w-1/4 items-center justify-center"}><img className={"w-10 md:w-25 pr-2"} src={fix} onClick={() => {setEditProduct(product)}}/><img className={"w-10 md:w-25 pr-2"} src={move} onClick={() => {setMoveUPC(product.productUPC);}}/>{validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? null : <img className={"w-10 md:w-25 pr-2"} src={cross} onClick={() => {setDeleteUPC(product.productUPC);}}/>}</div>
+                                <div className={"flex w-1/4 items-center justify-center"}><img className={"w-10 md:w-25 pr-2"} src={fix} onClick={() => {setEditProduct(product);}}/><img className={"w-10 md:w-25 pr-2"} src={move} onClick={() => {setMoveUPC(product.productUPC);}}/>{validUPCs.includes(product.productUPC) || product.productExpiryCount > 0 ? null : <img className={"w-10 md:w-25 pr-2"} src={cross} onClick={() => {setDeleteUPC(product.productUPC);}}/>}</div>
                             </div>
                         </td>
                         {/* <td className={'text-center text-base leading-none'}>{product.productUPC}</td> */}
@@ -498,7 +498,7 @@ export default function CheckSection() {
                                     <div>Move Product</div>
                                     <div className="w-7 ml-1"><img src={tick}/></div>
                                 </div> 
-                                <div className='m-auto ml-0 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center' onClick={() => setMoveUPC(null)}>
+                                <div className='m-auto ml-0 basis-30 bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center' onClick={() => {setMoveUPC(null);}}>
                                     <div>Cancel</div>
                                     <div className="w-7 ml-1"><img src={cross}/></div>
                                 </div>
@@ -512,7 +512,7 @@ export default function CheckSection() {
                                     <div className="">Confirm</div>
                                     <div className="w-7 ml-1"><img src={tick}/></div>
                                 </div>
-                                <div onClick={() => setDeleteUPC(null)} className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center">
+                                <div onClick={() => {setDeleteUPC(null);}} className="bg-red-400 text-xl text-center font-bold border border-black rounded-r-lg flex py-1 justify-center">
                                     <div className="">Cancel</div>
                                     <div className="w-7 ml-1"><img src={cross}/></div>
                                 </div>

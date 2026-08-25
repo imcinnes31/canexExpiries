@@ -163,32 +163,33 @@ function pullList(products, setProducts, pullAmounts, setPullAmounts, setProduct
         setPullAmounts(currentPulls => ({...currentPulls, [e.target.id.replace("numberPull","")]: currentPull}));
     }
 
+    // TODO: Combine these two fetches in one (the POST one so it calls if recording true)
     async function deleteProduct(divID, recording = null) {
         // the ID of the div where the buttons are is the product UPC plus the string of the expiry date
         const prodUPC = divID.substring(0,12);
         const prodExpiry = divID.substring(12,20);
-        try {
-            await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}&${prodExpiry}`, {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            // this calls another fetch which adds the number of products pulled to another collection of records
-            const currentPull = pullAmounts[divID];
-            if (currentPull['clicked'] == false) {
-                currentPull['clicked'] = true;
-                setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+        const currentPull = pullAmounts[divID];
+        if (currentPull['clicked'] == false) {
+            currentPull['clicked'] = true;
+            try {
                 if (recording == true) {
-                    await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${divID.substring(0,12)}&${pullAmounts[divID]['amount']}&expired`, {
+                    await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${prodUPC}&${pullAmounts[divID]['amount']}&expired&${prodExpiry}&true`, {
                         method: "POST",
                     });
+                } else {
+                    await fetch(`${REACT_APP_API_URL}/expiries/products/${prodUPC}&${prodExpiry}`, {
+                        method: "DELETE",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
                 }
+                setPullAmounts(currentPulls => ({...currentPulls, [divID]: currentPull}));
+            } catch (error) {
+                console.error('A problem occurred with your fetch operation: ', error);
+                console.error(error);
+                alert("Failed to remove expiry date from product. Please try again.")
             }
-        } catch (error) {
-          console.error('A problem occurred with your fetch operation: ', error);
-          console.error(error);
-          alert("Failed to remove expiry date from product. Please try again.")
         }
     } 
 

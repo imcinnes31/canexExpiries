@@ -149,7 +149,7 @@ export default function OtherWriteOff() {
     async function writeOffProduct() {
         if (reason && amount > 0) {
             try {
-                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${currentUPC}&${amount}&${reason}`, {
+                await fetch(`${REACT_APP_API_URL}/expiries/expiryRecords/${currentUPC}&${amount}&${reason}&null&false`, {
                     method: "POST",
                 });
             } catch (error) {

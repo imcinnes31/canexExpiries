@@ -549,7 +549,7 @@ export default function CheckSection() {
                         <div className="text-2xl font-serif font-bold">*Saturday Check - Just Tim's Dispenser / Dairyland Cartons and Jugs*</div>
                     : null}
                     <div className="text-2xl font-serif">Check for any products expiring until:</div>
-                    {currentSection.section == "Health & Beauty" 
+                    {currentSection.section == "Health & Beauty" || currentSection.section == "Protein Powders" 
                         ?
                         <div className="text-2xl font-bold">{monthNames[addDays(currentSection.expiryRange).getMonth()] + " " + addDays(currentSection.expiryRange).getFullYear()}</div>
                         :
